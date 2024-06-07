@@ -1,0 +1,50 @@
+syntax = "proto3";
+
+package actor;
+
+option php_namespace = "Phluxor\\ActorSystem\\ProtoBuf";
+option php_metadata_namespace = "Phluxor\\Metadata\\ProtoBuf";
+
+message PID {
+  string address = 1;
+  string id = 2;
+  uint32 request_id = 3;
+}
+
+//user messages
+message PoisonPill {
+}
+
+message DeadLetterResponse {
+  PID target = 1;
+}
+
+//system messages
+message Watch {
+  PID watcher = 1;
+}
+
+message Unwatch {
+  PID watcher = 1;
+}
+
+message Terminated {
+  PID who = 1;
+  TerminatedReason why = 2;
+}
+
+enum TerminatedReason {
+  Stopped = 0;
+  AddressTerminated = 1;
+  NotFound = 2;
+}
+
+message Stop {
+}
+
+message Touch {
+}
+
+message Touched {
+  PID who = 1;
+}

@@ -1,0 +1,68 @@
+{
+  "name": "phluxor/phluxor",
+  "description": "A toolkit for flexible actor models in PHP, empowering the PHP ecosystem",
+  "license": "Apache-2.0",
+  "type": "library",
+  "keywords": [
+    "actor",
+    "actor-model",
+    "actor-system",
+    "actor-toolkit",
+    "async",
+    "swoole"
+  ],
+  "authors": [
+    {
+      "name": "Yuuki Takezawa",
+      "email": "yuuki.takezawa@comnect.jp.net"
+    }
+  ],
+  "require": {
+    "php": "^8.3",
+    "ramsey/uuid": "^4.7.5",
+    "pascaldevink/shortuuid": "^4.0.0",
+    "psr/log": "^3.0",
+    "google/protobuf": "v4.26.1",
+    "monolog/monolog": "^3.6.0",
+    "ext-swoole": "^5.0"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^10.5.11",
+    "phpstan/phpstan": "^1.10.67",
+    "swoole/ide-helper": "^5.0.0",
+    "squizlabs/php_codesniffer": "^3.10.1",
+    "slevomat/coding-standard": "^8.15.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "Phluxor\\": "src/Phluxor/"
+    },
+    "files": [
+      "src/Phluxor/ActorSystem/middleware_chain.php"
+    ]
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Test\\": "tests"
+    }
+  },
+  "scripts": {
+    "tests": [
+      "./vendor/bin/phpunit"
+    ],
+    "cs": [
+      "phpcs --standard=./phpcs.xml src tests"
+    ],
+    "cs-fix": [
+      "./vendor/bin/phpcbf src tests"
+    ]
+  },
+  "config": {
+    "optimize-autoloader": true,
+    "preferred-install": "dist",
+    "sort-packages": true,
+    "allow-plugins": {
+      "dealerdirect/phpcodesniffer-composer-installer": true
+    }
+  }
+}
