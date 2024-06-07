@@ -34,7 +34,7 @@ now local actors are supported, and remote actors are in progress.
 
 ## Supervision
 
-exception handling is done by the actor system, and the actor system can be supervised by another actor system.
+exception handling is done by the actor system, and the actor can be supervised by parent , root actors.
 
 - `OneForOneStrategy`
 - `AllForOneStrategy`
