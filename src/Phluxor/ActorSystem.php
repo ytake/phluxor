@@ -74,7 +74,7 @@ class ActorSystem
         $actor->extentions = new ContextExtensions();
         $actor->processRegistry->add(new EventStreamProcess($actor), 'eventstream');
         $actor->stopped = false;
-        $actor->subscribeSuperVision($actor);
+        $actor->subscribeSupervision($actor);
         $actor->logger->info('actor system started', ['id' => $actor->id]);
         return $actor;
     }
@@ -190,7 +190,7 @@ class ActorSystem
         return $this->extentions;
     }
 
-    private function subscribeSuperVision(ActorSystem $system): void
+    private function subscribeSupervision(ActorSystem $system): void
     {
         $system->getEventStream()?->subscribe(
             function (mixed $event) use ($system) {

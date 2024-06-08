@@ -21,9 +21,13 @@ class SliceMap
 
     public function getBucket(string $key): ConcurrentMap
     {
-        $hash = $this->seedSum32(0, unpack('C*', $key));
-        $index = $hash % 1024;
-        return $this->fixedArray[$index];
+        $pack = unpack('C*', $key);
+        if ($pack !== false) {
+            $hash = $this->seedSum32(0, $pack);
+            $index = $hash % 1024;
+            return $this->fixedArray[$index];
+        }
+        return new ConcurrentMap();
     }
 
     private function SeedSum32(int $seed, array $data): int
@@ -56,17 +60,17 @@ class SliceMap
         $h1 ^= $clen;
         $h1 = $this->finalizeHash32($h1);
 
-        return $h1;
+        return $h1 & 0xffffffff;
     }
 
-    function multiplyAndRotate(int $value, int $multiplier, int $rot): int
+    private function multiplyAndRotate(int $value, int $multiplier, int $rot): int
     {
         $value *= $multiplier;
         $value = intval($value);
         return ($value << $rot) | ($value >> (32 - $rot));
     }
 
-    function finalizeHash32(int $h): int
+    private function finalizeHash32(int $h): int
     {
         $h ^= $h >> 16;
         $h *= 0x85ebca6b;
