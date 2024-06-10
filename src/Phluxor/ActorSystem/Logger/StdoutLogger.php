@@ -20,6 +20,7 @@ class StdoutLogger implements LoggerInterface
     public function __invoke(ActorSystem $actorSystem): PsrLoggerInterface
     {
         $log = new Logger('Phluxor');
+        $log->useLoggingLoopDetection(false);
         $log->pushHandler(new StreamHandler('php://stdout', Level::Info));
         return $log;
     }
