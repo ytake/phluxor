@@ -434,7 +434,7 @@ class ActorContext implements
             $this->logger()->error("poison pid is null");
             return;
         }
-        $pid->sendSystemMessage(
+        $pid->sendUserMessage(
             $this->actorSystem,
             new ActorSystem\ProtoBuf\PoisonPill()
         );
