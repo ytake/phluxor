@@ -12,6 +12,8 @@ use Phluxor\Value\ContextExtensionId;
 use Psr\Log\LoggerInterface;
 use Swoole\Atomic\Long;
 
+use Throwable;
+
 use function sprintf;
 
 class ActorContext implements
@@ -465,8 +467,8 @@ class ActorContext implements
         }
         $influenceTimeout = true;
         if ($this->receiveTimeout->s > 0) {
+            // TODO need metrics
         }
-        //
         $this->processMessage($message);
     }
 
@@ -723,7 +725,11 @@ class ActorContext implements
 
     public function escalateFailure(mixed $reason, mixed $message): void
     {
-        $this->logger()->info("Recovering", ['self' => $this->self, 'reason' => $reason]);
+        $reports = ['self' => $this->self, 'reason' => $reason];
+        if ($reason instanceof Throwable) {
+            $reports = ['self' => $this->self, 'reason' => $reason, 'stack' => $reason->getTraceAsString()];
+        }
+        $this->logger()->info("Recovering", $reports);
         if ($this->actorSystem->config()->developerSupervisionLogging()) {
             $this->logger()->error(
                 "Supervision",

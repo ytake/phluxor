@@ -11,8 +11,10 @@ use Phluxor\ActorSystem\Message\MessageEnvelope;
 use Phluxor\ActorSystem\Message\ResumeMailbox;
 use Phluxor\ActorSystem\Message\SuspendMailbox;
 use Phluxor\ActorSystem\QueueInterface;
+use Phluxor\ActorSystem\QueueResult;
 use Phluxor\Mspc\Queue as MpscQueue;
 use Swoole\Atomic;
+use Swoole\FastCGI\Message;
 use Throwable;
 
 class DefaultMailbox implements MailboxInterface
@@ -184,10 +186,18 @@ class DefaultMailbox implements MailboxInterface
      */
     protected function handleSystemMessage(mixed $msg): void
     {
-        match ($msg) {
-            ($msg instanceof SuspendMailbox) => $this->suspended->set(1),
-            ($msg instanceof ResumeMailbox) => $this->suspended->set(0),
-            default => $this->invoker?->invokeSystemMessage($msg),
+        if ($msg instanceof QueueResult) {
+            $msg = $msg->value();
+        }
+        switch (true) {
+            case $msg instanceof SuspendMailbox:
+                $this->suspended->set(1);
+                break;
+            case $msg instanceof ResumeMailbox:
+                $this->suspended->set(0);
+                break;
+            default:
+                $this->invoker?->invokeSystemMessage($msg);
         };
         foreach ($this->middlewares as $middleware) {
             $middleware->messageReceived($msg);
@@ -200,6 +210,9 @@ class DefaultMailbox implements MailboxInterface
      */
     protected function handleUserMessage(mixed $msg): void
     {
+        if ($msg instanceof QueueResult) {
+            $msg = $msg->value();
+        }
         $this->invoker?->invokeUserMessage($msg);
         foreach ($this->middlewares as $middleware) {
             $middleware->messageReceived($msg);

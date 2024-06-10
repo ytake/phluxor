@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package Test.Persistence.ProtoBuf;
+
+option php_namespace = "Test\\Persistence\\ProtoBuf";
+option php_metadata_namespace = "Test\\Metadata";
+
+message TestMessage {
+  string message = 1;
+}
+
+message TestSnapshot {
+  string message = 1;
+}

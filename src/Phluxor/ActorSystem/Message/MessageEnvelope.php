@@ -8,8 +8,6 @@ use Phluxor\ActorSystem\Pid;
 use Phluxor\ActorSystem\QueueResult;
 use Phluxor\ActorSystem\ReadonlyMessageHeaderInterface;
 
-use function Swoole\Coroutine\Http\request;
-
 readonly class MessageEnvelope
 {
     /**
@@ -113,7 +111,7 @@ readonly class MessageEnvelope
         if ($message instanceof QueueResult) {
             $msg = $message->value();
             if ($msg instanceof MessageEnvelope) {
-                return $msg->message;
+                return $msg->getMessage();
             }
             return $msg;
         }
