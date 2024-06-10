@@ -8,6 +8,7 @@ use function array_key_exists;
 
 class ConcurrentMap
 {
+    /** @var ConcurrentMapShared[] */
     private array $map = [];
 
     private const int SHARD_COUNT = 32;

@@ -9,33 +9,44 @@ use Phluxor\ActorSystem\Context\ContextInterface;
 use Phluxor\ActorSystem\Context\ReceiverInterface;
 use Phluxor\ActorSystem\Context\ReceiverPartInterface;
 use Phluxor\ActorSystem\Message\MessageEnvelope;
-use Phluxor\Persistence\Message\Replay;
 use Phluxor\Persistence\Message\ReplayComplete;
 use Phluxor\Persistence\Message\RequestSnapshot;
 use RuntimeException;
 
-class Mixin implements PersistentInterface
+trait Mixin
 {
-    public function __construct(
-        private string $name,
-        private ReceiverPartInterface $receiver,
-        private ProviderStateInterface|null $providerState = null,
-        private int $eventIndex = 0,
-        private bool $recovering = true
-    ) {
-    }
+    /** @var int */
+    private int $eventIndex = 0;
+
+    /** @var bool */
+    private bool $recovering = true;
+
+    /** @var string */
+    private string $name = '';
+
+    /** @var ReceiverPartInterface */
+    private ReceiverPartInterface $receiver;
+
+    /** @var ProviderStateInterface|null */
+    private ProviderStateInterface|null $providerState = null;
 
     public function recovering(): bool
     {
         return $this->recovering;
     }
 
-    public function init(ProviderInterface $provider, ContextInterface $context): void
-    {
+    /**
+     * @param ProviderInterface $provider
+     * @param ContextInterface|ReceiverInterface $context
+     * @return void
+     */
+    public function init(
+        ProviderInterface $provider,
+        ContextInterface|ReceiverInterface $context
+    ): void {
         if ($this->providerState == null) {
             $this->providerState = $provider->getState();
         }
-
         $receiver = $context;
         $name = $context->self()?->protobufPid()->getId() ?? '';
         if ($name === '') {
@@ -43,23 +54,23 @@ class Mixin implements PersistentInterface
         }
         $this->name = $name;
         $this->providerState->restart();
-        $receiver->receive(new MessageEnvelope(header: null, message: new Replay()));
+        $this->receiver = $receiver;
         $result = $this->providerState->getSnapshot($this->name());
         if ($result->isOk()) {
             $this->eventIndex = $result->getEventIndex();
-            $receiver->receive(new MessageEnvelope(header: null, message: $result->getSnapshot()));
+            $this->receiver->receive(new MessageEnvelope(header: null, message: $result->getSnapshot()));
         }
         $this->providerState->getEvents(
             $this->name(),
             $this->eventIndex,
             0,
             function (mixed $event) use ($receiver) {
-                $receiver->receive(new MessageEnvelope(header: null, message: $event));
+                $this->receiver->receive(new MessageEnvelope(header: null, message: $event));
                 $this->eventIndex++;
             }
         );
         $this->recovering = false;
-        $receiver->receive(new MessageEnvelope(header: null, message: new ReplayComplete()));
+        $this->receiver->receive(new MessageEnvelope(header: null, message: new ReplayComplete()));
     }
 
     public function persistenceReceive(Message $message): void

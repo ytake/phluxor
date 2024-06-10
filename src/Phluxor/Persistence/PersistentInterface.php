@@ -6,15 +6,16 @@ namespace Phluxor\Persistence;
 
 use Google\Protobuf\Internal\Message;
 use Phluxor\ActorSystem\Context\ContextInterface;
+use Phluxor\ActorSystem\Context\ReceiverInterface;
 
 interface PersistentInterface
 {
     /**
      * @param ProviderInterface $provider
-     * @param ContextInterface $context
+     * @param ContextInterface|ReceiverInterface $context
      * @return void
      */
-    public function init(ProviderInterface $provider, ContextInterface $context): void;
+    public function init(ProviderInterface $provider, ContextInterface|ReceiverInterface $context): void;
 
     /**
      * @param Message $message

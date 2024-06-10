@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Test\ActorSystem\Mailbox;
 
 use Swoole\Coroutine\WaitGroup;
-use Phluxor\ActorSystem\QueueResult;
 use Phluxor\Mspc\Queue as MspcQueue;
 use Phluxor\ActorSystem\Dispatcher\CoroutineDispatcher;
 use Phluxor\ActorSystem\Mailbox\BoundedMailboxQueue;
@@ -28,9 +27,11 @@ class DefaultMailboxTest extends TestCase
                 $wg->add();
                 $p = new UnboundedLochFree($mspc);
                 $q = $p();
+                $counter = 0;
                 $invoker = new StubInvoker(0, $max, $wg);
-                $invoker->withUserMessageReceiveHandler(function (mixed $message) {
-                    $this->assertInstanceOf(QueueResult::class, $message);
+                $invoker->withUserMessageReceiveHandler(function (mixed $message) use (&$counter) {
+                    $this->assertIsInt($message);
+                    $counter++;
                 });
                 $q->registerHandlers(
                     $invoker,
@@ -48,6 +49,7 @@ class DefaultMailboxTest extends TestCase
                     }, $q, $cmax);
                 }
                 $wg->wait();
+                $this->assertSame($max, $counter);
                 $this->assertTrue($mspc->isEmpty());
             });
         });

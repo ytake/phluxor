@@ -24,14 +24,15 @@ class Future
     private bool $done = false;
     private Channel $channel;
     private int|false $timer = false;
+    private FutureProcess $futureProcess;
 
     /**
      * @param ActorSystem $actorSystem
      * @param Pid|null $pid
      */
-    public function __construct(
+    private function __construct(
         private readonly ActorSystem $actorSystem,
-        private Pid|null $pid,
+        private Pid|null $pid = null,
     ) {
         $this->channel = new Channel(1);
     }
@@ -131,8 +132,13 @@ class Future
 
     public function stop(Pid $pid): void
     {
+        // already stopped
         if ($this->done) {
-            $this->channel->pop();
+            // send to pipes
+            if (!$this->channel->isEmpty()) {
+                // channel is full
+                $this->channel->pop();
+            }
             return;
         }
         $this->done = true;
@@ -143,9 +149,11 @@ class Future
         $this->sendToPipes();
         $this->runCompletion();
         if (!$this->channel->isFull()) {
+            // send to pipes
             $this->channel->push(true);
         }
         if ($this->timer === false) {
+            // clear channel
             $this->channel->pop();
             return;
         }
@@ -181,6 +189,7 @@ class Future
         $futureProcess = new FutureProcess(new Future($actorSystem, null));
         $registry = $actorSystem->getProcessRegistry();
         $f = $futureProcess->getFuture();
+        $f->futureProcess = $futureProcess;
         $r = $registry->add($futureProcess, sprintf("future%s", $registry->nextId()));
         $pid = $r->getPid();
         if (!$r->isAdded()) {

@@ -15,6 +15,16 @@ class Pid
     ) {
     }
 
+    public function registerProcess(ProcessInterface $process): void
+    {
+        $this->process = $process;
+    }
+
+    public function resetProcess(): void
+    {
+        $this->process = null;
+    }
+
     /**
      * @param ActorSystem $actorSystem
      * @return ProcessInterface|null

@@ -27,14 +27,4 @@ interface SnapshotStoreInterface
         int $snapshotIndex,
         Message $snapshot
     ): void;
-
-    /**
-     * @param string $actorName
-     * @param int $inclusiveToIndex
-     * @return void
-     */
-    public function deleteSnapshots(
-        string $actorName,
-        int $inclusiveToIndex
-    ): void;
 }

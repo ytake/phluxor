@@ -34,14 +34,4 @@ interface EventStoreInterface
         int $eventIndex,
         Message $event
     ): void;
-
-    /**
-     * @param string $actorName
-     * @param int $inclusiveToIndex
-     * @return void
-     */
-    public function deleteEvents(
-        string $actorName,
-        int $inclusiveToIndex
-    ): void;
 }

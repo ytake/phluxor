@@ -37,7 +37,6 @@ class StubInvoker implements MessageInvokerInterface
             $handler = $this->handler;
             $handler($message);
         }
-
         if ($this->count == $this->max) {
             $this->waitGroup->done();
         }
