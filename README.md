@@ -12,7 +12,6 @@ do not use this in production yet.
 
 ## work in progress
 
-- persistent actors (soon)
 - router / round-robin, broadcast, scatter-gather, etc.
 - open telemetry support (tracing, metrics, etc.)
 - virtual actors / cluster support
@@ -29,6 +28,8 @@ already implemented:
 - mailbox / dispatcher
 - event stream
 - future
+- persistent actors
+
 
 now local actors are supported, and remote actors are in progress.
 
@@ -134,3 +135,80 @@ function main(): void
 }
 
 ```
+
+## Persistent Actors
+
+persistent actors are actors that can be restored from the previous state.
+
+need protocol buffers file for message serialization.
+
+for example, the protocol buffers file is like this.
+
+```protobuf
+syntax = "proto3";
+
+package Acme.Persistence.ProtoBuf;
+
+option php_namespace = "Acme\\Persistence\\ProtoBuf";
+option php_metadata_namespace = "Acme\\Metadata";
+
+message Message {
+  string message = 1;
+}
+
+message Snapshot {
+  string message = 1;
+}
+
+```
+
+for example, the persistent actor is like this.
+
+use `Phluxor\Persistence\Mixin` trait and implement `Phluxor\Persistence\PersistentInterface`.
+
+```php
+<?php
+
+declare(strict_types=1);
+
+namespace Acme\Persistence;
+
+use Phluxor\ActorSystem\Context\ContextInterface;
+use Phluxor\ActorSystem\Message\ActorInterface;
+use Phluxor\Persistence\Message\RequestSnapshot;
+use Phluxor\Persistence\Mixin;
+use Phluxor\Persistence\PersistentInterface;
+use Acme\Persistence\ProtoBuf\Message;
+use Acme\Persistence\ProtoBuf\Snapshot;
+
+class InMemoryTestActor implements ActorInterface, PersistentInterface
+{
+    use Mixin;
+
+    private string $state = '';
+
+    public function receive(ContextInterface $context): void
+    {
+        $msg = $context->message();
+        switch (true) {
+            case $msg instanceof RequestSnapshot:
+                $this->persistenceSnapshot(new TestSnapshot(['message' => $this->state]));
+                break;
+            case $msg instanceof TestSnapshot:
+                $this->state = $msg->getMessage();
+                break;
+            case $msg instanceof TestMessage:
+                if (!$this->recovering()) {
+                    $this->persistenceReceive($msg);
+                }
+                $this->state = $msg->getMessage();
+                break;
+            case $msg instanceof Query:
+                $context->respond($this->state);
+                break;
+        }
+    }
+}
+```
+
+more examples are in the [Persistence Tests](tests/Persistence) directory.
