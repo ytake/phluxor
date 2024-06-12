@@ -199,7 +199,7 @@ class Props
     public function getSupervisorStrategy(): SupervisorStrategyInterface
     {
         if ($this->supervisorStrategy == null) {
-            return new ActorSystem\Strategy\OneForOneStrategy(
+            $this->supervisorStrategy = new ActorSystem\Strategy\OneForOneStrategy(
                 10,
                 new DateInterval('PT10S'),
                 fn($reason) => Directive::Restart

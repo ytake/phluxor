@@ -54,7 +54,7 @@
       "phpcs --standard=./phpcs.xml src tests"
     ],
     "cs-fix": [
-      "./vendor/bin/phpcbf src tests"
+      "./vendor/bin/phpcbf --ignore=*/ProtoBuf/*,*/Metadata/* src tests"
     ]
   },
   "config": {

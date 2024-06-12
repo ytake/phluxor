@@ -11,7 +11,6 @@ use Phluxor\ActorSystem\Message\MessageEnvelope;
 use Phluxor\Value\ContextExtensionId;
 use Psr\Log\LoggerInterface;
 use Swoole\Atomic\Long;
-
 use Throwable;
 
 use function sprintf;
@@ -28,7 +27,7 @@ class ActorContext implements
     private const int stateStopping = 2;
     private const int stateStopped = 3;
 
-    /** @var ActorContextExtras|null  */
+    /** @var ActorContextExtras|null */
     private ActorContextExtras|null $extras = null;
 
     /** @var Long */
@@ -467,9 +466,16 @@ class ActorContext implements
         }
         $influenceTimeout = true;
         if ($this->receiveTimeout->s > 0) {
-            // TODO need metrics
+            if ($message instanceof ActorSystem\Message\NotInfluenceReceiveTimeoutInterface) {
+                $influenceTimeout = false;
+            } else {
+                $this->ensureExtras()->stopReceiveTimeoutTimer();
+            }
         }
         $this->processMessage($message);
+        if ($this->receiveTimeout->s > 0 && $influenceTimeout) {
+            $this->ensureExtras()->resetReceiveTimeoutTimer($this->receiveTimeout->s);
+        }
     }
 
     private function processMessage(mixed $message): void
@@ -496,7 +502,7 @@ class ActorContext implements
 
     public function incarnateActor(): void
     {
-        $this->state->add(self::stateAlive);
+        $this->state->set(self::stateAlive);
         $this->actor = $this->props->producer($this->actorSystem);
         // open telemetry
     }
@@ -594,7 +600,7 @@ class ActorContext implements
 
     private function handleRestart(): void
     {
-        $this->state->add(self::stateRestarting);
+        $this->state->set(self::stateRestarting);
         $this->invokeUserMessage(new ActorSystem\Message\Restarting());
         $this->stopAllChildren();
         $this->tryRestartOrTerminate();
@@ -606,9 +612,13 @@ class ActorContext implements
         if ($this->state->get() >= self::stateStopping) {
             return;
         }
-        $this->state->add(self::stateStopping);
-
-        $this->invokeUserMessage(new ActorSystem\Message\Stopping());
+        $this->state->set(self::stateStopping);
+        try {
+            $this->invokeUserMessage(new ActorSystem\Message\Stopping());
+        } catch (Throwable $e) {
+            // finalizing throwables / logging
+            $this->logger()->error("stopping error", ['exception' => $e->getTraceAsString()]);
+        }
         $this->stopAllChildren();
         $this->tryRestartOrTerminate();
     }
@@ -720,7 +730,7 @@ class ActorContext implements
             $this->actorSystem,
             $otherStopped
         );
-        $this->state->add(self::stateStopped);
+        $this->state->set(self::stateStopped);
     }
 
     public function escalateFailure(mixed $reason, mixed $message): void
