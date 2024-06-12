@@ -53,17 +53,18 @@ final readonly class AllForOneStrategy implements SupervisorStrategyInterface
                 $supervisor->resumeChildren($child);
                 break;
             case ActorSystem\Directive::Restart:
+                $children = $supervisor->children();
                 // restart the all children and check if we should stop
                 if ($this->shouldStop($restartStatistics)) {
                     $actorSystem->getEventStream()?->publish(
                         new SupervisorEvent($child, $reason, ActorSystem\Directive::Stop)
                     );
-                    $supervisor->stopChildren($child);
+                    $supervisor->stopChildren(...$children);
                 } else {
                     $actorSystem->getEventStream()?->publish(
                         new SupervisorEvent($child, $reason, ActorSystem\Directive::Restart)
                     );
-                    $supervisor->restartChildren($child);
+                    $supervisor->restartChildren(...$children);
                 }
                 break;
             case ActorSystem\Directive::Stop:
@@ -86,7 +87,6 @@ final readonly class AllForOneStrategy implements SupervisorStrategyInterface
         if ($this->maxNrOfRetries === 0) {
             return true;
         }
-
         $rs->fail();
 
         if ($rs->numberOfFailures($this->withinDuration) > $this->maxNrOfRetries) {
