@@ -6,7 +6,7 @@ namespace Phluxor\ActorSystem;
 
 use Phluxor\ActorSystem;
 
-class Pid
+class Ref
 {
     private ProcessInterface|null $process = null;
 
@@ -74,10 +74,10 @@ class Pid
     }
 
     /**
-     * @param Pid|null $other
+     * @param Ref|null $other
      * @return bool
      */
-    public function equal(Pid|null $other): bool
+    public function equal(Ref|null $other): bool
     {
         if ($other == null) {
             return false;

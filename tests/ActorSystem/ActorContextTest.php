@@ -8,7 +8,7 @@ use DateInterval;
 use Phluxor\ActorSystem;
 use Phluxor\ActorSystem\ActorContext;
 use Phluxor\ActorSystem\Context\ContextInterface;
-use Phluxor\ActorSystem\Pid;
+use Phluxor\ActorSystem\Ref;
 use Phluxor\ActorSystem\Props;
 use Phluxor\ActorSystem\Strategy\OneForOneStrategy;
 use Phluxor\ActorSystem\Supervision\DefaultDecider;
@@ -27,9 +27,9 @@ class ActorContextTest extends TestCase
      * @param ActorSystem $system
      * @param WaitGroup $wg
      * @param int $count
-     * @return ActorSystem\Pid|null
+     * @return ActorSystem\Ref|null
      */
-    private function receiver(ActorSystem $system, WaitGroup $wg, int &$count): ActorSystem\Pid|null
+    private function receiver(ActorSystem $system, WaitGroup $wg, int &$count): ActorSystem\Ref|null
     {
         return $system->root()->spawn(
             Props::fromFunction(
@@ -96,7 +96,7 @@ class ActorContextTest extends TestCase
                 $watcher = $this->spawnMockProcess(
                     $system,
                     'watcher',
-                    function (?Pid $pid, mixed $message) use (&$terminate) {
+                    function (?Ref $pid, mixed $message) use (&$terminate) {
                         /** @var ActorSystem\ProtoBuf\Terminated $message */
                         $this->assertInstanceOf(ActorSystem\ProtoBuf\Terminated::class, $message);
                         $this->assertSame('foo', $message->getWho()?->getId());

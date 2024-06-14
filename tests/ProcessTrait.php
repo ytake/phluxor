@@ -6,16 +6,16 @@ namespace Test;
 
 use Closure;
 use Phluxor\ActorSystem;
-use Phluxor\ActorSystem\Pid;
+use Phluxor\ActorSystem\Ref;
 
 trait ProcessTrait
 {
     /**
      * @param ActorSystem $system
      * @param string $id
-     * @param Closure(?Pid, mixed): void|null $systemMessageFunc
-     * @param Closure(?Pid, mixed): void|null $userMessageFunc
-     * @return array{ref: ActorSystem\Pid, process: ActorSystem\ProcessInterface}
+     * @param Closure(?Ref, mixed): void|null $systemMessageFunc
+     * @param Closure(?Ref, mixed): void|null $userMessageFunc
+     * @return array{ref: ActorSystem\Ref, process: ActorSystem\ProcessInterface}
      */
     private function spawnMockProcess(
         ActorSystem $system,
@@ -26,17 +26,17 @@ trait ProcessTrait
         $process = new MockProcess($systemMessageFunc, $userMessageFunc);
         $r = $system->getProcessRegistry()->add($process, $id);
         return [
-            'ref' => $r->getPid(),
+            'ref' => $r->getRef(),
             'process' => $process
         ];
     }
 
     /**
      * @param ActorSystem $system
-     * @param ActorSystem\Pid $pid
+     * @param ActorSystem\Ref $pid
      * @return void
      */
-    private function removeMockProcess(ActorSystem $system, ActorSystem\Pid $pid): void
+    private function removeMockProcess(ActorSystem $system, ActorSystem\Ref $pid): void
     {
         $system->getProcessRegistry()->remove($pid);
     }

@@ -16,17 +16,17 @@ readonly class ActorProcess implements ProcessInterface
     ) {
     }
 
-    public function sendUserMessage(?Pid $pid, mixed $message): void
+    public function sendUserMessage(?Ref $pid, mixed $message): void
     {
         $this->mailbox->postUserMessage($message);
     }
 
-    public function sendSystemMessage(Pid $pid, mixed $message): void
+    public function sendSystemMessage(Ref $pid, mixed $message): void
     {
         $this->mailbox->postSystemMessage($message);
     }
 
-    public function stop(Pid $pid): void
+    public function stop(Ref $pid): void
     {
         $this->dead->set(1);
         $this->sendSystemMessage($pid, new Stop());

@@ -20,7 +20,7 @@ class RootContext implements
     ActorSystem\Context\SenderInterface,
     ActorSystem\Context\StopperPartInterface
 {
-    /** @var Closure(SenderInterface, Pid, MessageEnvelope): void|SenderFunctionInterface|null */
+    /** @var Closure(SenderInterface, Ref, MessageEnvelope): void|SenderFunctionInterface|null */
     private Closure|SenderFunctionInterface|null $senderMiddleware;
 
     /** @var Closure(ActorSystem, string, Props, SpawnerInterface): SpawnResult|SpawnFunctionInterface|null */
@@ -100,12 +100,12 @@ class RootContext implements
         return $this;
     }
 
-    public function parent(): Pid|null
+    public function parent(): Ref|null
     {
         return null;
     }
 
-    public function self(): Pid|null
+    public function self(): Ref|null
     {
         if ($this->guardianStrategy != null) {
             return $this->actorSystem->getGuardiansValue()->getGuardianPid($this->guardianStrategy);
@@ -113,7 +113,7 @@ class RootContext implements
         return null;
     }
 
-    public function sender(): Pid|null
+    public function sender(): Ref|null
     {
         return null;
     }
@@ -139,26 +139,26 @@ class RootContext implements
     }
 
     /**
-     * @param Pid|null $pid
+     * @param Ref|null $pid
      * @param mixed $message
      * @return void
      */
-    public function send(?Pid $pid, mixed $message): void
+    public function send(?Ref $pid, mixed $message): void
     {
         $this->sendUserMessage($pid, $message);
     }
 
     /**
-     * @param Pid|null $pid
+     * @param Ref|null $pid
      * @param mixed $message
      * @return void
      */
-    public function request(?Pid $pid, mixed $message): void
+    public function request(?Ref $pid, mixed $message): void
     {
         $this->sendUserMessage($pid, $message);
     }
 
-    public function requestWithCustomSender(?Pid $pid, mixed $message, ?Pid $sender): void
+    public function requestWithCustomSender(?Ref $pid, mixed $message, ?Ref $sender): void
     {
         $env = new MessageEnvelope(
             header: null,
@@ -168,7 +168,7 @@ class RootContext implements
         $this->sendUserMessage($pid, $env);
     }
 
-    public function requestFuture(?Pid $pid, mixed $message, int $duration): Future
+    public function requestFuture(?Ref $pid, mixed $message, int $duration): Future
     {
         $future = Future::create($this->actorSystem, $duration);
         $env = new MessageEnvelope(
@@ -180,7 +180,7 @@ class RootContext implements
         return $future;
     }
 
-    private function sendUserMessage(?Pid $pid, mixed $envelope): void
+    private function sendUserMessage(?Ref $pid, mixed $envelope): void
     {
         if ($this->senderMiddleware != null) {
             $call = $this->senderMiddleware;
@@ -193,30 +193,30 @@ class RootContext implements
     /**
      * starts a new actor based on props and named with a unique id.
      * @param Props $props
-     * @return Pid|null
+     * @return Ref|null
      */
-    public function spawn(Props $props): Pid|null
+    public function spawn(Props $props): Ref|null
     {
         $result = $this->spawnNamed($props, $this->actorSystem->getProcessRegistry()->nextId());
         if ($result->isError() != null) {
             throw $result->isError();
         }
-        return $result->getPid();
+        return $result->getRef();
     }
 
     /**
      * starts a new actor based on props and named with a unique id.
      * @param Props $props
      * @param string $prefix
-     * @return Pid|null
+     * @return Ref|null
      */
-    public function spawnPrefix(Props $props, string $prefix): Pid|null
+    public function spawnPrefix(Props $props, string $prefix): Ref|null
     {
         $result = $this->spawnNamed($props, $prefix . $this->actorSystem->getProcessRegistry()->nextId());
         if ($result->isError() != null) {
             throw $result->isError();
         }
-        return $result->getPid();
+        return $result->getRef();
     }
 
     /**
@@ -239,10 +239,10 @@ class RootContext implements
     }
 
     /**
-     * @param Pid|null $pid
+     * @param Ref|null $pid
      * @return void
      */
-    public function stop(?Pid $pid): void
+    public function stop(?Ref $pid): void
     {
         if ($pid == null) {
             return;
@@ -250,7 +250,7 @@ class RootContext implements
         $pid->ref($this->actorSystem)?->stop($pid);
     }
 
-    public function stopFuture(?Pid $pid): Future|null
+    public function stopFuture(?Ref $pid): Future|null
     {
         $future = Future::create($this->actorSystem, 10);
         if ($pid != null) {
@@ -266,12 +266,12 @@ class RootContext implements
         return null;
     }
 
-    public function poison(?Pid $pid): void
+    public function poison(?Ref $pid): void
     {
         $pid?->sendUserMessage($this->actorSystem(), new ActorSystem\ProtoBuf\PoisonPill());
     }
 
-    public function poisonFuture(?Pid $pid): Future|null
+    public function poisonFuture(?Ref $pid): Future|null
     {
         $future = Future::create($this->actorSystem, 10);
         if ($pid != null) {

@@ -9,7 +9,7 @@ use Phluxor\ActorSystem\Config;
 use Phluxor\ActorSystem\DeadLetterProcess;
 use Phluxor\ActorSystem\EventStreamProcess;
 use Phluxor\ActorSystem\GuardiansValue;
-use Phluxor\ActorSystem\Pid;
+use Phluxor\ActorSystem\Ref;
 use Phluxor\ActorSystem\ProcessRegistryValue;
 use Phluxor\ActorSystem\RootContext;
 use Phluxor\ActorSystem\Strategy\SupervisorEvent;
@@ -94,11 +94,11 @@ class ActorSystem
 
     /**
      * @param string $id
-     * @return Pid
+     * @return Ref
      */
-    public function newLocalAddress(string $id): Pid
+    public function newLocalAddress(string $id): Ref
     {
-        return new Pid(new ActorSystem\ProtoBuf\PID([
+        return new Ref(new ActorSystem\ProtoBuf\PID([
             'address' => $this->getProcessRegistry()->getAddress(),
             'id' => $id,
         ]));

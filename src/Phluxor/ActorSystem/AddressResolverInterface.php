@@ -9,9 +9,9 @@ namespace Phluxor\ActorSystem;
 interface AddressResolverInterface
 {
     /**
-     * Resolves the address to a Pid
-     * @param Pid|null $pid
+     * Resolves the address to a Ref
+     * @param Ref|null $pid
      * @return ProcessRegistryResult
      */
-    public function __invoke(?Pid $pid): ProcessRegistryResult;
+    public function __invoke(?Ref $pid): ProcessRegistryResult;
 }

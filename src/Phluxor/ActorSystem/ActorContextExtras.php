@@ -18,11 +18,11 @@ class ActorContextExtras
     /** @var Closure|null  */
     private Closure|null $timer = null;
 
-    /** @var PidSet */
-    private PidSet $children;
+    /** @var RefSet */
+    private RefSet $children;
 
-    /** @var PidSet */
-    private PidSet $watchers;
+    /** @var RefSet */
+    private RefSet $watchers;
 
     /** @var int|bool|null */
     private int|bool|null $receiveTimeoutTimer = null;
@@ -31,8 +31,8 @@ class ActorContextExtras
         private readonly ContextInterface $context,
         private readonly ContextExtensions $extensions = new ContextExtensions(),
     ) {
-        $this->children = new PidSet();
-        $this->watchers = new PidSet();
+        $this->children = new RefSet();
+        $this->watchers = new RefSet();
     }
 
     public function context(): ContextInterface
@@ -57,25 +57,25 @@ class ActorContextExtras
     }
 
     /**
-     * @param Pid $pid
+     * @param Ref $pid
      * @return void
      */
-    public function addChild(Pid $pid): void
+    public function addChild(Ref $pid): void
     {
         $this->children->add($pid);
     }
 
     /**
-     * @param Pid $pid
+     * @param Ref $pid
      * @return void
      */
-    public function removeChild(Pid $pid): void
+    public function removeChild(Ref $pid): void
     {
         $this->children->remove($pid);
     }
 
     /**
-     * @return Pid[]
+     * @return Ref[]
      */
     public function childrenValues(): array
     {
@@ -83,24 +83,24 @@ class ActorContextExtras
     }
 
     /**
-     * @param Pid $pid
+     * @param Ref $pid
      * @return void
      */
-    public function watch(Pid $pid): void
+    public function watch(Ref $pid): void
     {
         $this->watchers->add($pid);
     }
 
     /**
-     * @param Pid $pid
+     * @param Ref $pid
      * @return void
      */
-    public function unwatch(Pid $pid): void
+    public function unwatch(Ref $pid): void
     {
         $this->watchers->remove($pid);
     }
 
-    public function watchers(): PidSet
+    public function watchers(): RefSet
     {
         return $this->watchers;
     }

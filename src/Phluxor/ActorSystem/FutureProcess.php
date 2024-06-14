@@ -20,11 +20,11 @@ readonly class FutureProcess implements ProcessInterface
 
     /**
      * sendUserMessage sends a message asynchronously to the given PID
-     * @param Pid|null $pid
+     * @param Ref|null $pid
      * @param mixed $message
      * @return void
      */
-    public function sendUserMessage(?Pid $pid, mixed $message): void
+    public function sendUserMessage(?Ref $pid, mixed $message): void
     {
         $msg = MessageEnvelope::unwrapEnvelope($message);
         $res = $msg['message'];
@@ -41,13 +41,13 @@ readonly class FutureProcess implements ProcessInterface
         }
     }
 
-    public function sendSystemMessage(Pid $pid, mixed $message): void
+    public function sendSystemMessage(Ref $pid, mixed $message): void
     {
         $this->future->setResult($message);
         $this->stop($pid);
     }
 
-    public function stop(Pid $pid): void
+    public function stop(Ref $pid): void
     {
         $this->future->stop($pid);
     }

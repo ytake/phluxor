@@ -51,22 +51,22 @@ class PersistenceTest extends TestCase
                     ));
                 $ref = $system->root()->spawnNamed($props, 'test.actor');
                 $this->assertNull($ref->isError());
-                $system->root()->send($ref->getPid(), new TestMessage(['message' => 'hello']));
-                $f = $system->root()->requestFuture($ref->getPid(), new Query(), 1);
+                $system->root()->send($ref->getRef(), new TestMessage(['message' => 'hello']));
+                $f = $system->root()->requestFuture($ref->getRef(), new Query(), 1);
                 $this->assertSame('hello', $f->result()->value());
 
-                $system->root()->poisonFuture($ref->getPid())?->wait();
-                $system->root()->send($ref->getPid(), new TestMessage(['message' => 'world']));
+                $system->root()->poisonFuture($ref->getRef())?->wait();
+                $system->root()->send($ref->getRef(), new TestMessage(['message' => 'world']));
                 $ref = $system->root()->spawnNamed($props, 'test.actor');
                 $this->assertNull($ref->isError());
-                $f = $system->root()->requestFuture($ref->getPid(), new Query(), 1);
+                $f = $system->root()->requestFuture($ref->getRef(), new Query(), 1);
                 $this->assertSame('hello', $f->result()->value());
-                $system->root()->send($ref->getPid(), new TestMessage(['message' => 'hello2']));
-                $system->root()->send($ref->getPid(), new TestMessage(['message' => 'hello3']));
+                $system->root()->send($ref->getRef(), new TestMessage(['message' => 'hello2']));
+                $system->root()->send($ref->getRef(), new TestMessage(['message' => 'hello3']));
                 $this->assertTrue($deadLetter);
-                $f = $system->root()->requestFuture($ref->getPid(), new Query(), 1);
+                $f = $system->root()->requestFuture($ref->getRef(), new Query(), 1);
                 $this->assertSame('hello3', $f->result()->value());
-                $system->root()->poisonFuture($ref->getPid())?->wait();
+                $system->root()->poisonFuture($ref->getRef())?->wait();
             });
         });
     }

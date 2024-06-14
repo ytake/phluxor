@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Phluxor\ActorSystem\Message;
 
-use Phluxor\ActorSystem\Pid;
+use Phluxor\ActorSystem\Ref;
 use Phluxor\ActorSystem\QueueResult;
 use Phluxor\ActorSystem\ReadonlyMessageHeaderInterface;
 
@@ -13,16 +13,16 @@ readonly class MessageEnvelope
     /**
      * @param MessageHeader|null $header
      * @param mixed|null $message
-     * @param Pid|null $sender
+     * @param Ref|null $sender
      */
     public function __construct(
         private MessageHeader|null $header = null,
         private mixed $message = null,
-        private Pid|null $sender = null
+        private Ref|null $sender = null
     ) {
     }
 
-    public function getSender(): Pid|null
+    public function getSender(): Ref|null
     {
         return $this->sender;
     }
@@ -58,14 +58,14 @@ readonly class MessageEnvelope
 
     /**
      * @param mixed $message
-     * @return array{header: ReadonlyMessageHeaderInterface|null, message: mixed, sender: Pid|null}
+     * @return array{header: ReadonlyMessageHeaderInterface|null, message: mixed, sender: Ref|null}
      */
     public static function unwrapEnvelope(mixed $message): array
     {
         if ($message instanceof MessageEnvelope) {
             return [
                 'header' => $message->header,
-                'message' => $message->message,
+                'message' => $message->getMessage(),
                 'sender' => $message->sender
             ];
         }
@@ -126,9 +126,9 @@ readonly class MessageEnvelope
 
     /**
      * @param mixed $message
-     * @return Pid|null
+     * @return Ref|null
      */
-    public static function unwrapEnvelopeSender(mixed $message): Pid|null
+    public static function unwrapEnvelopeSender(mixed $message): Ref|null
     {
         if ($message instanceof QueueResult) {
             $msg = $message->value();

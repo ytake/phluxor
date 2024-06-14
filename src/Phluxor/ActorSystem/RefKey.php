@@ -6,7 +6,7 @@ namespace Phluxor\ActorSystem;
 
 use function sprintf;
 
-readonly class PidKey
+readonly class RefKey
 {
     /**
      * @param string $address

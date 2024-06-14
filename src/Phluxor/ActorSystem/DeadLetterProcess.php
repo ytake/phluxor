@@ -18,7 +18,7 @@ readonly class DeadLetterProcess implements ProcessInterface
         $this->initialize();
     }
 
-    public function sendUserMessage(?Pid $pid, mixed $message): void
+    public function sendUserMessage(?Ref $pid, mixed $message): void
     {
         $m = ActorSystem\Message\MessageEnvelope::wrapEnvelope($message);
         $this->actorSystem->getEventStream()?->publish(
@@ -30,7 +30,7 @@ readonly class DeadLetterProcess implements ProcessInterface
         );
     }
 
-    public function sendSystemMessage(Pid $pid, mixed $message): void
+    public function sendSystemMessage(Ref $pid, mixed $message): void
     {
         $this->actorSystem->getEventStream()?->publish(
             new DeadLetterEvent(
@@ -41,7 +41,7 @@ readonly class DeadLetterProcess implements ProcessInterface
         );
     }
 
-    public function stop(Pid $pid): void
+    public function stop(Ref $pid): void
     {
         $this->sendSystemMessage($pid, new Stop());
     }
@@ -71,7 +71,7 @@ readonly class DeadLetterProcess implements ProcessInterface
                             [
                                 "message" => $message->getMessage(),
                                 "sender" => $message->getSender(),
-                                "pid" => $message->getPid()
+                                "pid" => $message->getRef()
                             ]
                         );
                     }
@@ -83,11 +83,11 @@ readonly class DeadLetterProcess implements ProcessInterface
                 $m = $message->getMessage();
                 if ($m instanceof ActorSystem\ProtoBuf\Watch) {
                     if ($m->getWatcher() != null) {
-                        $pid = new Pid($m->getWatcher());
+                        $pid = new Ref($m->getWatcher());
                         $pid->sendSystemMessage(
                             $this->actorSystem,
                             new ActorSystem\ProtoBuf\Terminated([
-                                "who" => $message->getPid(),
+                                "who" => $message->getRef(),
                                 'why'  => ActorSystem\ProtoBuf\TerminatedReason::NotFound
                             ])
                         );

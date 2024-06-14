@@ -6,7 +6,7 @@ namespace Phluxor\ActorSystem\Context;
 
 use DateInterval;
 use Phluxor\ActorSystem\Future;
-use Phluxor\ActorSystem\Pid;
+use Phluxor\ActorSystem\Ref;
 use Phluxor\ActorSystem\ReenterAfterInterface;
 
 interface BasePartInterface
@@ -19,7 +19,7 @@ interface BasePartInterface
 
     /**
      * returns a slice of the actors children
-     * @return Pid[]
+     * @return Ref[]
      */
     public function children(): array;
 
@@ -37,18 +37,18 @@ interface BasePartInterface
     public function stash(): void;
 
     /**
-     * registers the actor as a monitor for the specified Pid
-     * @param Pid $pid
+     * registers the actor as a monitor for the specified Ref
+     * @param Ref $pid
      * @return void
      */
-    public function watch(Pid $pid): void;
+    public function watch(Ref $pid): void;
 
     /**
-     * unregisters the actor as a monitor for the specified Pid
-     * @param Pid $pid
+     * unregisters the actor as a monitor for the specified Ref
+     * @param Ref $pid
      * @return void
      */
-    public function unwatch(Pid $pid): void;
+    public function unwatch(Ref $pid): void;
 
     /**
      * @param DateInterval $dateInterval
@@ -62,11 +62,11 @@ interface BasePartInterface
     public function cancelReceiveTimeout(): void;
 
     /**
-     * forwards current message to the given Pid
-     * @param Pid $pid
+     * forwards current message to the given Ref
+     * @param Ref $pid
      * @return void
      */
-    public function forward(Pid $pid): void;
+    public function forward(Ref $pid): void;
 
     /**
      * Executes the given Future and reenters the current method after the Future has completed.

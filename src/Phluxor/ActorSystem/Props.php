@@ -42,7 +42,7 @@ class Props
     /** @var SenderMiddlewareInterface[] */
     private array $senderMiddleware = [];
 
-    /** @var Closure(SenderInterface|ContextInterface, Pid, MessageEnvelope): void|SenderFunctionInterface|null */
+    /** @var Closure(SenderInterface|ContextInterface, Ref, MessageEnvelope): void|SenderFunctionInterface|null */
     private Closure|SenderFunctionInterface|null $senderMiddlewareChain = null;
     private SupervisorStrategyInterface|null $supervisorStrategy = null;
     private SupervisorStrategyInterface|null $guardianStrategy = null;
@@ -156,7 +156,7 @@ class Props
     }
 
     /**
-     * @return Closure(SenderInterface|ContextInterface, Pid, MessageEnvelope): void|SenderFunctionInterface|null
+     * @return Closure(SenderInterface|ContextInterface, Ref, MessageEnvelope): void|SenderFunctionInterface|null
      */
     public function senderMiddlewareChain(): Closure|SenderFunctionInterface|null
     {
@@ -328,7 +328,7 @@ class Props
 
             $props->senderMiddlewareChain = makeSenderMiddlewareChain(
                 $props->senderMiddleware,
-                function (SenderInterface|ContextInterface $ctx, Pid $pid, MessageEnvelope $envelope) {
+                function (SenderInterface|ContextInterface $ctx, Ref $pid, MessageEnvelope $envelope) {
                     $pid->sendUserMessage(
                         $ctx->actorSystem(),
                         $envelope->getMessage()

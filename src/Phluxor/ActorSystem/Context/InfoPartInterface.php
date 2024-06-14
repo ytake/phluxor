@@ -6,14 +6,14 @@ namespace Phluxor\ActorSystem\Context;
 
 use Phluxor\ActorSystem;
 use Phluxor\ActorSystem\Message\ActorInterface;
-use Phluxor\ActorSystem\Pid;
+use Phluxor\ActorSystem\Ref;
 use Psr\Log\LoggerInterface;
 
 interface InfoPartInterface
 {
-    public function parent(): Pid|null;
+    public function parent(): Ref|null;
 
-    public function self(): Pid|null;
+    public function self(): Ref|null;
 
     public function actor(): ActorInterface;
 
