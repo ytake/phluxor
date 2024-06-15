@@ -18,7 +18,6 @@ readonly class RouterMessage
     }
 
     /**
-     * @param mixed $o
      * @return bool
      */
     public function isManagementMessage(): bool

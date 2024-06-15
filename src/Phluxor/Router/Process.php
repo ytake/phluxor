@@ -15,9 +15,9 @@ class Process implements ActorSystem\ProcessInterface
     private const int RUNNING = 0;
     private const int STOPPING = 1;
 
-    private function __construct(
-        private StateInterface $state,
+    public function __construct(
         private ActorSystem $actorSystem,
+        private ?StateInterface $state = null,
         private ?Ref $parent = null,
         private ?Ref $router = null,
         private Lock $mutex = new Lock(Lock::MUTEX),
@@ -65,10 +65,12 @@ class Process implements ActorSystem\ProcessInterface
                 $this->mutex->lock();
                 $this->watchers->add(new Ref($message->getWatcher()));
                 $this->mutex->unlock();
+                break;
             case $message instanceof ActorSystem\ProtoBuf\Unwatch:
                 $this->mutex->lock();
                 $this->watchers->remove(new Ref($message->getWatcher()));
                 $this->mutex->unlock();
+                break;
             case $message instanceof ActorSystem\ProtoBuf\Stop:
                 $terminate = new ActorSystem\ProtoBuf\Terminated(['who' => $pid]);
                 $this->mutex->lock();
@@ -87,11 +89,13 @@ class Process implements ActorSystem\ProcessInterface
                     }
                 }
                 $this->mutex->unlock();
+                break;
             default:
                 $r = $this->actorSystem->getProcessRegistry()->get($this->router);
                 if ($r->isProcess()) {
                     $r->getProcess()->sendSystemMessage($pid, $message);
                 }
+                break;
         }
     }
 
@@ -117,5 +121,25 @@ class Process implements ActorSystem\ProcessInterface
         $this->actorSystem->root()->poisonFuture($this->router)->wait();
         $this->actorSystem->getProcessRegistry()->remove($pid);
         $this->sendSystemMessage($pid, new ActorSystem\ProtoBuf\Stop());
+    }
+
+    public function setState(StateInterface $state): void
+    {
+        $this->state = $state;
+    }
+
+    public function setParent(Ref $parent): void
+    {
+        $this->parent = $parent;
+    }
+
+    public function setRouter(Ref $router): void
+    {
+        $this->router = $router;
+    }
+
+    public function getState(): StateInterface
+    {
+        return $this->state;
     }
 }

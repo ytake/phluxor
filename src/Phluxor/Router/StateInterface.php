@@ -14,7 +14,7 @@ interface StateInterface
 
     public function registerRoute(RefSet $routes): void;
 
-    public function getRoute(): RefSet;
+    public function getRoutees(): RefSet;
 
     public function setSender(ContextInterface|SenderInterface $sender): void;
 }
