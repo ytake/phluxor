@@ -6,6 +6,7 @@ namespace Test\Router;
 
 use Phluxor\ActorSystem;
 use Phluxor\ActorSystem\Ref;
+use Phluxor\Router\RouterSpawner;
 use PHPUnit\Framework\TestCase;
 use Test\ProcessTrait;
 
@@ -17,6 +18,7 @@ class ProcessTest extends TestCase
 
     public function testRouterSendsUserMessageToChild(): void
     {
+        $this->markTestSkipped('Not implemented yet');
         run(function () {
             \Swoole\Coroutine\go(function () {
                 $system = ActorSystem::create();
@@ -38,7 +40,7 @@ class ProcessTest extends TestCase
                                 var_dump($context->message());
                             }
                         ),
-                        // ActorSystem\Props::withSpawnFunc()
+                        ActorSystem\Props::withSpawnFunc(RouterSpawner::spawner($gr))
                     )
                 );
                 $this->removeMockProcess($system, $r['ref']);

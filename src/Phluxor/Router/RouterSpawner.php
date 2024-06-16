@@ -4,13 +4,33 @@ declare(strict_types=1);
 
 namespace Phluxor\Router;
 
+use Closure;
 use Phluxor\ActorSystem;
+use Phluxor\ActorSystem\Context\SpawnerInterface;
+use Phluxor\ActorSystem\Props;
+use Phluxor\ActorSystem\SpawnResult;
 use Swoole\Coroutine\WaitGroup;
 
 class RouterSpawner
 {
     private function __construct()
     {
+    }
+
+    /**
+     * @param ConfigInterface $config
+     * @return Closure(ActorSystem, string, Props, SpawnerInterface): SpawnResult
+     */
+    public static function spawner(ConfigInterface $config): Closure
+    {
+        return function (
+            ActorSystem $actorSystem,
+            string $id,
+            ActorSystem\Props $props,
+            ActorSystem\Context\SpawnerInterface $parent
+        ) use ($config): ActorSystem\SpawnResult {
+            return self::spawn($actorSystem, $id, $config, $props, $parent);
+        };
     }
 
     private static function spawn(

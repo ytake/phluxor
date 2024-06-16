@@ -67,10 +67,10 @@ class GroupRouterActor implements ActorInterface
                 break;
             case $msg instanceof GetRoutees:
                 $r = $this->state->getRoutees();
-                /** @var Ref[] $routees */
+                /** @var PID[] $routees */
                 $routees = [];
                 $r->forEach(function (int $int, Ref $pid) use (&$routees) {
-                    $routees[] = $pid;
+                    $routees[] = $pid->protobufPid();
                 });
                 $context->respond(new Routees(['PIDs' => $routees]));
                 break;
