@@ -5,34 +5,34 @@ declare(strict_types=1);
 namespace Test\ActorSystem;
 
 use Phluxor\ActorSystem;
-use Phluxor\ActorSystem\Pid;
-use Phluxor\ActorSystem\PidSet;
+use Phluxor\ActorSystem\Ref;
+use Phluxor\ActorSystem\RefSet;
 use PHPUnit\Framework\TestCase;
 
 class PidSetTest extends TestCase
 {
     public function testPidSetIsEmptyWhenCreated(): void
     {
-        $pidSet = new PidSet();
+        $pidSet = new RefSet();
         $this->assertTrue($pidSet->empty());
     }
 
     public function testPidSetClears(): void
     {
-        $pidSet = new PidSet();
-        $pidSet->add(new Pid(new \Phluxor\ActorSystem\ProtoBuf\PID([
+        $pidSet = new RefSet();
+        $pidSet->add(new Ref(new \Phluxor\ActorSystem\ProtoBuf\PID([
             'address' => ActorSystem::LOCAL_ADDRESS,
             'id' => 'p1',
         ])));
 
         $pid = new \Phluxor\ActorSystem\ProtoBuf\PID();
-        $pidSet->add(new Pid(new \Phluxor\ActorSystem\ProtoBuf\PID([
+        $pidSet->add(new Ref(new \Phluxor\ActorSystem\ProtoBuf\PID([
             'address' => ActorSystem::LOCAL_ADDRESS,
             'id' => 'p2',
         ])));
 
         $pid = new \Phluxor\ActorSystem\ProtoBuf\PID();
-        $pidSet->add(new Pid(new \Phluxor\ActorSystem\ProtoBuf\PID([
+        $pidSet->add(new Ref(new \Phluxor\ActorSystem\ProtoBuf\PID([
             'address' => ActorSystem::LOCAL_ADDRESS,
             'id' => 'p3',
         ])));
@@ -45,21 +45,21 @@ class PidSetTest extends TestCase
 
     public function testShouldRemovePidFromPidSet(): void
     {
-        $pidSet = new PidSet();
-        $pidSet->add(new Pid(new \Phluxor\ActorSystem\ProtoBuf\PID([
+        $pidSet = new RefSet();
+        $pidSet->add(new Ref(new \Phluxor\ActorSystem\ProtoBuf\PID([
             'address' => ActorSystem::LOCAL_ADDRESS,
             'id' => 'p1',
         ])));
-        $pidSet->add(new Pid(new \Phluxor\ActorSystem\ProtoBuf\PID([
+        $pidSet->add(new Ref(new \Phluxor\ActorSystem\ProtoBuf\PID([
             'address' => ActorSystem::LOCAL_ADDRESS,
             'id' => 'p2',
         ])));
-        $pidSet->add(new Pid(new \Phluxor\ActorSystem\ProtoBuf\PID([
+        $pidSet->add(new Ref(new \Phluxor\ActorSystem\ProtoBuf\PID([
             'address' => ActorSystem::LOCAL_ADDRESS,
             'id' => 'p3',
         ])));
         $this->assertSame(3, $pidSet->len());
-        $pidSet->remove(new Pid(new \Phluxor\ActorSystem\ProtoBuf\PID([
+        $pidSet->remove(new Ref(new \Phluxor\ActorSystem\ProtoBuf\PID([
             'address' => ActorSystem::LOCAL_ADDRESS,
             'id' => 'p2',
         ])));
@@ -68,13 +68,13 @@ class PidSetTest extends TestCase
 
     public function testAddSmall(): void
     {
-        $pidSet = new PidSet();
-        $pidSet->add(new Pid(new \Phluxor\ActorSystem\ProtoBuf\PID([
+        $pidSet = new RefSet();
+        $pidSet->add(new Ref(new \Phluxor\ActorSystem\ProtoBuf\PID([
             'address' => ActorSystem::LOCAL_ADDRESS,
             'id' => 'p1',
         ])));
         $this->assertFalse($pidSet->empty());
-        $pidSet->add(new Pid(new \Phluxor\ActorSystem\ProtoBuf\PID([
+        $pidSet->add(new Ref(new \Phluxor\ActorSystem\ProtoBuf\PID([
             'address' => ActorSystem::LOCAL_ADDRESS,
             'id' => 'p1',
         ])));
@@ -83,16 +83,16 @@ class PidSetTest extends TestCase
 
     public function testPidSetValue(): void
     {
-        $pidSet = new PidSet();
-        $pidSet->add(new Pid(new \Phluxor\ActorSystem\ProtoBuf\PID([
+        $pidSet = new RefSet();
+        $pidSet->add(new Ref(new \Phluxor\ActorSystem\ProtoBuf\PID([
             'address' => ActorSystem::LOCAL_ADDRESS,
             'id' => 'p1',
         ])));
-        $pidSet->add(new Pid(new \Phluxor\ActorSystem\ProtoBuf\PID([
+        $pidSet->add(new Ref(new \Phluxor\ActorSystem\ProtoBuf\PID([
             'address' => ActorSystem::LOCAL_ADDRESS,
             'id' => 'p2',
         ])));
-        $pidSet->add(new Pid(new \Phluxor\ActorSystem\ProtoBuf\PID([
+        $pidSet->add(new Ref(new \Phluxor\ActorSystem\ProtoBuf\PID([
             'address' => ActorSystem::LOCAL_ADDRESS,
             'id' => 'p3',
         ])));

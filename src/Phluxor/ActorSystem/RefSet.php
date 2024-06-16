@@ -8,15 +8,15 @@ use Closure;
 
 use function array_pop;
 
-class PidSet
+class RefSet
 {
-    /** @var Pid[] */
+    /** @var Ref[] */
     private array $pids = [];
 
     /** @var int[] array{string, int} */
     private array $lookup = [];
 
-    public function __construct(Pid ...$pids)
+    public function __construct(Ref ...$pids)
     {
         foreach ($pids as $pid) {
             $this->add($pid);
@@ -29,20 +29,20 @@ class PidSet
     }
 
     /**
-     * @param Pid $pid
+     * @param Ref $pid
      * @return string
      */
-    private function key(Pid $pid): string
+    private function key(Ref $pid): string
     {
-        $pidKey = new PidKey($pid->protobufPid()->getAddress(), $pid->protobufPid()->getId());
+        $pidKey = new RefKey($pid->protobufPid()->getAddress(), $pid->protobufPid()->getId());
         return (string)$pidKey;
     }
 
     /**
-     * @param Pid $pid
+     * @param Ref $pid
      * @return int
      */
-    public function indexOf(Pid $pid): int
+    public function indexOf(Ref $pid): int
     {
         $k = $this->key($pid);
         foreach ($this->lookup as $v => $idx) {
@@ -54,19 +54,19 @@ class PidSet
     }
 
     /**
-     * @param Pid $v
+     * @param Ref $v
      * @return bool
      */
-    public function contains(Pid $v): bool
+    public function contains(Ref $v): bool
     {
         return isset($this->lookup[$this->key($v)]);
     }
 
     /**
-     * @param Pid $pid
+     * @param Ref $pid
      * @return void
      */
-    public function add(Pid $pid): void
+    public function add(Ref $pid): void
     {
         if (!$this->contains($pid)) {
             $this->pids[] = $pid;
@@ -75,10 +75,10 @@ class PidSet
     }
 
     /**
-     * @param Pid $pid
+     * @param Ref $pid
      * @return bool
      */
-    public function remove(Pid $pid): bool
+    public function remove(Ref $pid): bool
     {
         $index = $this->indexOf($pid);
         if ($index === -1) {
@@ -113,7 +113,7 @@ class PidSet
     }
 
     /**
-     * @return Pid[]
+     * @return Ref[]
      */
     public function values(): array
     {
@@ -121,7 +121,7 @@ class PidSet
     }
 
     /**
-     * @param Closure(int, Pid): void $f
+     * @param Closure(int, Ref): void $f
      * @return void
      */
     public function forEach(Closure $f): void
@@ -131,13 +131,13 @@ class PidSet
         }
     }
 
-    public function get(int $index): ?Pid
+    public function get(int $index): ?Ref
     {
         return $this->pids[$index] ?? null;
     }
 
-    public function clone(): PidSet
+    public function clone(): RefSet
     {
-        return new PidSet(...$this->pids);
+        return new RefSet(...$this->pids);
     }
 }

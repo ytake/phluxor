@@ -7,15 +7,15 @@ namespace Phluxor\ActorSystem;
 interface SupervisorInterface
 {
     /**
-     * @return Pid[]
+     * @return Ref[]
      */
     public function children(): array;
 
     public function escalateFailure(mixed $reason, mixed $message): void;
 
-    public function restartChildren(Pid ...$pids): void;
+    public function restartChildren(Ref ...$pids): void;
 
-    public function stopChildren(Pid ...$pids): void;
+    public function stopChildren(Ref ...$pids): void;
 
-    public function resumeChildren(Pid ...$pids): void;
+    public function resumeChildren(Ref ...$pids): void;
 }

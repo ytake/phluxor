@@ -8,3 +8,7 @@ It generates code in the target language of your choice from a `.proto` file.
 ```bash
 $ protoc --proto_path=protobuf --php_out=src protobuf/actor.proto
 ```
+
+```bash
+$ protoc --proto_path=protobuf --php_out=src protobuf/router.proto
+```

@@ -7,12 +7,12 @@ namespace Phluxor\ActorSystem;
 readonly class ProcessRegistryAddResult
 {
     public function __construct(
-        private Pid $pid,
+        private Ref $pid,
         private bool $added
     ) {
     }
 
-    public function getPid(): Pid
+    public function getRef(): Ref
     {
         return $this->pid;
     }

@@ -6,7 +6,7 @@ namespace Phluxor\ActorSystem\Strategy;
 
 use DateInterval;
 use Phluxor\ActorSystem;
-use Phluxor\ActorSystem\Pid;
+use Phluxor\ActorSystem\Ref;
 use Phluxor\ActorSystem\SupervisorInterface;
 use Phluxor\ActorSystem\SupervisorStrategyInterface;
 use Phluxor\ActorSystem\Child;
@@ -28,7 +28,7 @@ final readonly class AllForOneStrategy implements SupervisorStrategyInterface
     /**
      * @param ActorSystem $actorSystem
      * @param SupervisorInterface $supervisor
-     * @param Pid $child
+     * @param Ref $child
      * @param Child\RestartStatistics $restartStatistics
      * @param mixed $reason
      * @param mixed $message
@@ -37,7 +37,7 @@ final readonly class AllForOneStrategy implements SupervisorStrategyInterface
     public function handleFailure(
         ActorSystem $actorSystem,
         SupervisorInterface $supervisor,
-        Pid $child,
+        Ref $child,
         Child\RestartStatistics $restartStatistics,
         mixed $reason,
         mixed $message

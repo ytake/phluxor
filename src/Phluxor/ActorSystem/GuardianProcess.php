@@ -14,24 +14,24 @@ class GuardianProcess implements ProcessInterface, SupervisorInterface
 {
     /**
      * @param GuardiansValue $guardiansValue
-     * @param Pid|null $pid
+     * @param Ref|null $pid
      * @param SupervisorStrategyInterface $strategy
      */
     public function __construct(
         private readonly GuardiansValue $guardiansValue,
-        private Pid|null $pid,
+        private Ref|null $pid,
         private readonly SupervisorStrategyInterface $strategy
     ) {
     }
 
-    public function sendUserMessage(?Pid $pid, mixed $message): void
+    public function sendUserMessage(?Ref $pid, mixed $message): void
     {
         throw new GuardianErrorException(
             'guardian actor cannot receive any user messages'
         );
     }
 
-    public function sendSystemMessage(Pid $pid, mixed $message): void
+    public function sendSystemMessage(Ref $pid, mixed $message): void
     {
         if ($message instanceof Failure) {
             $this->strategy->handleFailure(
@@ -45,7 +45,7 @@ class GuardianProcess implements ProcessInterface, SupervisorInterface
         }
     }
 
-    public function stop(Pid $pid): void
+    public function stop(Ref $pid): void
     {
         // none
     }
@@ -65,10 +65,10 @@ class GuardianProcess implements ProcessInterface, SupervisorInterface
     }
 
     /**
-     * @param Pid ...$pids
+     * @param Ref ...$pids
      * @return void
      */
-    public function restartChildren(Pid ...$pids): void
+    public function restartChildren(Ref ...$pids): void
     {
         foreach ($pids as $pid) {
             $pid->sendUserMessage($this->guardiansValue->getActorSystem(), new Restart());
@@ -76,10 +76,10 @@ class GuardianProcess implements ProcessInterface, SupervisorInterface
     }
 
     /**
-     * @param Pid ...$pids
+     * @param Ref ...$pids
      * @return void
      */
-    public function stopChildren(Pid ...$pids): void
+    public function stopChildren(Ref ...$pids): void
     {
         foreach ($pids as $pid) {
             $pid->sendUserMessage($this->guardiansValue->getActorSystem(), new Stop());
@@ -87,22 +87,22 @@ class GuardianProcess implements ProcessInterface, SupervisorInterface
     }
 
     /**
-     * @param Pid ...$pids
+     * @param Ref ...$pids
      * @return void
      */
-    public function resumeChildren(Pid ...$pids): void
+    public function resumeChildren(Ref ...$pids): void
     {
         foreach ($pids as $pid) {
             $pid->sendUserMessage($this->guardiansValue->getActorSystem(), new ResumeMailbox());
         }
     }
 
-    public function setPid(Pid $pid): void
+    public function setPid(Ref $pid): void
     {
         $this->pid = $pid;
     }
 
-    public function getPid(): Pid
+    public function getRef(): Ref
     {
         if ($this->pid === null) {
             throw new GuardianErrorException(

@@ -36,18 +36,18 @@ class ActorContext implements
     /**
      * @param ActorSystem $actorSystem
      * @param Props $props
-     * @param Pid|null $parent
+     * @param Ref|null $parent
      * @param ActorInterface|null $actor
-     * @param Pid|null $self
+     * @param Ref|null $self
      * @param DateInterval $receiveTimeout
      * @param mixed|null $messageOrEnvelope
      */
     public function __construct(
         private readonly ActorSystem $actorSystem,
         private readonly Props $props,
-        private readonly Pid|null $parent = null,
+        private readonly Ref|null $parent = null,
         private ActorInterface|null $actor = null,
-        private Pid|null $self = null,
+        private Ref|null $self = null,
         private DateInterval $receiveTimeout = new DateInterval('PT0S'),
         private mixed $messageOrEnvelope = null,
     ) {
@@ -81,26 +81,26 @@ class ActorContext implements
         return $this->actorSystem()->getLogger();
     }
 
-    public function parent(): Pid|null
+    public function parent(): Ref|null
     {
         return $this->parent;
     }
 
-    public function self(): Pid|null
+    public function self(): Ref|null
     {
         return $this->self;
     }
 
     /**
-     * @param Pid $pid
+     * @param Ref $pid
      * @return void
      */
-    public function setSelf(Pid $pid): void
+    public function setSelf(Ref $pid): void
     {
         $this->self = $pid;
     }
 
-    public function sender(): Pid|null
+    public function sender(): Ref|null
     {
         return MessageEnvelope::unwrapEnvelopeSender($this->messageOrEnvelope);
     }
@@ -121,7 +121,7 @@ class ActorContext implements
     }
 
     /**
-     * @return Pid[]
+     * @return Ref[]
      */
     public function children(): array
     {
@@ -150,10 +150,10 @@ class ActorContext implements
     }
 
     /**
-     * @param Pid $pid
+     * @param Ref $pid
      * @return void
      */
-    public function watch(Pid $pid): void
+    public function watch(Ref $pid): void
     {
         $pid->sendSystemMessage(
             $this->actorSystem,
@@ -161,7 +161,7 @@ class ActorContext implements
         );
     }
 
-    public function unwatch(Pid $pid): void
+    public function unwatch(Ref $pid): void
     {
         $pid->sendSystemMessage(
             $this->actorSystem,
@@ -211,10 +211,10 @@ class ActorContext implements
     }
 
     /**
-     * @param Pid $pid
+     * @param Ref $pid
      * @return void
      */
-    public function forward(Pid $pid): void
+    public function forward(Ref $pid): void
     {
         if ($this->messageOrEnvelope instanceof ActorSystem\Message\SystemMessageInterface) {
             $this->logger()->error(
@@ -255,12 +255,12 @@ class ActorContext implements
         return MessageEnvelope::unwrapEnvelopeHeader($this->messageOrEnvelope);
     }
 
-    public function send(?Pid $pid, mixed $message): void
+    public function send(?Ref $pid, mixed $message): void
     {
         $this->sendUserMessage($pid, $message);
     }
 
-    public function sendUserMessage(?Pid $pid, mixed $message): void
+    public function sendUserMessage(?Ref $pid, mixed $message): void
     {
         if ($this->props->senderMiddlewareChain() != null) {
             $chain = $this->props->senderMiddlewareChain();
@@ -276,28 +276,28 @@ class ActorContext implements
 
     /**
      * tell & ask
-     * @param Pid|null $pid
+     * @param Ref|null $pid
      * @param mixed $message
      * @return void
      */
-    public function request(?Pid $pid, mixed $message): void
+    public function request(?Ref $pid, mixed $message): void
     {
         $this->sendUserMessage($pid, new MessageEnvelope(null, $message, $this->self()));
     }
 
     /**
      * specify sender pid / actor
-     * @param Pid|null $pid
+     * @param Ref|null $pid
      * @param mixed $message
-     * @param Pid|null $sender
+     * @param Ref|null $sender
      * @return void
      */
-    public function requestWithCustomSender(?Pid $pid, mixed $message, ?Pid $sender): void
+    public function requestWithCustomSender(?Ref $pid, mixed $message, ?Ref $sender): void
     {
         $this->sendUserMessage($pid, new MessageEnvelope(null, $message, $sender));
     }
 
-    public function requestFuture(?Pid $pid, mixed $message, int $duration): Future
+    public function requestFuture(?Ref $pid, mixed $message, int $duration): Future
     {
         $future = Future::create($this->actorSystem, $duration);
         if ($future->pid() == null) {
@@ -345,24 +345,24 @@ class ActorContext implements
 
     /**
      * @param Props $props
-     * @return Pid|null
+     * @return Ref|null
      */
-    public function spawn(Props $props): Pid|null
+    public function spawn(Props $props): Ref|null
     {
         $result = $this->spawnNamed($props, $this->actorSystem->getProcessRegistry()->nextId());
         if ($result->isError() != null) {
             throw $result->isError();
         }
-        return $result->getPid();
+        return $result->getRef();
     }
 
-    public function spawnPrefix(Props $props, string $prefix): Pid|null
+    public function spawnPrefix(Props $props, string $prefix): Ref|null
     {
         $result = $this->spawnNamed($props, $prefix . $this->actorSystem->getProcessRegistry()->nextId());
         if ($result->isError() != null) {
             throw $result->isError();
         }
-        return $result->getPid();
+        return $result->getRef();
     }
 
     public function spawnNamed(Props $props, string $name): SpawnResult
@@ -382,19 +382,19 @@ class ActorContext implements
         if ($r->isError() instanceof ActorSystem\Exception\SpawnErrorException) {
             throw $r->isError();
         }
-        if ($r->getPid() == null) {
+        if ($r->getRef() == null) {
             throw new ActorSystem\Exception\SpawnErrorException("spawned child pid is null");
         }
-        $this->ensureExtras()->addChild($r->getPid());
+        $this->ensureExtras()->addChild($r->getRef());
         return $r;
     }
 
     /**
      * stop will stop actor immediately regardless of existing user messages in mailbox.
-     * @param Pid|null $pid
+     * @param Ref|null $pid
      * @return void
      */
-    public function stop(?Pid $pid): void
+    public function stop(?Ref $pid): void
     {
         if ($pid == null) {
             return;
@@ -404,10 +404,10 @@ class ActorContext implements
 
     /**
      * stopFuture will stop actor immediately regardless of existing user messages in mailbox, and return its future.
-     * @param Pid|null $pid
+     * @param Ref|null $pid
      * @return Future|null
      */
-    public function stopFuture(?Pid $pid): Future|null
+    public function stopFuture(?Ref $pid): Future|null
     {
         if ($pid == null) {
             return null;
@@ -427,7 +427,7 @@ class ActorContext implements
         return $future;
     }
 
-    public function poison(?Pid $pid): void
+    public function poison(?Ref $pid): void
     {
         if ($pid == null) {
             $this->logger()->error("poison pid is null");
@@ -439,7 +439,7 @@ class ActorContext implements
         );
     }
 
-    public function poisonFuture(?Pid $pid): Future|null
+    public function poisonFuture(?Ref $pid): Future|null
     {
         if ($pid == null) {
             return null;
@@ -575,14 +575,14 @@ class ActorContext implements
         $watcher = $msg->getWatcher();
         if ($watcher != null) {
             if ($this->state->get() >= self::stateStopping) {
-                (new Pid($watcher))->sendSystemMessage(
+                (new Ref($watcher))->sendSystemMessage(
                     $this->actorSystem,
                     new ActorSystem\ProtoBuf\Terminated([
                         'who' => $this->self?->protobufPid()
                     ])
                 );
             } else {
-                $this->ensureExtras()->watch(new Pid($watcher));
+                $this->ensureExtras()->watch(new Ref($watcher));
             }
         }
     }
@@ -594,7 +594,7 @@ class ActorContext implements
         }
         $watcher = $msg->getWatcher();
         if ($watcher != null) {
-            $this->extras->unwatch(new Pid($watcher));
+            $this->extras->unwatch(new Ref($watcher));
         }
     }
 
@@ -628,7 +628,7 @@ class ActorContext implements
         if ($this->extras != null) {
             $who = $msg->getWho();
             if ($who != null) {
-                $this->extras->removeChild(new Pid($who));
+                $this->extras->removeChild(new Ref($who));
             }
         }
         $this->invokeUserMessage($msg);
@@ -718,7 +718,7 @@ class ActorContext implements
             'who' => $this->self?->protobufPid()
         ]);
         $this->extras?->watchers()->forEach(
-            function (int $index, Pid $pid) use ($otherStopped) {
+            function (int $index, Ref $pid) use ($otherStopped) {
                 $pid->sendSystemMessage(
                     $this->actorSystem,
                     $otherStopped
@@ -763,21 +763,21 @@ class ActorContext implements
         }
     }
 
-    public function restartChildren(Pid ...$pids): void
+    public function restartChildren(Ref ...$pids): void
     {
         foreach ($pids as $pid) {
             $pid->sendSystemMessage($this->actorSystem, new ActorSystem\Message\Restart());
         }
     }
 
-    public function stopChildren(Pid ...$pids): void
+    public function stopChildren(Ref ...$pids): void
     {
         foreach ($pids as $pid) {
             $pid->sendSystemMessage($this->actorSystem, new ActorSystem\ProtoBuf\Stop());
         }
     }
 
-    public function resumeChildren(Pid ...$pids): void
+    public function resumeChildren(Ref ...$pids): void
     {
         foreach ($pids as $pid) {
             $pid->sendSystemMessage($this->actorSystem, new ActorSystem\Message\ResumeMailbox());

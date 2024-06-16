@@ -51,7 +51,7 @@
       "./vendor/bin/phpunit"
     ],
     "cs": [
-      "phpcs --standard=./phpcs.xml src tests"
+      "phpcs --standard=./phpcs.xml --ignore=*/ProtoBuf/*,*/Metadata/* src tests"
     ],
     "cs-fix": [
       "./vendor/bin/phpcbf --ignore=*/ProtoBuf/*,*/Metadata/* src tests"

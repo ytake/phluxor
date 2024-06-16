@@ -35,19 +35,19 @@ class DefaultSpawner implements ActorSystem\SpawnFunctionInterface
         $addResult = $actorSystem->getProcessRegistry()->add($process, $id);
         if (!$addResult->isAdded()) {
             return new SpawnResult(
-                $addResult->getPid(),
+                $addResult->getRef(),
                 new ActorSystem\Exception\SpawnErrorException(
                     'Actor with id ' . $id . ' already exists'
                 )
             );
         }
-        $context->setSelf($addResult->getPid());
+        $context->setSelf($addResult->getRef());
         $props->initialize($context);
         $mailbox->registerHandlers($context, $dispatcher);
         $mailbox->postSystemMessage(new ActorSystem\Message\Started());
         $mailbox->start();
         return new SpawnResult(
-            $addResult->getPid(),
+            $addResult->getRef(),
             null
         );
     }

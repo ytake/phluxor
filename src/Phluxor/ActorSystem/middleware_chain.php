@@ -43,8 +43,8 @@ function makeReceiverMiddlewareChain(
 
 /**
  * @param Closure[]|SenderMiddlewareInterface[] $senderMiddleware
- * @param Closure(SenderInterface|ContextInterface, Pid, MessageEnvelope): void|SenderFunctionInterface|null $lastSender
- * @return Closure(SenderInterface|ContextInterface, Pid, MessageEnvelope): void|SenderFunctionInterface|null
+ * @param Closure(SenderInterface|ContextInterface, Ref, MessageEnvelope): void|SenderFunctionInterface|null $lastSender
+ * @return Closure(SenderInterface|ContextInterface, Ref, MessageEnvelope): void|SenderFunctionInterface|null
  */
 function makeSenderMiddlewareChain(
     array $senderMiddleware,

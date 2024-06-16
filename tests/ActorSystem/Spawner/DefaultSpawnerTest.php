@@ -24,7 +24,7 @@ class DefaultSpawnerTest extends TestCase
                 Props::fromProducer(fn() => new VoidActor()),
                 $actorSystem->root()
             );
-            $this->assertSame('test', (string)$pid->getPid());
+            $this->assertSame('test', (string)$pid->getRef());
             $pid = $spawner(
                 $actorSystem,
                 'test',

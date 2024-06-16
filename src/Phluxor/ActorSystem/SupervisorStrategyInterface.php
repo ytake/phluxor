@@ -11,7 +11,7 @@ interface SupervisorStrategyInterface
     public function handleFailure(
         ActorSystem $actorSystem,
         SupervisorInterface $supervisor,
-        Pid $child,
+        Ref $child,
         ActorSystem\Child\RestartStatistics $restartStatistics,
         mixed $reason,
         mixed $message

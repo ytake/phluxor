@@ -6,7 +6,7 @@ namespace Test\ActorSystem;
 
 use Brick\Math\Exception\MathException;
 use Phluxor\ActorSystem;
-use Phluxor\ActorSystem\Pid;
+use Phluxor\ActorSystem\Ref;
 use PHPUnit\Framework\TestCase;
 
 class PidTest extends TestCase
@@ -22,7 +22,7 @@ class PidTest extends TestCase
                 $pid = new ActorSystem\ProtoBuf\PID();
                 $pid->setAddress('localhost');
                 $pid->setId('test');
-                $r = (new Pid($pid))->ref($actor);
+                $r = (new Ref($pid))->ref($actor);
                 $this->assertInstanceOf(
                     ActorSystem\DeadLetterProcess::class,
                     $r

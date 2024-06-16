@@ -7,22 +7,22 @@ namespace Phluxor\ActorSystem;
 interface ProcessInterface
 {
     /**
-     * @param ?Pid $pid
+     * @param ?Ref $pid
      * @param mixed $message
      * @return void
      */
-    public function sendUserMessage(?Pid $pid, mixed $message): void;
+    public function sendUserMessage(?Ref $pid, mixed $message): void;
 
     /**
-     * @param Pid $pid
+     * @param Ref $pid
      * @param mixed $message
      * @return void
      */
-    public function sendSystemMessage(Pid $pid, mixed $message): void;
+    public function sendSystemMessage(Ref $pid, mixed $message): void;
 
     /**
-     * @param Pid $pid
+     * @param Ref $pid
      * @return void
      */
-    public function stop(Pid $pid): void;
+    public function stop(Ref $pid): void;
 }

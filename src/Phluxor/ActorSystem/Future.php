@@ -14,7 +14,7 @@ use function go;
 
 class Future
 {
-    /** @var Pid[] */
+    /** @var Ref[] */
     private array $pipes = [];
     private mixed $result = null;
     private FutureTimeoutException|null $error = null;
@@ -28,32 +28,32 @@ class Future
 
     /**
      * @param ActorSystem $actorSystem
-     * @param Pid|null $pid
+     * @param Ref|null $pid
      */
     private function __construct(
         private readonly ActorSystem $actorSystem,
-        private Pid|null $pid = null,
+        private Ref|null $pid = null,
     ) {
         $this->channel = new Channel(1);
     }
 
     /**
      * pid to the backing actor for the Future result.
-     * @return Pid|null
+     * @return Ref|null
      */
-    public function pid(): Pid|null
+    public function pid(): Ref|null
     {
         return $this->pid;
     }
 
-    public function setPid(Pid $pid): void
+    public function setPid(Ref $pid): void
     {
         $this->pid = $pid;
     }
 
-    public function pipeTo(Pid ...$pids): void
+    public function pipeTo(Ref ...$pids): void
     {
-        go(function (Pid ...$pids) {
+        go(function (Ref ...$pids) {
             $this->channel->push(true);
             $this->pipes = array_merge($this->pipes, $pids);
             if ($this->done) {
@@ -130,7 +130,7 @@ class Future
         $this->completions = [];
     }
 
-    public function stop(Pid $pid): void
+    public function stop(Ref $pid): void
     {
         // already stopped
         if ($this->done) {
@@ -191,7 +191,7 @@ class Future
         $f = $futureProcess->getFuture();
         $f->futureProcess = $futureProcess;
         $r = $registry->add($futureProcess, sprintf("future%s", $registry->nextId()));
-        $pid = $r->getPid();
+        $pid = $r->getRef();
         if (!$r->isAdded()) {
             $actorSystem->getLogger()->error("Failed to register future process", ['pid' => $pid]);
         } else {
@@ -210,7 +210,7 @@ class Future
     }
 
     /**
-     * @return Pid[]
+     * @return Ref[]
      */
     public function pipes(): array
     {

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Phluxor\ActorSystem\Message;
 
 use Phluxor\ActorSystem\Child\RestartStatistics;
-use Phluxor\ActorSystem\Pid;
+use Phluxor\ActorSystem\Ref;
 
 /**
  * message is sent to an actor parent when an exception is thrown by one of its methods
@@ -13,20 +13,20 @@ use Phluxor\ActorSystem\Pid;
 readonly class Failure implements SystemMessageInterface
 {
     /**
-     * @param Pid $who
+     * @param Ref $who
      * @param mixed $reason
      * @param RestartStatistics $restartStatistics
      * @param mixed $message
      */
     public function __construct(
-        private Pid $who,
+        private Ref $who,
         private mixed $reason,
         private RestartStatistics $restartStatistics,
         private mixed $message,
     ) {
     }
 
-    public function getWho(): Pid
+    public function getWho(): Ref
     {
         return $this->who;
     }

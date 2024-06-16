@@ -74,7 +74,7 @@ class ProcessRegistryValue
     public function add(ProcessInterface $process, string $id): ProcessRegistryAddResult
     {
         $bucket = $this->localPIDs->getBucket($id);
-        $pid = new Pid(new ActorSystem\ProtoBuf\PID());
+        $pid = new Ref(new ActorSystem\ProtoBuf\PID());
         $pid->protobufPid()->setAddress($this->address);
         $pid->protobufPid()->setId($id);
         return new ProcessRegistryAddResult($pid, $bucket->setIfAbsent($id, $process));
@@ -82,10 +82,10 @@ class ProcessRegistryValue
 
     /**
      * remove a process from the registry
-     * @param Pid $pid
+     * @param Ref $pid
      * @return void
      */
-    public function remove(Pid $pid): void
+    public function remove(Ref $pid): void
     {
         $bucket = $this->localPIDs->getBucket($pid->protobufPid()->getId());
         $ref = $bucket->pop($pid->protobufPid()->getId());
@@ -96,10 +96,10 @@ class ProcessRegistryValue
     }
 
     /**
-     * @param Pid|null $pid
+     * @param Ref|null $pid
      * @return ProcessRegistryResult
      */
-    public function get(?Pid $pid): ProcessRegistryResult
+    public function get(?Ref $pid): ProcessRegistryResult
     {
         if ($pid === null) {
             return new ProcessRegistryResult($this->actorSystem->getDeadLetter(), false);

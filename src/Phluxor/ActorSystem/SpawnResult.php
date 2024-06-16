@@ -9,12 +9,12 @@ use Phluxor\ActorSystem\Exception\SpawnErrorException;
 readonly class SpawnResult
 {
     public function __construct(
-        private Pid|null $pid,
+        private Ref|null $pid,
         private SpawnErrorException|null $isError
     ) {
     }
 
-    public function getPid(): Pid|null
+    public function getRef(): Ref|null
     {
         return $this->pid;
     }

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Test\ActorSystem;
 
 use Phluxor\ActorSystem;
-use Phluxor\ActorSystem\Pid;
+use Phluxor\ActorSystem\Ref;
 use PHPUnit\Framework\TestCase;
 use Swoole\Coroutine;
 use Test\ProcessTrait;
@@ -39,7 +39,7 @@ class FutureTest extends TestCase
                     $system,
                     'a1',
                     null,
-                    function (?Pid $pid, mixed $message) use (&$count) {
+                    function (?Ref $pid, mixed $message) use (&$count) {
                         $this->assertSame('hello', $message);
                         $count++;
                     }
@@ -48,7 +48,7 @@ class FutureTest extends TestCase
                     $system,
                     'a2',
                     null,
-                    function (?Pid $pid, mixed $message) use (&$count) {
+                    function (?Ref $pid, mixed $message) use (&$count) {
                         $this->assertSame('hello', $message);
                         $count++;
                     }
@@ -57,7 +57,7 @@ class FutureTest extends TestCase
                     $system,
                     'a3',
                     null,
-                    function (?Pid $pid, mixed $message) use (&$count) {
+                    function (?Ref $pid, mixed $message) use (&$count) {
                         $this->assertSame('hello', $message);
                         $count++;
                     }
@@ -88,7 +88,7 @@ class FutureTest extends TestCase
                     $system,
                     'a1',
                     null,
-                    function (?Pid $pid, mixed $message) use (&$count) {
+                    function (?Ref $pid, mixed $message) use (&$count) {
                         $this->assertInstanceOf(
                             ActorSystem\Exception\FutureTimeoutException::class,
                             $message
@@ -100,7 +100,7 @@ class FutureTest extends TestCase
                     $system,
                     'a2',
                     null,
-                    function (?Pid $pid, mixed $message) use (&$count) {
+                    function (?Ref $pid, mixed $message) use (&$count) {
                         $this->assertInstanceOf(
                             ActorSystem\Exception\FutureTimeoutException::class,
                             $message
@@ -112,7 +112,7 @@ class FutureTest extends TestCase
                     $system,
                     'a3',
                     null,
-                    function (?Pid $pid, mixed $message) use (&$count) {
+                    function (?Ref $pid, mixed $message) use (&$count) {
                         $this->assertInstanceOf(
                             ActorSystem\Exception\FutureTimeoutException::class,
                             $message
@@ -137,7 +137,7 @@ class FutureTest extends TestCase
 
     public function testFutureCreateTimeoutNoRace(): void
     {
-        run(function () {
+        run(fn: function () {
             $system = ActorSystem::create();
             go(function (ActorSystem $system) {
                 $future = ActorSystem\Future::create($system, 1);
@@ -146,11 +146,8 @@ class FutureTest extends TestCase
                     ActorSystem\Props::fromFunction(
                         new ActorSystem\Message\ReceiveFunction(
                             function (ActorSystem\Context\ContextInterface $context) use ($future) {
-                                switch (true) {
-                                    case $context->message() instanceof ActorSystem\Message\Started:
-                                        $context->send($future->pid(), 'echo');
-                                    default:
-                                        //
+                                if ($context->message() instanceof ActorSystem\Message\Started) {
+                                    $context->send($future->pid(), 'echo');
                                 }
                             }
                         )

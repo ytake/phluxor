@@ -16,18 +16,18 @@ readonly class EventStreamProcess implements ProcessInterface
     ) {
     }
 
-    public function sendUserMessage(?Pid $pid, mixed $message): void
+    public function sendUserMessage(?Ref $pid, mixed $message): void
     {
         $msg = ActorSystem\Message\MessageEnvelope::unwrapEnvelope($message);
         $this->actorSystem->getEventStream()?->publish($msg['message']);
     }
 
-    public function sendSystemMessage(Pid $pid, mixed $message): void
+    public function sendSystemMessage(Ref $pid, mixed $message): void
     {
         // none
     }
 
-    public function stop(Pid $pid): void
+    public function stop(Ref $pid): void
     {
         // none
     }

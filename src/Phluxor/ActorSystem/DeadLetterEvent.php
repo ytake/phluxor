@@ -10,9 +10,9 @@ namespace Phluxor\ActorSystem;
 readonly class DeadLetterEvent
 {
     public function __construct(
-        private Pid|null $pid,
+        private Ref|null $pid,
         private mixed $message,
-        private Pid|null $sender,
+        private Ref|null $sender,
     ) {
     }
 
@@ -21,7 +21,7 @@ readonly class DeadLetterEvent
         return $this->message;
     }
 
-    public function getSender(): Pid|null
+    public function getSender(): Ref|null
     {
         return $this->sender;
     }
@@ -31,7 +31,7 @@ readonly class DeadLetterEvent
         return $this->sender === null;
     }
 
-    public function getPid(): Pid|null
+    public function getRef(): Ref|null
     {
         return $this->pid;
     }

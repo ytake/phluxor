@@ -21,16 +21,16 @@ class GuardiansValue
     ) {
     }
 
-    public function getGuardianPid(SupervisorStrategyInterface $strategy): Pid
+    public function getGuardianPid(SupervisorStrategyInterface $strategy): Ref
     {
         $key = $this->getKeyForStrategy($strategy);
         if (isset($this->guardians[$key])) {
-            return $this->guardians[$key]->getPid();
+            return $this->guardians[$key]->getRef();
         }
 
         $guardian = $this->makeGuardian($strategy);
         $this->guardians[$key] = $guardian;
-        return $guardian->getPid();
+        return $guardian->getRef();
     }
 
     private function makeGuardian(SupervisorStrategyInterface $strategy): GuardianProcess
@@ -46,10 +46,10 @@ class GuardiansValue
         if (!$pid->isAdded()) {
             $this->actorSystem->getLogger()->error(
                 "Failed to register guardian process",
-                ['pid' => $pid->getPid()]
+                ['pid' => $pid->getRef()]
             );
         }
-        $ref->setPid($pid->getPid());
+        $ref->setPid($pid->getRef());
         return $ref;
     }
 
