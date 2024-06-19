@@ -6,7 +6,8 @@ namespace Test\Router;
 
 use Phluxor\ActorSystem;
 use Phluxor\ActorSystem\Ref;
-use Phluxor\Router\RouterSpawner;
+use Phluxor\Router\Message\Broadcast;
+use Phluxor\Router\Config;
 use PHPUnit\Framework\TestCase;
 use Test\ProcessTrait;
 
@@ -18,32 +19,38 @@ class ProcessTest extends TestCase
 
     public function testRouterSendsUserMessageToChild(): void
     {
-        $this->markTestSkipped('Not implemented yet');
         run(function () {
             \Swoole\Coroutine\go(function () {
+                $proceed = false;
                 $system = ActorSystem::create();
                 $r = $this->spawnMockProcess(
                     $system,
                     'child',
                     null,
-                    function (?Ref $pid, mixed $message) {
-                        var_dump($message);
+                    function (?Ref $pid, mixed $message) use (&$proceed) {
+                        $proceed = true;
+                        $this->assertInstanceOf(Broadcast::class, $message);
+                        $this->assertSame('hello', $message->getMessage());
                     }
                 );
                 $set = new ActorSystem\RefSet($r['ref']);
-                $rs = new TestRouterState($system);
+                $rs = new TestRouterState($system, $set);
                 $gr = new TestGroupRouter($system);
-                $system->root()->spawn(
+                $gr->setRouterState($rs);
+                $routerRef = $system->root()->spawn(
                     ActorSystem\Props::fromFunction(
                         new ActorSystem\Message\ReceiveFunction(
                             function (ActorSystem\Context\ContextInterface $context) {
                                 var_dump($context->message());
                             }
                         ),
-                        ActorSystem\Props::withSpawnFunc(RouterSpawner::spawner($gr))
+                        ActorSystem\Props::withSpawnFunc(Config::spawner($gr))
                     )
                 );
+                $system->root()->send($routerRef, new Broadcast('hello'));
+                $system->root()->requestWithCustomSender($routerRef, 'hello', $routerRef);
                 $this->removeMockProcess($system, $r['ref']);
+                $this->assertTrue($proceed);
             });
         });
     }

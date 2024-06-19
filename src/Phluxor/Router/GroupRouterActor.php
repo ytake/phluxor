@@ -42,7 +42,7 @@ class GroupRouterActor implements ActorInterface
                 }
                 $context->watch($ref);
                 $r->add($ref);
-                $this->state->registerRoute($r);
+                $this->state->registerRoutees($r);
                 break;
             case $msg instanceof RemoveRoutee:
                 $r = $this->state->getRoutees();
@@ -52,7 +52,7 @@ class GroupRouterActor implements ActorInterface
                 }
                 $context->unwatch($ref);
                 $r->remove($ref);
-                $this->state->registerRoute($r);
+                $this->state->registerRoutees($r);
                 break;
             case $msg instanceof Broadcast:
                 $r = $this->state->getRoutees();

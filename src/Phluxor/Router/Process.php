@@ -34,7 +34,6 @@ class Process implements ActorSystem\ProcessInterface
             $this->poison($pid);
             return;
         }
-
         if ((new RouterMessage($msg))->isManagementMessage()) {
             $this->state->routeMessage($message);
             return;
@@ -128,7 +127,11 @@ class Process implements ActorSystem\ProcessInterface
         $this->state = $state;
     }
 
-    public function setParent(Ref $parent): void
+    /**
+     * @param Ref|null $parent
+     * @return void
+     */
+    public function setParent(?Ref $parent): void
     {
         $this->parent = $parent;
     }
