@@ -11,7 +11,7 @@ use Phluxor\ActorSystem\Props;
 use Phluxor\ActorSystem\SpawnResult;
 use Swoole\Coroutine\WaitGroup;
 
-class RouterSpawner
+class Config
 {
     private function __construct()
     {
@@ -53,11 +53,10 @@ class RouterSpawner
         $props->configure(fn(ActorSystem\Props $props) => null);
         $process->setState($config->createRouterState());
 
+        $wg = new WaitGroup();
+        $wg->add(1);
+        $spawner = new ActorSystem\Spawner\DefaultSpawner();
         if ($config->routerType() == RouterType::GroupRouterType) {
-            $wg = new WaitGroup();
-            $wg->add(1);
-            $spawner = new ActorSystem\Spawner\DefaultSpawner();
-
             $ref = $spawner(
                 $actorSystem,
                 sprintf("%s/router", $id),
@@ -71,12 +70,7 @@ class RouterSpawner
                 ),
                 $parent
             );
-            $process->setRouter($ref->getRef());
-            $wg->wait();
         } else {
-            $wg = new WaitGroup();
-            $wg->add(1);
-            $spawner = new ActorSystem\Spawner\DefaultSpawner();
             $ref = $spawner(
                 $actorSystem,
                 sprintf("%s/router", $id),
@@ -90,9 +84,9 @@ class RouterSpawner
                 ),
                 $parent
             );
-            $process->setRouter($ref->getRef());
-            $wg->wait();
         }
+        $process->setRouter($ref->getRef());
+        $wg->wait();
         $process->setParent($parent->self());
         return new ActorSystem\SpawnResult($result->getRef(), null);
     }

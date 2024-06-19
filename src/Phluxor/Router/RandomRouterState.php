@@ -2,29 +2,30 @@
 
 declare(strict_types=1);
 
-namespace Test\Router;
+namespace Phluxor\Router;
 
-use Phluxor\ActorSystem;
 use Phluxor\ActorSystem\Context\ContextInterface;
 use Phluxor\ActorSystem\Context\SenderInterface;
-use Phluxor\ActorSystem\Ref;
 use Phluxor\ActorSystem\RefSet;
-use Phluxor\Router\StateInterface;
+use Phluxor\Router\Exception\InvalidIndexException;
 
-class TestRouterState implements StateInterface
+use function rand;
+
+class RandomRouterState implements StateInterface
 {
     public function __construct(
-        private ActorSystem $system,
-        private RefSet|null $routees = null,
-        private SenderInterface|null $sender = null
+        private RefSet $routees = new RefSet(),
+        private ?SenderInterface $sender = null
     ) {
     }
 
     public function routeMessage(mixed $message): void
     {
-        $this->routees->forEach(
-            fn(int $_, Ref $ref) => $this->system->root()->send($ref, $message)
-        );
+        $ref = $this->routees->get(rand(0, $this->routees->len()));
+        if ($ref === null) {
+            throw new InvalidIndexException('Invalid route index, not found routee.');
+        }
+        $this->sender->send($ref, $message);
     }
 
     public function registerRoutees(RefSet $routes): void
