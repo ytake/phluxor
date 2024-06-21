@@ -51,7 +51,7 @@ readonly class PoolRouterActor implements ActorInterface
                 }
                 $context->watch($ref);
                 $r->add($ref);
-                $this->state->registerRoute($r);
+                $this->state->registerRoutees($r);
                 break;
             case $msg instanceof RemoveRoutee:
                 $r = $this->state->getRoutees();
@@ -61,7 +61,7 @@ readonly class PoolRouterActor implements ActorInterface
                 }
                 $context->unwatch($ref);
                 $r->remove($ref);
-                $this->state->registerRoute($r);
+                $this->state->registerRoutees($r);
                 usleep(1000 * 1000);
                 $context->send($ref, new PoisonPill());
                 break;
@@ -89,7 +89,7 @@ readonly class PoolRouterActor implements ActorInterface
             case $msg instanceof Terminated:
                 $r = $this->state->getRoutees();
                 if ($r->remove($msg->getWho())) {
-                    $this->state->registerRoute($r);
+                    $this->state->registerRoutees($r);
                 }
                 break;
         }

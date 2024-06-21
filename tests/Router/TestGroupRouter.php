@@ -14,6 +14,8 @@ use Phluxor\Router\StateInterface;
 
 class TestGroupRouter implements ConfigInterface
 {
+    private ?StateInterface $state = null;
+
     public function __construct(
         private ActorSystem $system,
         private GroupRouter|null $router = null,
@@ -22,7 +24,7 @@ class TestGroupRouter implements ConfigInterface
 
     public function routerType(): RouterType
     {
-        // TODO: Implement routerType() method.
+        return RouterType::GroupRouterType;
     }
 
     public function onStarter(ContextInterface $context, Props $props, StateInterface $state): void
@@ -30,8 +32,16 @@ class TestGroupRouter implements ConfigInterface
         // TODO: Implement onStarter() method.
     }
 
+    public function setRouterState(StateInterface $state): void
+    {
+        $this->state = $state;
+    }
+
     public function createRouterState(): StateInterface
     {
+        if ($this->state !== null) {
+            return $this->state;
+        }
         return new TestRouterState($this->system);
     }
 }
