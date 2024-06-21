@@ -9,6 +9,8 @@ use Phluxor\ActorSystem\Props;
 use Phluxor\ActorSystem\SpawnResult;
 use Phluxor\ActorSystem\Context\SpawnerInterface;
 
+use function sprintf;
+
 class DefaultSpawner implements ActorSystem\SpawnFunctionInterface
 {
     /**
@@ -36,8 +38,8 @@ class DefaultSpawner implements ActorSystem\SpawnFunctionInterface
         if (!$addResult->isAdded()) {
             return new SpawnResult(
                 $addResult->getRef(),
-                new ActorSystem\Exception\SpawnErrorException(
-                    'Actor with id ' . $id . ' already exists'
+                new ActorSystem\Exception\NameExistsException(
+                    sprintf('Actor with id %s already exists', $id)
                 )
             );
         }
