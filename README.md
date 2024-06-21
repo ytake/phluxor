@@ -75,7 +75,7 @@ class TicketSeller implements ActorInterface
         $msg = $context->message();
         switch (true) {
             case $msg instanceof Add:
-                // actorの状態を変更します
+                // change actor state
                 $this->name    = $msg->name;
                 $this->tickets = $msg->tickets;
                 $this->id      = $context->self()?->protobufPid()->getId();
