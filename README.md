@@ -2,7 +2,7 @@
 
 A toolkit for flexible actor models in PHP, empowering the PHP ecosystem.
 
-requires PHP 8.3 and swoole 5.0 or later.
+requires PHP 8.3 and swoole / open swoole.
 
 and Protocol Buffers for message serialization. / not supported other serialization formats yet.
 
@@ -10,14 +10,9 @@ Documentation is under preparation.
 
 do not use this in production yet.
 
-## work in progress
+[sample application / phluxor-http-application-samples](https://github.com/ytake/phluxor-http-application-samples)
 
-- router / round-robin, broadcast, scatter-gather, etc.
-- open telemetry support (tracing, metrics, etc.)
-- virtual actors / cluster support
-- typed streams
-
-already implemented:
+## already implemented
 
 - actor model
 - actor lifecycle
@@ -31,6 +26,13 @@ already implemented:
 - persistent actors
 
 
+## work in progress
+
+- router / round-robin, broadcast, scatter-gather, etc.
+- open telemetry support (tracing, metrics, etc.)
+- virtual actors / cluster support
+- typed streams
+
 now local actors are supported, and remote actors are in progress.
 
 ## Supervision
@@ -41,6 +43,107 @@ exception handling is done by the actor system, and the actor can be supervised 
 - `AllForOneStrategy`
 - `ExponentialBackoffStrategy`
 - `RestartStrategy`
+
+## Easy to use
+
+like a akka http, you can use it with a simple API.  
+use mezzio / mezzio-swoole / phluxor.  
+and you can use it with swoole / open swoole.
+
+```php
+<?php
+
+declare(strict_types=1);
+
+namespace App\ActorSystem;
+
+use App\Message\Add;
+use App\Message\Cancel;
+use App\Message\Event;
+use App\Message\GetEvent;
+use Phluxor\ActorSystem\Context\ContextInterface;
+use Phluxor\ActorSystem\Message\ActorInterface;
+
+class TicketSeller implements ActorInterface
+{
+    private int $tickets = 0;
+    private string $name = '';
+    private string $id   = '';
+
+    public function receive(ContextInterface $context): void
+    {
+        $msg = $context->message();
+        switch (true) {
+            case $msg instanceof Add:
+                // actorの状態を変更します
+                $this->name    = $msg->name;
+                $this->tickets = $msg->tickets;
+                $this->id      = $context->self()?->protobufPid()->getId();
+                break;
+            case $msg instanceof GetEvent:
+                $context->requestWithCustomSender(
+                    $context->sender(),
+                    new Event($this->name, $this->tickets),
+                    $context->parent()
+                );
+                break;
+            case $msg instanceof Cancel:
+                $context->requestWithCustomSender(
+                    $context->sender(),
+                    new Cancel(),
+                    $context->parent()
+                );
+                $context->poison($context->self());
+                break;
+        }
+    }
+}
+```
+
+send message to actor.
+
+```php
+<?php
+
+declare(strict_types=1);
+
+namespace App\ActorSystem;
+
+use App\Event\EventCreated;
+use App\Message\EventDescription;
+use App\Message\EventExists;
+use Phluxor\ActorSystem\Context\ContextInterface;
+use Phluxor\ActorSystem\Exception\SpawnErrorException;
+use Phluxor\ActorSystem\Message\ActorInterface;
+use Phluxor\ActorSystem\Props;
+use Swoole\Coroutine\WaitGroup;
+
+use function array_merge;
+use function sprintf;
+
+class BoxOffice implements ActorInterface
+{
+    public function receive(ContextInterface $context): void
+    {
+        $msg = $context->message();
+        switch (true) {
+            case $msg instanceof EventDescription:
+                try {
+                    $result = $context->spawnNamed(
+                        Props::fromProducer(fn() => new TicketSeller()),
+                        $msg->name
+                    );
+                    $context->send($result->getRef(), new Add($msg->name, $msg->tickets));
+                    $context->respond(new EventCreated($msg->name, $msg->tickets));
+                } catch (SpawnErrorException $e) {
+                    $context->respond(new EventExists());
+                }
+                break;
+            }
+        }
+    }
+}
+```
 
 ## Become/Unbecome
 
