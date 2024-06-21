@@ -12,6 +12,12 @@ do not use this in production yet.
 
 [sample application / phluxor-http-application-samples](https://github.com/ytake/phluxor-http-application-samples)
 
+## Installation
+
+```bash
+$ composer require phluxor/phluxor:dev-main
+```
+
 ## already implemented
 
 - actor model
