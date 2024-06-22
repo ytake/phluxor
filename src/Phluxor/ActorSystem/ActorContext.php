@@ -10,6 +10,7 @@ use Phluxor\ActorSystem\Message\ActorInterface;
 use Phluxor\ActorSystem\Message\MessageEnvelope;
 use Phluxor\Value\ContextExtensionId;
 use Psr\Log\LoggerInterface;
+use RuntimeException;
 use Swoole\Atomic\Long;
 use Throwable;
 
@@ -265,13 +266,13 @@ class ActorContext implements
         if ($this->props->senderMiddlewareChain() != null) {
             $chain = $this->props->senderMiddlewareChain();
             $chain($this->ensureExtras()->context(), $pid, MessageEnvelope::wrapEnvelope($message));
-        } else {
-            if ($pid != null) {
-                $pid->sendUserMessage($this->actorSystem, $message);
-            } else {
-                $this->actorSystem->getDeadLetter()->sendUserMessage($pid, $message);
-            }
+            return;
         }
+        if ($pid != null) {
+            $pid->sendUserMessage($this->actorSystem, $message);
+            return;
+        }
+        $this->actorSystem->getDeadLetter()->sendUserMessage($pid, $message);
     }
 
     /**
@@ -368,7 +369,7 @@ class ActorContext implements
     public function spawnNamed(Props $props, string $name): SpawnResult
     {
         if ($props->getGuardianStrategy() != null) {
-            throw new \RuntimeException("props used to spawn child cannot have GuardianStrategy");
+            throw new RuntimeException("props used to spawn child cannot have GuardianStrategy");
         }
         $id = "";
         if ($this->self != null) {
@@ -378,9 +379,6 @@ class ActorContext implements
             $r = $this->props->spawnMiddlewareChain()($this->actorSystem, sprintf("%s/%s", $id, $name), $props, $this);
         } else {
             $r = $props->spawn($this->actorSystem, sprintf("%s/%s", $id, $name), $this);
-        }
-        if ($r->isError() instanceof ActorSystem\Exception\SpawnErrorException) {
-            throw $r->isError();
         }
         if ($r->getRef() == null) {
             throw new ActorSystem\Exception\SpawnErrorException("spawned child pid is null");
