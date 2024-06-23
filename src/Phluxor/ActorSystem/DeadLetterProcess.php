@@ -4,11 +4,16 @@ declare(strict_types=1);
 
 namespace Phluxor\ActorSystem;
 
+use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use Phluxor\ActorSystem;
 use Phluxor\ActorSystem\ProtoBuf\Stop;
+use Phluxor\Metrics\ActorMetrics;
+use Phluxor\Metrics\PhluxorMetrics;
 
 readonly class DeadLetterProcess implements ProcessInterface
 {
+    use ActorSystem\Metrics\MetricsSystemTrait;
+
     /**
      * @param ActorSystem $actorSystem
      */
@@ -20,6 +25,20 @@ readonly class DeadLetterProcess implements ProcessInterface
 
     public function sendUserMessage(?Ref $pid, mixed $message): void
     {
+        $metricsSystem = $this->enabledMetricsSystem($this->actorSystem);
+        if ($metricsSystem) {
+            $instruments = $metricsSystem->metrics()->find(PhluxorMetrics::INTERNAL_ACTOR_METRICS);
+            if ($instruments instanceof ActorMetrics) {
+                $instruments->getDeadLetterCounter()
+                    ->add(
+                        1,
+                        Attributes::create([
+                            'address' => $this->actorSystem->address(),
+                            'messagetype' => get_debug_type($message),
+                        ])
+                    );
+            }
+        }
         $m = ActorSystem\Message\MessageEnvelope::wrapEnvelope($message);
         $this->actorSystem->getEventStream()?->publish(
             new DeadLetterEvent(
@@ -64,14 +83,14 @@ readonly class DeadLetterProcess implements ProcessInterface
                         new ActorSystem\ProtoBuf\DeadLetterResponse()
                     );
                 }
-                if ($this->actorSystem->config()->deadLetterRequestLogging() && !$message->isNoSender()) {
+                if ($this->actorSystem->config()->deadLetterRequestLogging() && $message->isNoSender()) {
                     if ($throttle->shouldThrottle() == Valve::Open) {
                         $this->actorSystem->getLogger()->info(
                             "deadletter",
                             [
                                 "message" => $message->getMessage(),
-                                "sender" => $message->getSender(),
-                                "pid" => $message->getRef()
+                                "sender" => (string) $message->getSender(),
+                                "pid" => (string) $message->getRef()
                             ]
                         );
                     }
@@ -88,7 +107,7 @@ readonly class DeadLetterProcess implements ProcessInterface
                             $this->actorSystem,
                             new ActorSystem\ProtoBuf\Terminated([
                                 "who" => $message->getRef(),
-                                'why'  => ActorSystem\ProtoBuf\TerminatedReason::NotFound
+                                'why' => ActorSystem\ProtoBuf\TerminatedReason::NotFound
                             ])
                         );
                     }

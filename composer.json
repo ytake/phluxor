@@ -19,11 +19,15 @@
   ],
   "require": {
     "php": "^8.3",
-    "ramsey/uuid": "^4.7.5",
+    "google/protobuf": "^3.25.3",
+    "guzzlehttp/promises": "^2.0",
+    "monolog/monolog": "^3.6.0",
+    "open-telemetry/context-swoole": "^1.0.1",
+    "open-telemetry/opentelemetry": "^1.0.0",
     "pascaldevink/shortuuid": "^4.0.0",
+    "php-http/httplug": "^2.4",
     "psr/log": "^3.0",
-    "google/protobuf": "v4.26.1",
-    "monolog/monolog": "^3.6.0"
+    "ramsey/uuid": "^4.7.5"
   },
   "require-dev": {
     "phpunit/phpunit": "^10.5.11",
@@ -34,7 +38,10 @@
   },
   "suggest": {
     "ext-openswoole": "The package requires at least one of Open Swoole or Swoole",
-    "ext-swoole": "The package requires at least one of Open Swoole or Swoole"
+    "ext-swoole": "The package requires at least one of Open Swoole or Swoole",
+    "ext-opentelemetry": "Automatic instrumentation with PHP requires at least PHP 8.0",
+    "ext-grpc": "to use vitual actor model with grpc",
+    "ext-protobuf": "serialization with protobuf"
   },
   "autoload": {
     "psr-4": {
@@ -54,9 +61,11 @@
       "./vendor/bin/phpunit"
     ],
     "cs": [
+      "Composer\\Config::disableProcessTimeout",
       "phpcs --standard=./phpcs.xml --ignore=*/ProtoBuf/*,*/Metadata/* src tests"
     ],
     "cs-fix": [
+      "Composer\\Config::disableProcessTimeout",
       "./vendor/bin/phpcbf --ignore=*/ProtoBuf/*,*/Metadata/* src tests"
     ]
   },
@@ -65,7 +74,8 @@
     "preferred-install": "dist",
     "sort-packages": true,
     "allow-plugins": {
-      "dealerdirect/phpcodesniffer-composer-installer": true
+      "dealerdirect/phpcodesniffer-composer-installer": true,
+      "php-http/discovery": true
     }
   }
 }

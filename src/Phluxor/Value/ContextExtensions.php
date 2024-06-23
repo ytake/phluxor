@@ -6,10 +6,10 @@ namespace Phluxor\Value;
 
 use SplFixedArray;
 
-final class ContextExtensions
+final readonly class ContextExtensions
 {
     /**
-     * @param SplFixedArray<ContextExtensionId> $extensions
+     * @param SplFixedArray<ExtensionInterface> $extensions
      */
     public function __construct(
         private SplFixedArray $extensions = new SplFixedArray(100)
@@ -18,22 +18,20 @@ final class ContextExtensions
 
     /**
      * @param ContextExtensionId $id
-     * @return ContextExtensionId
+     * @return ExtensionInterface
      */
-    public function get(ContextExtensionId $id): ContextExtensionId
+    public function get(ContextExtensionId $id): ExtensionInterface
     {
         return $this->extensions->offsetGet($id->value());
     }
 
     /**
-     * @param ContextExtensionId $id
+     * @param ExtensionInterface $extension
      * @return void
      */
-    public function set(ContextExtensionId $id): void
+    public function set(ExtensionInterface $extension): void
     {
-        if ($id->value() >= $this->extensions->getSize()) {
-            $this->extensions = new SplFixedArray($id->value() * 2);
-        }
-        $this->extensions->offsetSet($id->value(), $id);
+        $extensionId = $extension->extensionID();
+        $this->extensions->offsetSet($extensionId->value(), $extension);
     }
 }

@@ -7,8 +7,10 @@ namespace Phluxor\ActorSystem;
 interface ProcessInterface
 {
     /**
-     * @param ?Ref $pid
-     * @param mixed $message
+     * Sends a user message.
+     *
+     * @param Ref|null $pid The reference to an actor.
+     * @param mixed $message The message to send.
      * @return void
      */
     public function sendUserMessage(?Ref $pid, mixed $message): void;

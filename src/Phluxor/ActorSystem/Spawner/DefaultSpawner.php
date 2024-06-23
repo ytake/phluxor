@@ -4,10 +4,13 @@ declare(strict_types=1);
 
 namespace Phluxor\ActorSystem\Spawner;
 
+use OpenTelemetry\API\Metrics\ObserverInterface;
 use Phluxor\ActorSystem;
 use Phluxor\ActorSystem\Props;
 use Phluxor\ActorSystem\SpawnResult;
 use Phluxor\ActorSystem\Context\SpawnerInterface;
+use Phluxor\Metrics\ActorMetrics;
+use Phluxor\Metrics\PhluxorMetrics;
 
 use function sprintf;
 
@@ -32,6 +35,9 @@ class DefaultSpawner implements ActorSystem\SpawnFunctionInterface
             parent: $parentContext->self()
         );
         $mailbox = $props->produceMailbox();
+
+        $this->prepareMailboxMetrics($actorSystem, $mailbox, $context);
+
         $dispatcher = $props->getDispatcher();
         $process = new ActorSystem\ActorProcess($mailbox);
         $addResult = $actorSystem->getProcessRegistry()->add($process, $id);
@@ -52,5 +58,37 @@ class DefaultSpawner implements ActorSystem\SpawnFunctionInterface
             $addResult->getRef(),
             null
         );
+    }
+
+    /**
+     * @param ActorSystem $actorSystem
+     * @param ActorSystem\Mailbox\MailboxInterface $mailbox
+     * @param ActorSystem\ActorContext $context
+     * @return void
+     */
+    public function prepareMailboxMetrics(
+        ActorSystem $actorSystem,
+        ActorSystem\Mailbox\MailboxInterface $mailbox,
+        ActorSystem\ActorContext $context
+    ): void {
+        if ($actorSystem->config()->metricsProvider() !== null) {
+            $id = $actorSystem->metrics()?->extensionID();
+            if ($id != null) {
+                $metricsSystem = $actorSystem->extensions()->get($id);
+                if ($metricsSystem instanceof ActorSystem\Metrics) {
+                    if ($metricsSystem->isEnabled()) {
+                        $instruments = $metricsSystem->metrics()->find(PhluxorMetrics::INTERNAL_ACTOR_METRICS);
+                        if ($instruments instanceof ActorMetrics) {
+                            $metricsSystem->prepareMailboxLengthGauge(
+                                fn(ObserverInterface $observer) => $observer->observe(
+                                    $mailbox->userMessageCount(),
+                                    $metricsSystem->commonLabels($context)
+                                )
+                            );
+                        }
+                    }
+                }
+            }
+        }
     }
 }

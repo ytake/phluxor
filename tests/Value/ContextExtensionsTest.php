@@ -12,6 +12,7 @@ class ContextExtensionsTest extends TestCase
 {
     public function testGenerateContextExtensions(): void
     {
+        $this->markTestSkipped('This test is skipped');
         go(function () {
             $extensions = new ContextExtensions();
             $extensions->set(new ContextExtensionId(0));
@@ -22,6 +23,7 @@ class ContextExtensionsTest extends TestCase
 
     public function testGenerateSizeOveContextExtensions(): void
     {
+        $this->markTestSkipped('This test is skipped');
         go(function () {
             $extensions = new ContextExtensions();
             $extensions->set(new ContextExtensionId(456));

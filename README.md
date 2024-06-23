@@ -30,12 +30,13 @@ $ composer require phluxor/phluxor:dev-main
 - event stream
 - future
 - persistent actors
-
+- [OpenTelemetry](https://opentelemetry.io/docs/languages/php/) support (metrics) 
+- group /pool router
 
 ## work in progress
 
 - router / round-robin, broadcast, scatter-gather, etc.
-- open telemetry support (tracing, metrics, etc.)
+- open telemetry support (tracing)
 - virtual actors / cluster support
 - typed streams
 
