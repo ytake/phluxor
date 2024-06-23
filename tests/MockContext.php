@@ -16,20 +16,21 @@ use Phluxor\ActorSystem\ReenterAfterInterface;
 use Phluxor\ActorSystem\Ref;
 use Phluxor\ActorSystem\SpawnResult;
 use Phluxor\Value\ContextExtensionId;
+use Phluxor\Value\ExtensionInterface;
 use Psr\Log\LoggerInterface;
 
 class MockContext implements \Phluxor\ActorSystem\Context\ContextInterface
 {
-    /** @var Closure(): mixed|null    */
+    /** @var Closure(): mixed|null */
     private ?Closure $messageHandler = null;
 
-    /** @var Closure(mixed): void|null  */
+    /** @var Closure(mixed): void|null */
     private ?Closure $respondHandler = null;
 
-    /** @var Closure(?Ref, mixed): void|null  */
+    /** @var Closure(?Ref, mixed): void|null */
     private ?Closure $sendHandler = null;
 
-    /** @var Closure(?Ref, mixed, ?Ref): void|null  */
+    /** @var Closure(?Ref, mixed, ?Ref): void|null */
     private ?Closure $requestWithCustomSenderHandler = null;
 
     /**
@@ -109,12 +110,12 @@ class MockContext implements \Phluxor\ActorSystem\Context\ContextInterface
         // TODO: Implement reenterAfter() method.
     }
 
-    public function get(ContextExtensionId $id): ContextExtensionId
+    public function get(ContextExtensionId $id): ExtensionInterface
     {
         // TODO: Implement get() method.
     }
 
-    public function set(ContextExtensionId $id): void
+    public function set(ExtensionInterface $extension): void
     {
         // TODO: Implement set() method.
     }

@@ -5,8 +5,11 @@ declare(strict_types=1);
 namespace Phluxor\ActorSystem;
 
 use Closure;
+use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use Phluxor\ActorSystem;
 use Phluxor\ActorSystem\Exception\FutureTimeoutException;
+use Phluxor\Metrics\ActorMetrics;
+use Phluxor\Metrics\PhluxorMetrics;
 use Swoole\Coroutine\Channel;
 use Swoole\Timer;
 
@@ -14,6 +17,8 @@ use function go;
 
 class Future
 {
+    use ActorSystem\Metrics\MetricsSystemTrait;
+
     /** @var Ref[] */
     private array $pipes = [];
     private mixed $result = null;
@@ -195,6 +200,20 @@ class Future
         if (!$r->isAdded()) {
             $actorSystem->getLogger()->error("Failed to register future process", ['pid' => $pid]);
         } else {
+            $metricsSystem = $f->enabledMetricsSystem($actorSystem);
+            if ($metricsSystem) {
+                $instruments = $metricsSystem->metrics()->find(PhluxorMetrics::INTERNAL_ACTOR_METRICS);
+                if ($instruments instanceof ActorMetrics) {
+                    $instruments->getFuturesStartedCount()
+                        ->add(
+                            1,
+                            Attributes::create([
+                                'address' => $actorSystem->address(),
+                                'actor_ref' => (string)$pid,
+                            ])
+                        );
+                }
+            }
             $f->setPid($pid);
         }
         if ($duration >= 0) {
@@ -215,5 +234,18 @@ class Future
     public function pipes(): array
     {
         return $this->pipes;
+    }
+
+    /**
+     * @return ActorSystem
+     */
+    public function getActorSystem(): ActorSystem
+    {
+        return $this->actorSystem;
+    }
+
+    public function isError(): bool
+    {
+        return $this->error !== null;
     }
 }

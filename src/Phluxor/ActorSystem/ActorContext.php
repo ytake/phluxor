@@ -8,12 +8,16 @@ use DateInterval;
 use Phluxor\ActorSystem;
 use Phluxor\ActorSystem\Message\ActorInterface;
 use Phluxor\ActorSystem\Message\MessageEnvelope;
+use Phluxor\Metrics\ActorMetrics;
+use Phluxor\Metrics\PhluxorMetrics;
 use Phluxor\Value\ContextExtensionId;
+use Phluxor\Value\ExtensionInterface;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Swoole\Atomic\Long;
 use Throwable;
 
+use function microtime;
 use function sprintf;
 
 class ActorContext implements
@@ -23,6 +27,8 @@ class ActorContext implements
     ActorSystem\Context\SpawnerInterface,
     SupervisorInterface
 {
+    use ActorSystem\Metrics\MetricsSystemTrait;
+
     private const int stateAlive = 0;
     private const int stateRestarting = 1;
     private const int stateStopping = 2;
@@ -397,6 +403,7 @@ class ActorContext implements
         if ($pid == null) {
             return;
         }
+        $this->handleActorStoppedMetrics();
         $pid->ref($this->actorSystem)?->stop($pid);
     }
 
@@ -470,7 +477,11 @@ class ActorContext implements
                 $this->ensureExtras()->stopReceiveTimeoutTimer();
             }
         }
-        $this->processMessage($message);
+        if ($this->actorSystem->config()->metricsProvider() !== null) {
+            $this->handleActorMessageReceiveMetricsRecord($message);
+        } else {
+            $this->processMessage($message);
+        }
         if ($this->receiveTimeout->s > 0 && $influenceTimeout) {
             $this->ensureExtras()->resetReceiveTimeoutTimer($this->receiveTimeout->s);
         }
@@ -503,6 +514,22 @@ class ActorContext implements
         $this->state->set(self::stateAlive);
         $this->actor = $this->props->producer($this->actorSystem);
         // open telemetry
+        $id = $this->actorSystem->metrics()?->extensionID();
+        if ($id != null) {
+            $metricsSystem = $this->actorSystem->extensions()->get($id);
+            if ($metricsSystem instanceof ActorSystem\Metrics) {
+                if ($metricsSystem->isEnabled()) {
+                    $instruments = $metricsSystem->metrics()
+                        ->find(PhluxorMetrics::INTERNAL_ACTOR_METRICS);
+                    if ($instruments instanceof ActorMetrics) {
+                        $instruments->getActorSpawnCounter()->add(
+                            1,
+                            $metricsSystem->commonLabels($this)
+                        );
+                    }
+                }
+            }
+        }
     }
 
     public function invokeSystemMessage(mixed $message): void
@@ -603,6 +630,7 @@ class ActorContext implements
         $this->stopAllChildren();
         $this->tryRestartOrTerminate();
         // add metrics
+        $this->handleRestartedCountMetrics();
     }
 
     private function handleStop(): void
@@ -747,6 +775,7 @@ class ActorContext implements
         if ($this->self == null) {
             return;
         }
+        $this->handleActorFailureMetrics();
         $failure = new ActorSystem\Message\Failure(
             who: $this->self,
             reason: $reason,
@@ -782,14 +811,14 @@ class ActorContext implements
         }
     }
 
-    public function get(ContextExtensionId $id): ContextExtensionId
+    public function get(ContextExtensionId $id): ExtensionInterface
     {
         return $this->ensureExtras()->extensions()->get($id);
     }
 
-    public function set(ContextExtensionId $id): void
+    public function set(ExtensionInterface $extension): void
     {
-        $this->ensureExtras()->extensions()->set($id);
+        $this->ensureExtras()->extensions()->set($extension);
     }
 
     public function __toString(): string
@@ -798,5 +827,72 @@ class ActorContext implements
             return "";
         }
         return $this->self->protobufPid()->serializeToString();
+    }
+
+    /**
+     * @return void
+     */
+    private function handleActorFailureMetrics(): void
+    {
+        $metricsSystem = $this->enabledMetricsSystem($this->actorSystem);
+        if ($metricsSystem) {
+            $instruments = $metricsSystem->metrics()->find(PhluxorMetrics::INTERNAL_ACTOR_METRICS);
+            if ($instruments instanceof ActorMetrics) {
+                $instruments->getActorFailureCount()->add(1, $metricsSystem->commonLabels($this));
+            }
+        }
+    }
+
+    private function handleActorMessageReceiveMetricsRecord(mixed $message): void
+    {
+        $metricsSystem = $this->enabledMetricsSystem($this->actorSystem);
+        if ($metricsSystem) {
+            $instruments = $metricsSystem->metrics()->find(PhluxorMetrics::INTERNAL_ACTOR_METRICS);
+            if ($instruments instanceof ActorMetrics) {
+                $start = microtime(true);
+                $this->processMessage($message);
+                $end = microtime(true);
+                $executionTime = $end - $start;
+                $instruments
+                    ->getActorMessageReceiveHistogram()
+                    ->record(
+                        $executionTime,
+                        array_merge($metricsSystem->commonLabels($this)->toArray(), [
+                            'messagetype' => get_debug_type($message),
+                        ])
+                    );
+            }
+        }
+    }
+
+    /**
+     * @return void
+     */
+    private function handleRestartedCountMetrics(): void
+    {
+        $metricsSystem = $this->enabledMetricsSystem($this->actorSystem);
+        if ($metricsSystem) {
+            $instruments = $metricsSystem->metrics()->find(PhluxorMetrics::INTERNAL_ACTOR_METRICS);
+            if ($instruments instanceof ActorMetrics) {
+                $instruments->getActorRestartedCounter()->add(
+                    1,
+                    $metricsSystem->commonLabels($this)
+                );
+            }
+        }
+    }
+
+    private function handleActorStoppedMetrics(): void
+    {
+        $metricsSystem = $this->enabledMetricsSystem($this->actorSystem);
+        if ($metricsSystem) {
+            $instruments = $metricsSystem->metrics()->find(PhluxorMetrics::INTERNAL_ACTOR_METRICS);
+            if ($instruments instanceof ActorMetrics) {
+                $instruments->getActorStoppedCounter()->add(
+                    1,
+                    $metricsSystem->commonLabels($this)
+                );
+            }
+        }
     }
 }

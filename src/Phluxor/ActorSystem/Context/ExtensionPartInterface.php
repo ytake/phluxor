@@ -5,14 +5,19 @@ declare(strict_types=1);
 namespace Phluxor\ActorSystem\Context;
 
 use Phluxor\Value\ContextExtensionId;
+use Phluxor\Value\ExtensionInterface;
 
 interface ExtensionPartInterface
 {
     /**
      * @param ContextExtensionId $id
-     * @return ContextExtensionId
+     * @return ExtensionInterface
      */
-    public function get(ContextExtensionId $id): ContextExtensionId;
+    public function get(ContextExtensionId $id): ExtensionInterface;
 
-    public function set(ContextExtensionId $id): void;
+    /**
+     * @param ExtensionInterface $extension
+     * @return void
+     */
+    public function set(ExtensionInterface $extension): void;
 }

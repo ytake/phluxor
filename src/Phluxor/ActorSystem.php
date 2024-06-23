@@ -8,7 +8,9 @@ use Brick\Math\Exception\MathException;
 use Phluxor\ActorSystem\Config;
 use Phluxor\ActorSystem\DeadLetterProcess;
 use Phluxor\ActorSystem\EventStreamProcess;
+use Phluxor\ActorSystem\Exception\ExtensionNotLoadedException;
 use Phluxor\ActorSystem\GuardiansValue;
+use Phluxor\ActorSystem\Metrics;
 use Phluxor\ActorSystem\Ref;
 use Phluxor\ActorSystem\ProcessRegistryValue;
 use Phluxor\ActorSystem\RootContext;
@@ -49,11 +51,19 @@ class ActorSystem
 
     /** @var LoggerInterface */
     private LoggerInterface $logger;
+    private Channel $stopper;
+    private ?Metrics $metrics = null;
 
     public function __construct(
         private readonly Config $config = new Config(),
-        private readonly Channel $stopper = new Channel(1),
     ) {
+        if (!extension_loaded('swoole') && !extension_loaded('openswoole')) {
+            throw new ExtensionNotLoadedException(
+                "Actor system cannot be executed because swoole/openswoole extension is not loaded.\n" .
+                "Please install the extension first."
+            );
+        }
+        $this->stopper = new Channel(1);
     }
 
     /**
@@ -74,6 +84,8 @@ class ActorSystem
         $actor->extentions = new ContextExtensions();
         $actor->processRegistry->add(new EventStreamProcess($actor), 'eventstream');
         $actor->stopped = false;
+        $actor->metrics = new Metrics($actor, $config->metricsProvider());
+        $actor->extentions->set($actor->metrics);
         $actor->subscribeSupervision($actor);
         $actor->logger->info('actor system started', ['id' => $actor->id]);
         return $actor;
@@ -90,6 +102,11 @@ class ActorSystem
     public function getId(): string
     {
         return $this->id;
+    }
+
+    public function metrics(): ?Metrics
+    {
+        return $this->metrics;
     }
 
     /**
@@ -159,6 +176,18 @@ class ActorSystem
             throw new RuntimeException('stopper channel close failed');
         }
         $this->stopped = true;
+    }
+
+    /**
+     * Return the address of the process registry.
+     *
+     * @return string The address of the process registry.
+     *
+     * @throws RuntimeException if the process registry is not initialized.
+     */
+    public function address(): string
+    {
+        return $this->getProcessRegistry()->getAddress();
     }
 
     public function isStopped(): bool
