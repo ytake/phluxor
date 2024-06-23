@@ -28,7 +28,7 @@ class HttpJsonMeterProvider implements ProviderInterface
     private array $resourceAttributes = [];
 
     /**
-     * @param string $serviceName
+     * @param string $serviceName for example 'phluxor'
      * @param string $url for example 'http://127.0.0.1:4318/v1/metrics'
      */
     public function __construct(
@@ -37,6 +37,13 @@ class HttpJsonMeterProvider implements ProviderInterface
     ) {
     }
 
+    /**
+     * Add a resource attribute.
+     *
+     * @param string $key
+     * @param string $value
+     * @return self
+     */
     public function addResourceAttribute(string $key, string $value): self
     {
         $this->resourceAttributes[$key] = $value;
