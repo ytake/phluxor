@@ -38,7 +38,6 @@ $ composer require phluxor/phluxor:dev-main
 - router / round-robin, broadcast, scatter-gather, etc.
 - open telemetry support (tracing)
 - virtual actors / cluster support
-- typed streams
 
 now local actors are supported, and remote actors are in progress.
 
