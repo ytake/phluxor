@@ -10,7 +10,8 @@ Documentation is under preparation.
 
 do not use this in production yet.
 
-[sample application / phluxor-http-application-samples](https://github.com/ytake/phluxor-http-application-samples)
+[sample web application / phluxor-http-application-samples](https://github.com/ytake/phluxor-http-application-samples)  
+[demonstrate the use of Phluxor](https://github.com/ytake/phluxor-example) 
 
 ## Installation
 
