@@ -21,7 +21,7 @@ class GuardiansValue
     ) {
     }
 
-    public function getGuardianPid(SupervisorStrategyInterface $strategy): Ref
+    public function getGuardianRef(SupervisorStrategyInterface $strategy): Ref
     {
         $key = $this->getKeyForStrategy($strategy);
         if (isset($this->guardians[$key])) {

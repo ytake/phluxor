@@ -11,14 +11,12 @@ use Phluxor\Buffer\Queue;
 class BoundedMailboxQueue implements QueueInterface
 {
     private Queue $queue;
-    private int $size;
-    private bool $drop;
 
-    public function __construct(int $size, bool $drop)
-    {
+    public function __construct(
+        readonly private int $size,
+        readonly bool $drop
+    ) {
         $this->queue = new Queue($size);
-        $this->size = $size;
-        $this->drop = $drop;
     }
 
     /**

@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Phluxor\ActorSystem\Strategy;
 
+use Closure;
 use DateInterval;
 use Phluxor\ActorSystem;
+use Phluxor\ActorSystem\Directive;
 use Phluxor\ActorSystem\Ref;
 use Phluxor\ActorSystem\SupervisorInterface;
 use Phluxor\ActorSystem\SupervisorStrategyInterface;
@@ -16,12 +18,12 @@ final readonly class AllForOneStrategy implements SupervisorStrategyInterface
     /**
      * @param int $maxNrOfRetries
      * @param DateInterval $withinDuration
-     * @param ActorSystem\Supervision\DeciderFunctionInterface $decider
+     * @param ActorSystem\Supervision\DeciderFunctionInterface|Closure(mixed): Directive $decider $decider
      */
     public function __construct(
         private int $maxNrOfRetries,
         private DateInterval $withinDuration,
-        private ActorSystem\Supervision\DeciderFunctionInterface $decider
+        private ActorSystem\Supervision\DeciderFunctionInterface|Closure $decider
     ) {
     }
 
