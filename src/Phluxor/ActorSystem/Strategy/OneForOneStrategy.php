@@ -19,7 +19,7 @@ final readonly class OneForOneStrategy implements SupervisorStrategyInterface
     /**
      * @param int $maxNrOfRetries
      * @param DateInterval $withinDuration
-     * @param DeciderFunctionInterface|Closure $decider
+     * @param DeciderFunctionInterface|Closure(mixed): Directive $decider
      */
     public function __construct(
         private int $maxNrOfRetries,
@@ -83,7 +83,7 @@ final readonly class OneForOneStrategy implements SupervisorStrategyInterface
      * @param RestartStatistics $rs
      * @return bool
      */
-    public function shouldStop(RestartStatistics $rs): bool
+    private function shouldStop(RestartStatistics $rs): bool
     {
         if ($this->maxNrOfRetries === 0) {
             return true;

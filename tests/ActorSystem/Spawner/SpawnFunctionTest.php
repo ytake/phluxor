@@ -2,41 +2,39 @@
 
 declare(strict_types=1);
 
-namespace Test\ActorSystem\Spawner;
+namespace ActorSystem\Spawner;
 
 use Phluxor\ActorSystem;
-use Phluxor\ActorSystem\Props;
-use Phluxor\ActorSystem\Spawner\DefaultSpawner;
 use PHPUnit\Framework\TestCase;
+
 use Test\VoidActor;
 
 use function Swoole\Coroutine\run;
 
-class DefaultSpawnerTest extends TestCase
+class SpawnFunctionTest extends TestCase
 {
-    // should be spawn actor
-    public function testSpawnActor(): void
+    public function testInvoke(): void
     {
         run(function () {
-            $actorSystem = ActorSystem::create();
-            go(function (ActorSystem $actorSystem) {
-                $spawner = new DefaultSpawner();
+            go(function () {
+                $actorSystem = ActorSystem::create();
+                $spawner = new ActorSystem\Spawner\SpawnFunction();
                 $pid = $spawner(
                     $actorSystem,
                     'test',
-                    Props::fromProducer(fn() => new VoidActor()),
+                    ActorSystem\Props::fromProducer(fn() => new VoidActor()),
                     $actorSystem->root()
                 );
                 $this->assertSame('test', (string)$pid->getRef());
                 $pid = $spawner(
                     $actorSystem,
                     'test',
-                    Props::fromProducer(fn() => new VoidActor()),
+                    ActorSystem\Props::fromProducer(fn() => new VoidActor()),
                     $actorSystem->root()
                 );
                 $this->assertNotNull($pid->isError());
                 $this->assertInstanceOf(ActorSystem\Exception\SpawnErrorException::class, $pid->isError());
-            }, $actorSystem);
+            });
         });
     }
 }

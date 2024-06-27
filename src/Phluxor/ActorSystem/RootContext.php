@@ -108,7 +108,7 @@ class RootContext implements
     public function self(): Ref|null
     {
         if ($this->guardianStrategy != null) {
-            return $this->actorSystem->getGuardiansValue()->getGuardianPid($this->guardianStrategy);
+            return $this->actorSystem->getGuardiansValue()->getGuardianRef($this->guardianStrategy);
         }
         return null;
     }

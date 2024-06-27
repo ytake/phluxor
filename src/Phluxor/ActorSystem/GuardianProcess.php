@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Phluxor\ActorSystem;
 
-use Phluxor\ActorSystem\Message\Failure;
 use Phluxor\ActorSystem\Exception\GuardianErrorException;
+use Phluxor\ActorSystem\Message\Failure;
 use Phluxor\ActorSystem\Message\Restart;
 use Phluxor\ActorSystem\Message\ResumeMailbox;
 use Phluxor\ActorSystem\ProtoBuf\Stop;
