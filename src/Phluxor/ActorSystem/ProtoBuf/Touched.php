@@ -15,7 +15,7 @@ use Google\Protobuf\Internal\GPBUtil;
 class Touched extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Generated from protobuf field <code>.actor.PID who = 1;</code>
+     * Generated from protobuf field <code>.actor.Pid who = 1;</code>
      */
     protected $who = null;
 
@@ -25,7 +25,7 @@ class Touched extends \Google\Protobuf\Internal\Message
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
-     *     @type \Phluxor\ActorSystem\ProtoBuf\PID $who
+     *     @type \Phluxor\ActorSystem\ProtoBuf\Pid $who
      * }
      */
     public function __construct($data = NULL) {
@@ -34,8 +34,8 @@ class Touched extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>.actor.PID who = 1;</code>
-     * @return \Phluxor\ActorSystem\ProtoBuf\PID|null
+     * Generated from protobuf field <code>.actor.Pid who = 1;</code>
+     * @return \Phluxor\ActorSystem\ProtoBuf\Pid|null
      */
     public function getWho()
     {
@@ -53,13 +53,13 @@ class Touched extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>.actor.PID who = 1;</code>
-     * @param \Phluxor\ActorSystem\ProtoBuf\PID $var
+     * Generated from protobuf field <code>.actor.Pid who = 1;</code>
+     * @param \Phluxor\ActorSystem\ProtoBuf\Pid $var
      * @return $this
      */
     public function setWho($var)
     {
-        GPBUtil::checkMessage($var, \Phluxor\ActorSystem\ProtoBuf\PID::class);
+        GPBUtil::checkMessage($var, \Phluxor\ActorSystem\ProtoBuf\Pid::class);
         $this->who = $var;
 
         return $this;

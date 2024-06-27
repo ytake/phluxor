@@ -15,7 +15,7 @@ use Google\Protobuf\Internal\GPBUtil;
 class DeadLetterResponse extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Generated from protobuf field <code>.actor.PID target = 1;</code>
+     * Generated from protobuf field <code>.actor.Pid target = 1;</code>
      */
     protected $target = null;
 
@@ -25,7 +25,7 @@ class DeadLetterResponse extends \Google\Protobuf\Internal\Message
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
-     *     @type \Phluxor\ActorSystem\ProtoBuf\PID $target
+     *     @type \Phluxor\ActorSystem\ProtoBuf\Pid $target
      * }
      */
     public function __construct($data = NULL) {
@@ -34,8 +34,8 @@ class DeadLetterResponse extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>.actor.PID target = 1;</code>
-     * @return \Phluxor\ActorSystem\ProtoBuf\PID|null
+     * Generated from protobuf field <code>.actor.Pid target = 1;</code>
+     * @return \Phluxor\ActorSystem\ProtoBuf\Pid|null
      */
     public function getTarget()
     {
@@ -53,13 +53,13 @@ class DeadLetterResponse extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>.actor.PID target = 1;</code>
-     * @param \Phluxor\ActorSystem\ProtoBuf\PID $var
+     * Generated from protobuf field <code>.actor.Pid target = 1;</code>
+     * @param \Phluxor\ActorSystem\ProtoBuf\Pid $var
      * @return $this
      */
     public function setTarget($var)
     {
-        GPBUtil::checkMessage($var, \Phluxor\ActorSystem\ProtoBuf\PID::class);
+        GPBUtil::checkMessage($var, \Phluxor\ActorSystem\ProtoBuf\Pid::class);
         $this->target = $var;
 
         return $this;

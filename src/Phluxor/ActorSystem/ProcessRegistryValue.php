@@ -74,7 +74,7 @@ class ProcessRegistryValue
     public function add(ProcessInterface $process, string $id): ProcessRegistryAddResult
     {
         $bucket = $this->localPIDs->getBucket($id);
-        $pid = new Ref(new ActorSystem\ProtoBuf\PID());
+        $pid = new Ref(new ActorSystem\ProtoBuf\Pid());
         $pid->protobufPid()->setAddress($this->address);
         $pid->protobufPid()->setId($id);
         return new ProcessRegistryAddResult($pid, $bucket->setIfAbsent($id, $process));

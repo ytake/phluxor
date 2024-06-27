@@ -17,7 +17,7 @@ use Google\Protobuf\Internal\GPBUtil;
 class Watch extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Generated from protobuf field <code>.actor.PID watcher = 1;</code>
+     * Generated from protobuf field <code>.actor.Pid watcher = 1;</code>
      */
     protected $watcher = null;
 
@@ -27,7 +27,7 @@ class Watch extends \Google\Protobuf\Internal\Message
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
-     *     @type \Phluxor\ActorSystem\ProtoBuf\PID $watcher
+     *     @type \Phluxor\ActorSystem\ProtoBuf\Pid $watcher
      * }
      */
     public function __construct($data = NULL) {
@@ -36,8 +36,8 @@ class Watch extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>.actor.PID watcher = 1;</code>
-     * @return \Phluxor\ActorSystem\ProtoBuf\PID|null
+     * Generated from protobuf field <code>.actor.Pid watcher = 1;</code>
+     * @return \Phluxor\ActorSystem\ProtoBuf\Pid|null
      */
     public function getWatcher()
     {
@@ -55,13 +55,13 @@ class Watch extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>.actor.PID watcher = 1;</code>
-     * @param \Phluxor\ActorSystem\ProtoBuf\PID $var
+     * Generated from protobuf field <code>.actor.Pid watcher = 1;</code>
+     * @param \Phluxor\ActorSystem\ProtoBuf\Pid $var
      * @return $this
      */
     public function setWatcher($var)
     {
-        GPBUtil::checkMessage($var, \Phluxor\ActorSystem\ProtoBuf\PID::class);
+        GPBUtil::checkMessage($var, \Phluxor\ActorSystem\ProtoBuf\Pid::class);
         $this->watcher = $var;
 
         return $this;

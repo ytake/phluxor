@@ -51,7 +51,7 @@ class Future
         return $this->pid;
     }
 
-    public function setPid(Ref $pid): void
+    public function setRef(Ref $pid): void
     {
         $this->pid = $pid;
     }
@@ -214,7 +214,7 @@ class Future
                         );
                 }
             }
-            $f->setPid($pid);
+            $f->setRef($pid);
         }
         if ($duration >= 0) {
             $f->timer = \Swoole\Timer::after($duration * 1000, function () use ($f, $pid) {

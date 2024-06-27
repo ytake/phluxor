@@ -8,11 +8,11 @@ option php_metadata_namespace = "Phluxor\\Router\\Metadata\\ProtoBuf";
 import "actor.proto";
 
 message AddRoutee {
-  actor.PID PID = 1;
+  actor.Pid Pid = 1;
 }
 
 message RemoveRoutee {
-  actor.PID PID = 1;
+  actor.Pid Pid = 1;
 }
 
 message AdjustPoolSize {
@@ -22,5 +22,5 @@ message AdjustPoolSize {
 message GetRoutees {}
 
 message Routees {
-  repeated actor.PID PIDs = 1;
+  repeated actor.Pid Pids = 1;
 }

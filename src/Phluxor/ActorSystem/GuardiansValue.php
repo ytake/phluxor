@@ -49,7 +49,7 @@ class GuardiansValue
                 ['pid' => $pid->getRef()]
             );
         }
-        $ref->setPid($pid->getRef());
+        $ref->setRef($pid->getRef());
         return $ref;
     }
 
