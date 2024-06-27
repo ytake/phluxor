@@ -5,7 +5,7 @@ package actor;
 option php_namespace = "Phluxor\\ActorSystem\\ProtoBuf";
 option php_metadata_namespace = "Phluxor\\Metadata\\ProtoBuf";
 
-message PID {
+message Pid {
   string address = 1;
   string id = 2;
   uint32 request_id = 3;
@@ -16,20 +16,20 @@ message PoisonPill {
 }
 
 message DeadLetterResponse {
-  PID target = 1;
+  Pid target = 1;
 }
 
 //system messages
 message Watch {
-  PID watcher = 1;
+  Pid watcher = 1;
 }
 
 message Unwatch {
-  PID watcher = 1;
+  Pid watcher = 1;
 }
 
 message Terminated {
-  PID who = 1;
+  Pid who = 1;
   TerminatedReason why = 2;
 }
 
@@ -46,5 +46,5 @@ message Touch {
 }
 
 message Touched {
-  PID who = 1;
+  Pid who = 1;
 }

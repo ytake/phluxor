@@ -765,10 +765,10 @@ class ActorContext implements
         if ($reason instanceof Throwable) {
             $reports = ['self' => $this->self, 'reason' => $reason, 'stack' => $reason->getTraceAsString()];
         }
-        $this->logger()->info("Recovering", $reports);
+        $this->logger()->info("recovering", $reports);
         if ($this->actorSystem->config()->developerSupervisionLogging()) {
             $this->logger()->error(
-                "Supervision",
+                "supervision",
                 ['actor' => $this->self, 'message' => $message, 'exception' => $reason]
             );
         }

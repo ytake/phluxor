@@ -18,8 +18,8 @@ class DefaultSpawnerTest extends TestCase
     public function testSpawnActor(): void
     {
         run(function () {
-            $actorSystem = ActorSystem::create();
-            go(function (ActorSystem $actorSystem) {
+            go(function () {
+                $actorSystem = ActorSystem::create();
                 $spawner = new DefaultSpawner();
                 $pid = $spawner(
                     $actorSystem,
@@ -36,7 +36,7 @@ class DefaultSpawnerTest extends TestCase
                 );
                 $this->assertNotNull($pid->isError());
                 $this->assertInstanceOf(ActorSystem\Exception\SpawnErrorException::class, $pid->isError());
-            }, $actorSystem);
+            });
         });
     }
 }

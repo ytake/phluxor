@@ -11,7 +11,7 @@ class Ref
     private ProcessInterface|null $process = null;
 
     public function __construct(
-        private readonly ActorSystem\ProtoBuf\PID $pid
+        private readonly ActorSystem\ProtoBuf\Pid $pid
     ) {
     }
 
@@ -66,9 +66,9 @@ class Ref
     }
 
     /**
-     * @return ProtoBuf\PID
+     * @return ProtoBuf\Pid
      */
-    public function protobufPid(): ActorSystem\ProtoBuf\PID
+    public function protobufPid(): ActorSystem\ProtoBuf\Pid
     {
         return $this->pid;
     }

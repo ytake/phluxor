@@ -10,9 +10,9 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Generated from protobuf message <code>actor.PID</code>
+ * Generated from protobuf message <code>actor.Pid</code>
  */
-class PID extends \Google\Protobuf\Internal\Message
+class Pid extends \Google\Protobuf\Internal\Message
 {
     /**
      * Generated from protobuf field <code>string address = 1;</code>

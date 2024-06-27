@@ -84,7 +84,7 @@ readonly class PoolRouterActor implements ActorInterface
                 $r->forEach(function (int $int, Ref $pid) use (&$routees) {
                     $routees[] = $pid->protobufPid();
                 });
-                $context->respond(new Routees(['PIDs' => $routees]));
+                $context->respond(new Routees(['Pids' => $routees]));
                 break;
             case $msg instanceof Terminated:
                 $r = $this->state->getRoutees();

@@ -115,7 +115,7 @@ class ActorSystem
      */
     public function newLocalAddress(string $id): Ref
     {
-        return new Ref(new ActorSystem\ProtoBuf\PID([
+        return new Ref(new ActorSystem\ProtoBuf\Pid([
             'address' => $this->getProcessRegistry()->getAddress(),
             'id' => $id,
         ]));

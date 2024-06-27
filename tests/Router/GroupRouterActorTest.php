@@ -44,7 +44,7 @@ class GroupRouterActorTest extends TestCase
                 $m = new MockContext();
                 $m->messageHandle(function () {
                     return new AddRoutee([
-                        'PID' => new ActorSystem\ProtoBuf\PID([
+                        'Pid' => new ActorSystem\ProtoBuf\Pid([
                             'address' => 'test',
                             'id' => 1
                         ])
@@ -53,7 +53,7 @@ class GroupRouterActorTest extends TestCase
                 $a->receive($m);
                 $routees = $state->getRoutees();
                 $this->assertTrue(
-                    $routees->contains(new ActorSystem\Ref(new ActorSystem\ProtoBuf\PID([
+                    $routees->contains(new ActorSystem\Ref(new ActorSystem\ProtoBuf\Pid([
                     'address' => 'test',
                     'id' => 1
                     ])))
@@ -84,7 +84,7 @@ class GroupRouterActorTest extends TestCase
                 $m = new MockContext();
                 $m->messageHandle(function () use ($p) {
                     return new AddRoutee([
-                        'PID' => $p->protobufPid()
+                        'Pid' => $p->protobufPid()
                     ]);
                 });
                 $a->receive($m);
@@ -127,20 +127,20 @@ class GroupRouterActorTest extends TestCase
                 $m = new MockContext();
                 $m->messageHandle(function () use ($p) {
                     return new AddRoutee([
-                        'PID' => $p->protobufPid()
+                        'Pid' => $p->protobufPid()
                     ]);
                 });
                 $a->receive($m);
                 $m->messageHandle(function () use ($p1) {
                     return new AddRoutee([
-                        'PID' => $p1['ref']->protobufPid()
+                        'Pid' => $p1['ref']->protobufPid()
                     ]);
                 });
                 $a->receive($m);
                 // remove p1
                 $m->messageHandle(function () use ($p1) {
                     return new RemoveRoutee([
-                        'PID' => $p1['ref']->protobufPid()
+                        'Pid' => $p1['ref']->protobufPid()
                     ]);
                 });
                 $m->sendHandle(function (?ActorSystem\Ref $ref, $message) use ($p1) {
@@ -185,14 +185,14 @@ class GroupRouterActorTest extends TestCase
                 $p1 = $system->newLocalAddress('p1');
                 $m->messageHandle(function () use ($p1) {
                     return new AddRoutee([
-                        'PID' => $p1->protobufPid()
+                        'Pid' => $p1->protobufPid()
                     ]);
                 });
                 $a->receive($m);
                 $p2 = $system->newLocalAddress('p2');
                 $m->messageHandle(function () use ($p2) {
                     return new AddRoutee([
-                        'PID' => $p2->protobufPid()
+                        'Pid' => $p2->protobufPid()
                     ]);
                 });
                 $a->receive($m);

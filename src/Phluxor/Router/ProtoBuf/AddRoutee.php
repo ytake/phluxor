@@ -15,9 +15,9 @@ use Google\Protobuf\Internal\GPBUtil;
 class AddRoutee extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Generated from protobuf field <code>.actor.PID PID = 1;</code>
+     * Generated from protobuf field <code>.actor.Pid Pid = 1;</code>
      */
-    protected $PID = null;
+    protected $Pid = null;
 
     /**
      * Constructor.
@@ -25,7 +25,7 @@ class AddRoutee extends \Google\Protobuf\Internal\Message
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
-     *     @type \Phluxor\ActorSystem\ProtoBuf\PID $PID
+     *     @type \Phluxor\ActorSystem\ProtoBuf\Pid $Pid
      * }
      */
     public function __construct($data = NULL) {
@@ -34,33 +34,33 @@ class AddRoutee extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>.actor.PID PID = 1;</code>
-     * @return \Phluxor\ActorSystem\ProtoBuf\PID|null
+     * Generated from protobuf field <code>.actor.Pid Pid = 1;</code>
+     * @return \Phluxor\ActorSystem\ProtoBuf\Pid|null
      */
-    public function getPID()
+    public function getPid()
     {
-        return $this->PID;
+        return $this->Pid;
     }
 
-    public function hasPID()
+    public function hasPid()
     {
-        return isset($this->PID);
+        return isset($this->Pid);
     }
 
-    public function clearPID()
+    public function clearPid()
     {
-        unset($this->PID);
+        unset($this->Pid);
     }
 
     /**
-     * Generated from protobuf field <code>.actor.PID PID = 1;</code>
-     * @param \Phluxor\ActorSystem\ProtoBuf\PID $var
+     * Generated from protobuf field <code>.actor.Pid Pid = 1;</code>
+     * @param \Phluxor\ActorSystem\ProtoBuf\Pid $var
      * @return $this
      */
-    public function setPID($var)
+    public function setPid($var)
     {
-        GPBUtil::checkMessage($var, \Phluxor\ActorSystem\ProtoBuf\PID::class);
-        $this->PID = $var;
+        GPBUtil::checkMessage($var, \Phluxor\ActorSystem\ProtoBuf\Pid::class);
+        $this->Pid = $var;
 
         return $this;
     }

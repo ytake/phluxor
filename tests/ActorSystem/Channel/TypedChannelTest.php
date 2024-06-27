@@ -7,7 +7,6 @@ namespace ActorSystem\Channel;
 use Phluxor\ActorSystem;
 use Phluxor\ActorSystem\Channel\TypedChannel;
 use PHPUnit\Framework\TestCase;
-
 use Test\EchoRequest;
 
 use function Swoole\Coroutine\go;

@@ -97,7 +97,7 @@ class GuardianProcess implements ProcessInterface, SupervisorInterface
         }
     }
 
-    public function setPid(Ref $pid): void
+    public function setRef(Ref $pid): void
     {
         $this->pid = $pid;
     }

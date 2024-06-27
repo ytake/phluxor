@@ -15,9 +15,9 @@ use Google\Protobuf\Internal\GPBUtil;
 class Routees extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Generated from protobuf field <code>repeated .actor.PID PIDs = 1;</code>
+     * Generated from protobuf field <code>repeated .actor.Pid Pids = 1;</code>
      */
-    private $PIDs;
+    private $Pids;
 
     /**
      * Constructor.
@@ -25,7 +25,7 @@ class Routees extends \Google\Protobuf\Internal\Message
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
-     *     @type array<\Phluxor\ActorSystem\ProtoBuf\PID>|\Google\Protobuf\Internal\RepeatedField $PIDs
+     *     @type array<\Phluxor\ActorSystem\ProtoBuf\Pid>|\Google\Protobuf\Internal\RepeatedField $Pids
      * }
      */
     public function __construct($data = NULL) {
@@ -34,23 +34,23 @@ class Routees extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>repeated .actor.PID PIDs = 1;</code>
+     * Generated from protobuf field <code>repeated .actor.Pid Pids = 1;</code>
      * @return \Google\Protobuf\Internal\RepeatedField
      */
-    public function getPIDs()
+    public function getPids()
     {
-        return $this->PIDs;
+        return $this->Pids;
     }
 
     /**
-     * Generated from protobuf field <code>repeated .actor.PID PIDs = 1;</code>
-     * @param array<\Phluxor\ActorSystem\ProtoBuf\PID>|\Google\Protobuf\Internal\RepeatedField $var
+     * Generated from protobuf field <code>repeated .actor.Pid Pids = 1;</code>
+     * @param array<\Phluxor\ActorSystem\ProtoBuf\Pid>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
-    public function setPIDs($var)
+    public function setPids($var)
     {
-        $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::MESSAGE, \Phluxor\ActorSystem\ProtoBuf\PID::class);
-        $this->PIDs = $arr;
+        $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::MESSAGE, \Phluxor\ActorSystem\ProtoBuf\Pid::class);
+        $this->Pids = $arr;
 
         return $this;
     }

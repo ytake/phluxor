@@ -1,0 +1,22 @@
+syntax = "proto3";
+package cluster;
+
+option php_namespace = "Phluxor\\Cluster\\ProtoBuf";
+option php_metadata_namespace = "Phluxor\\Cluster\\Metadata\\ProtoBuf";
+
+message GrainRequest {
+  int32 method_index = 1;
+  bytes message_data = 2;
+  string message_type_name = 3;
+}
+
+message GrainResponse {
+  bytes message_data = 1;
+  string message_type_name = 2;
+}
+
+message GrainErrorResponse {
+  string reason = 1;
+  string message = 2;
+  map<string, string> metadata = 3;
+};
