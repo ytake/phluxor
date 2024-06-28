@@ -4,25 +4,23 @@ declare(strict_types=1);
 
 namespace Phluxor\Value;
 
-use SplFixedArray;
-
-final readonly class ContextExtensions
+final class ContextExtensions
 {
-    /**
-     * @param SplFixedArray<ExtensionInterface> $extensions
-     */
-    public function __construct(
-        private SplFixedArray $extensions = new SplFixedArray(100)
-    ) {
+    /** @var ExtensionInterface[] */
+    private array $extensions;
+
+    public function __construct()
+    {
+        $this->extensions = array_fill(0, 3, null);
     }
 
     /**
-     * @param ContextExtensionId $id
-     * @return ExtensionInterface
+     * @param ContextExtensionID $id
+     * @return ExtensionInterface|null
      */
-    public function get(ContextExtensionId $id): ExtensionInterface
+    public function get(ContextExtensionID $id): ?ExtensionInterface
     {
-        return $this->extensions->offsetGet($id->value());
+        return $this->extensions[$id->value()] ?? null;
     }
 
     /**
@@ -31,7 +29,19 @@ final readonly class ContextExtensions
      */
     public function set(ExtensionInterface $extension): void
     {
-        $extensionId = $extension->extensionID();
-        $this->extensions->offsetSet($extensionId->value(), $extension);
+        $id = $extension->extensionID()->value();
+        if ($id >= count($this->extensions)) {
+            $newExtensions = array_fill(0, $id * 2, null);
+            $this->array_copy($this->extensions, $newExtensions, count($this->extensions));
+            $this->extensions = $newExtensions;
+        }
+        $this->extensions[$id] = $extension;
+    }
+
+    function array_copy(array $src, array &$dest, int $length): void
+    {
+        for ($i = 0; $i < $length; $i++) {
+            $dest[$i] = $src[$i];
+        }
     }
 }

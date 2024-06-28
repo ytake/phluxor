@@ -18,7 +18,7 @@ class PhluxorMetrics
     private array $knownMetrics = [];
 
     public function __construct(
-        private LoggerInterface $logger
+        private readonly LoggerInterface $logger
     ) {
         $this->mutex = new Lock(Lock::MUTEX);
         $this->actorMetrics = new ActorMetrics();
