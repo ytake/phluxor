@@ -18,7 +18,7 @@ class TypedChannel
     /**
      * @param ActorSystem $actorSystem
      * @param Closure(mixed): bool $specification
-     *
+     * @param int $bufferSize
      * <code>
      *     $channel = new TypedChannel(
      *         $actorSystem,

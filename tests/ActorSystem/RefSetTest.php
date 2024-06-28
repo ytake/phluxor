@@ -9,7 +9,7 @@ use Phluxor\ActorSystem\Ref;
 use Phluxor\ActorSystem\RefSet;
 use PHPUnit\Framework\TestCase;
 
-class PidSetTest extends TestCase
+class RefSetTest extends TestCase
 {
     public function testPidSetIsEmptyWhenCreated(): void
     {

@@ -6,29 +6,44 @@ namespace Test\Value;
 
 use Phluxor\Value\ContextExtensions;
 use Phluxor\Value\ContextExtensionId;
+use Phluxor\Value\ExtensionInterface;
 use PHPUnit\Framework\TestCase;
+
+use function Swoole\Coroutine\run;
 
 class ContextExtensionsTest extends TestCase
 {
     public function testGenerateContextExtensions(): void
     {
-        $this->markTestSkipped('This test is skipped');
-        go(function () {
-            $extensions = new ContextExtensions();
-            $extensions->set(new ContextExtensionId(0));
-            $this->assertEquals(1, $extensions->get(new ContextExtensionId(0))->value());
+        run(function () {
+            \Swoole\Coroutine\go(function () {
+                $id = new class() implements ExtensionInterface {
+                    public function extensionID(): ContextExtensionId
+                    {
+                        return new ContextExtensionId(0);
+                    }
+                };
+                $extensions = new ContextExtensions();
+                $extensions->set($id);
+                $this->assertSame(1, $extensions->get($id->extensionID())->extensionID()->value());
+            });
         });
-        \Swoole\Event::wait();
     }
 
     public function testGenerateSizeOveContextExtensions(): void
     {
-        $this->markTestSkipped('This test is skipped');
-        go(function () {
-            $extensions = new ContextExtensions();
-            $extensions->set(new ContextExtensionId(456));
-            $this->assertEquals(457, $extensions->get(new ContextExtensionId(456))->value());
+        run(function () {
+            \Swoole\Coroutine\go(function () {
+                $id = new class() implements ExtensionInterface {
+                    public function extensionID(): ContextExtensionId
+                    {
+                        return new ContextExtensionId(456);
+                    }
+                };
+                $extensions = new ContextExtensions();
+                $extensions->set($id);
+                $this->assertSame(457, $extensions->get($id->extensionID())->extensionID()->value());
+            });
         });
-        \Swoole\Event::wait();
     }
 }
