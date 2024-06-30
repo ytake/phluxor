@@ -91,13 +91,7 @@ class HashRing
         if (null === $data) {
             return null;
         }
-
         assert(is_string($data));
-
-        $continuum = Continuum::unserialize($data);
-
-
-
-        return $continuum;
+        return Continuum::unserialize($data);
     }
 }
