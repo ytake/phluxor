@@ -220,10 +220,10 @@ class Props
     }
 
     /**
-     * @param ProducerInterface $producer
+     * @param ProducerInterface|Closure(): ActorInterface  $producer
      * @return Closure(Props): void
      */
-    public static function withProducer(ProducerInterface $producer): Closure
+    public static function withProducer(ProducerInterface|Closure $producer): Closure
     {
         return function (Props $props) use ($producer) {
             $props->producer = fn(ActorSystem $system) => $producer();

@@ -16,7 +16,7 @@ class PoolRouter implements ConfigInterface
      * @param int $poolSize
      */
     public function __construct(
-        private int $poolSize
+        private readonly int $poolSize
     ) {
     }
 

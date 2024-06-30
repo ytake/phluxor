@@ -34,7 +34,7 @@ class Process implements ActorSystem\ProcessInterface
             $this->poison($pid);
             return;
         }
-        if ((new RouterMessage($msg))->isManagementMessage()) {
+        if (!(new RouterMessage($msg))->isManagementMessage()) {
             $this->state->routeMessage($message);
             return;
         }

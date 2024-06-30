@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ActorSystem\Channel;
+namespace Test\ActorSystem\Channel;
 
 use Phluxor\ActorSystem;
 use Phluxor\ActorSystem\Channel\TypedChannel;

@@ -12,7 +12,7 @@ interface StateInterface
 {
     public function routeMessage(mixed $message): void;
 
-    public function registerRoutees(RefSet $routes): void;
+    public function registerRoutees(RefSet $routees): void;
 
     public function getRoutees(): RefSet;
 

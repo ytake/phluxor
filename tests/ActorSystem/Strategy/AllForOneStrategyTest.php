@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ActorSystem\Strategy;
+namespace Test\ActorSystem\Strategy;
 
 use DateInterval;
 use DateTimeImmutable;

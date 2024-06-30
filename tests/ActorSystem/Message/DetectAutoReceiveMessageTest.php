@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ActorSystem\Message;
+namespace Test\ActorSystem\Message;
 
 use Phluxor\ActorSystem\Message\DetectAutoReceiveMessage;
 use Phluxor\ActorSystem\Message\Restarting;

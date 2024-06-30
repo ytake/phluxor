@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ActorSystem\Spawner;
+namespace Test\ActorSystem\Spawner;
 
 use Phluxor\ActorSystem;
 use PHPUnit\Framework\TestCase;
