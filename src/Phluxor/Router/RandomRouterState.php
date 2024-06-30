@@ -28,9 +28,9 @@ class RandomRouterState implements StateInterface
         $this->sender->send($ref, $message);
     }
 
-    public function registerRoutees(RefSet $routes): void
+    public function registerRoutees(RefSet $routees): void
     {
-        $this->routees = $routes;
+        $this->routees = $routees;
     }
 
     public function getRoutees(): RefSet

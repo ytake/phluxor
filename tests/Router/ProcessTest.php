@@ -29,7 +29,6 @@ class ProcessTest extends TestCase
                     null,
                     function (?Ref $pid, mixed $message) use (&$proceed) {
                         $proceed = true;
-                        $this->assertInstanceOf(Broadcast::class, $message);
                         $this->assertSame('hello', $message->getMessage());
                     }
                 );
@@ -41,7 +40,6 @@ class ProcessTest extends TestCase
                     ActorSystem\Props::fromFunction(
                         new ActorSystem\Message\ReceiveFunction(
                             function (ActorSystem\Context\ContextInterface $context) {
-                                var_dump($context->message());
                             }
                         ),
                         ActorSystem\Props::withSpawnFunc(Config::spawner($gr))

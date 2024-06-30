@@ -57,13 +57,9 @@ class GroupRouterActor implements ActorInterface
             case $msg instanceof Broadcast:
                 $r = $this->state->getRoutees();
                 $sender = $context->sender();
-                $r->forEach(
-                    fn(int $int, Ref $pid) => $context->requestWithCustomSender(
-                        $pid,
-                        $msg->getMessage(),
-                        $sender
-                    )
-                );
+                $r->forEach(function (int $int, Ref $pid) use ($context, $msg, $sender) {
+                    $context->requestWithCustomSender($pid, $msg->getMessage(), $sender);
+                });
                 break;
             case $msg instanceof GetRoutees:
                 $r = $this->state->getRoutees();

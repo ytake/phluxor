@@ -2,28 +2,25 @@
 
 declare(strict_types=1);
 
-namespace Test\Router;
+namespace Phluxor\Router;
 
-use Phluxor\ActorSystem;
 use Phluxor\ActorSystem\Context\ContextInterface;
 use Phluxor\ActorSystem\Context\SenderInterface;
 use Phluxor\ActorSystem\Ref;
 use Phluxor\ActorSystem\RefSet;
-use Phluxor\Router\StateInterface;
 
-class TestRouterState implements StateInterface
+class BroadcastRouterState implements StateInterface
 {
     public function __construct(
-        private ActorSystem $system,
-        private RefSet|null $routees = null,
-        private SenderInterface|null $sender = null
+        private RefSet $routees = new RefSet(),
+        private ?SenderInterface $sender = null
     ) {
     }
 
     public function routeMessage(mixed $message): void
     {
         $this->routees->forEach(
-            fn(int $_, Ref $ref) => $this->system->root()->send($ref, $message)
+            fn(int $int, Ref $ref) => $this->sender->send($ref, $message)
         );
     }
 

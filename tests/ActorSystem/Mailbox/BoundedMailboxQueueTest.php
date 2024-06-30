@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ActorSystem\Mailbox;
+namespace Test\ActorSystem\Mailbox;
 
 use Phluxor\ActorSystem\Mailbox\BoundedMailboxQueue;
 use PHPUnit\Framework\TestCase;
