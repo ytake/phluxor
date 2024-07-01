@@ -29,7 +29,9 @@
     "psr/log": "^3.0",
     "ramsey/uuid": "^4.7.5",
     "alb/phpketama": "^0.4.0",
-    "symfony/cache": "^v7.1.2"
+    "symfony/cache": "^7.0",
+    "symfony/uid": "^7.0",
+    "ext-pdo": "*"
   },
   "require-dev": {
     "phpunit/phpunit": "^10.5.11",
@@ -55,7 +57,7 @@
   },
   "autoload-dev": {
     "psr-4": {
-      "Test\\": "tests"
+      "Test\\": "tests/Test"
     }
   },
   "scripts": {
