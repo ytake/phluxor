@@ -19,7 +19,7 @@ class EnvelopeTest extends TestCase
                 ['why' => TerminatedReason::AddressTerminated]
             )
         );
-        $env = new Envelope('id', json_encode($message), 1, 'actorName', 'eventName');
+        $env = new Envelope(json_encode($message));
         $o = $env->message();
         $this->assertInstanceOf(Terminated::class, $o);
         $this->assertSame(1, $o->getWhy());
