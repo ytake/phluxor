@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package protobuf;
+
+option php_namespace = "Test\\Persistence\\ProtoBuf";
+option php_metadata_namespace = "Test\\Metadata";
+
+message UserCreated {
+  string userName = 1;
+  string email = 2;
+  string userID = 3;
+}

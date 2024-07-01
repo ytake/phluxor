@@ -13,6 +13,13 @@ do not use this in production yet.
 [sample web application / phluxor-http-application-samples](https://github.com/ytake/phluxor-http-application-samples)  
 [demonstrate the use of Phluxor](https://github.com/ytake/phluxor-example) 
 
+// 日本語
+
+PhluxorはPHPでのアクターモデルを実現するためのツールキットです。  
+PHP 8.3 と swoole / open swoole が必要です。  
+メッセージのシリアライズには、Protocol Buffersを利用します。/ 他のシリアライズフォーマットはまだサポートされていません。  
+本番環境での使用はまだお勧めしません。
+
 ## Installation
 
 ```bash
@@ -30,13 +37,12 @@ $ composer require phluxor/phluxor:dev-main
 - mailbox / dispatcher
 - event stream
 - future
-- persistent actors
+- persistent actors (in memory / mysql)
 - [OpenTelemetry](https://opentelemetry.io/docs/languages/php/) support (metrics) 
-- group /pool router
+- router / round-robin, broadcast, scatter-gather, etc.
 
 ## work in progress
 
-- router / round-robin, broadcast, scatter-gather, etc.
 - open telemetry support (tracing)
 - virtual actors / cluster support
 
@@ -248,9 +254,16 @@ function main(): void
 
 ## Persistent Actors
 
-persistent actors are actors that can be restored from the previous state.
+パーシステンスアクターは、以前の状態から復元できるアクターです。  
+永続化に利用するデータベースは、お使いの環境などに合わせて自由にアダプターを実装することができます。  
+デフォルトではインメモリとMySQLが実装されています。  
+メッセージのシリアライズには、Protocol Buffersを利用しますので、事前にProtocol Buffersのファイルを用意しておく必要があります。
+以下はサンプルのProtocol Buffersファイルです。
 
-need protocol buffers file for message serialization.
+persistent actors are actors that can be restored from the previous state.  
+you can implement an adapter freely according to your environment for the database used for persistence.    
+by default, in-memory and MySQL are implemented.  
+Protocol Buffers is used for message serialization, so you need to prepare a Protocol Buffers file in advance.    
 
 for example, the protocol buffers file is like this.
 
@@ -272,7 +285,9 @@ message Snapshot {
 
 ```
 
-for example, the persistent actor is like this.
+詳しい永続化の使い方は、永続アクターのサンプルを参照してください。[Persistence / MySQL](example/persistence/SampleSystem.php)  
+
+for example, the persistent actor is like this. [Persistence / MySQL](example/persistence/SampleSystem.php)
 
 use `Phluxor\Persistence\Mixin` trait and implement `Phluxor\Persistence\PersistentInterface`.
 
