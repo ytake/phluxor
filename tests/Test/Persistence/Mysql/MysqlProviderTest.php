@@ -6,11 +6,11 @@ namespace Test\Persistence\Mysql;
 
 use Google\Protobuf\Internal\Message;
 use Phluxor\ActorSystem;
+use Phluxor\Persistence\Mysql\Connection;
 use Phluxor\Persistence\Mysql\DefaultSchema;
 use Phluxor\Persistence\Mysql\Dsn;
 use Phluxor\Persistence\Mysql\MysqlProvider;
 use PHPUnit\Framework\TestCase;
-
 use Swoole\Database\PDOConfig;
 use Swoole\Database\PDOPool;
 use Test\Persistence\ProtoBuf\UserCreated;
@@ -104,14 +104,16 @@ class MysqlProviderTest extends TestCase
 
     private function mysqlProvider(): MysqlProvider
     {
-        return new MysqlProvider(
+        $conn = new Connection(
             new Dsn(
                 '127.0.0.1',
                 3306,
                 'sample',
                 'user',
                 'passw@rd'
-            ),
+            ));
+        return new MysqlProvider(
+            $conn->proxy(),
             new DefaultSchema(),
             3,
             ActorSystem::create()->getLogger()

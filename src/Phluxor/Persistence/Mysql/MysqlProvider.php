@@ -13,8 +13,6 @@ use Phluxor\Persistence\SnapshotResult;
 use PDO;
 use Psr\Log\LoggerInterface;
 use ReflectionException;
-use Swoole\Database\PDOConfig;
-use Swoole\Database\PDOPool;
 use Swoole\Database\PDOProxy;
 use Symfony\Component\Uid\Ulid;
 
@@ -25,10 +23,8 @@ use function json_encode;
  */
 class MysqlProvider implements ProviderStateInterface, ProviderInterface
 {
-    private ?PDOProxy $pdo = null;
-
     public function __construct(
-        private readonly Dsn $dsn,
+        private readonly PDOProxy $connection,
         private readonly SchemaInterface $schema,
         private readonly int $snapshotInterval,
         private readonly LoggerInterface $logger
@@ -57,7 +53,7 @@ class MysqlProvider implements ProviderStateInterface, ProviderInterface
      */
     private function executeTx(Closure $callback): void
     {
-        $conn = $this->connection();
+        $conn = $this->connection;
         $conn->reset();
         $conn->beginTransaction();
         $result = $callback($conn);
@@ -74,7 +70,7 @@ class MysqlProvider implements ProviderStateInterface, ProviderInterface
      */
     public function getEvents(string $actorName, int $eventIndexStart, int $eventIndexEnd, Closure $callback): void
     {
-        $conn = $this->connection();
+        $conn = $this->connection;
         $conn->beginTransaction();
         $query = sprintf(
             'SELECT %s FROM %s WHERE %s = ? AND %s BETWEEN ? AND ? ORDER BY %s ASC',
@@ -144,29 +140,7 @@ class MysqlProvider implements ProviderStateInterface, ProviderInterface
     public function restart(): void
     {
         $this->pdo = null;
-        $this->connect();
-    }
-
-    protected function connection(): PDOProxy
-    {
-        if ($this->pdo === null) {
-            $this->connect();
-        }
-        return $this->pdo;
-    }
-
-    private function connect(): void
-    {
-        $pool = new PDOPool(
-            (new PDOConfig())
-                ->withHost($this->dsn->host)
-                ->withPort($this->dsn->port)
-                ->withDbName($this->dsn->database)
-                ->withCharset($this->dsn->charset)
-                ->withUsername($this->dsn->username)
-                ->withPassword($this->dsn->password)
-        );
-        $this->pdo = $pool->get();
+        $this->connection->reconnect();
     }
 
     public function getSnapshotInterval(): int
@@ -181,7 +155,7 @@ class MysqlProvider implements ProviderStateInterface, ProviderInterface
      */
     public function getSnapshot(string $actorName): SnapshotResult
     {
-        $conn = $this->connection();
+        $conn = $this->connection;
         $conn->beginTransaction();
         $stmt = $conn->prepare(
             sprintf(
