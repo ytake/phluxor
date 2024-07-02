@@ -6,6 +6,7 @@ namespace Example\Persistence;
 
 use Phluxor\ActorSystem;
 use Phluxor\Persistence\EventSourcedReceiver;
+use Phluxor\Persistence\Mysql\Connection;
 use Phluxor\Persistence\Mysql\DefaultSchema;
 use Phluxor\Persistence\Mysql\Dsn;
 use Phluxor\Persistence\Mysql\MysqlProvider;
@@ -33,16 +34,20 @@ class SampleSystem
         });
     }
 
-    private function mysqlProvider(LoggerInterface $logger, int $snapshotInterval): MysqlProvider
-    {
-        return new MysqlProvider(
+    private function mysqlProvider(
+        LoggerInterface $logger,
+        int $snapshotInterval
+    ): MysqlProvider {
+        $conn = new Connection(
             new Dsn(
                 '127.0.0.1',
                 3306,
                 'sample',
                 'user',
                 'passw@rd'
-            ),
+            ));
+        return new MysqlProvider(
+            $conn->proxy(),
             new DefaultSchema(),
             $snapshotInterval,
             $logger
