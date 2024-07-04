@@ -14,7 +14,6 @@ use Phluxor\ActorSystem\QueueInterface;
 use Phluxor\ActorSystem\QueueResult;
 use Phluxor\Mspc\Queue as MpscQueue;
 use Swoole\Atomic;
-use Swoole\FastCGI\Message;
 use Throwable;
 
 class DefaultMailbox implements MailboxInterface

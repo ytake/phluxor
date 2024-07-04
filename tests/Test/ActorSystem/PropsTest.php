@@ -4,10 +4,19 @@ declare(strict_types=1);
 
 namespace Test\ActorSystem;
 
+use Closure;
+use Phluxor\ActorSystem;
 use Phluxor\ActorSystem\Context\ContextInterface;
+use Phluxor\ActorSystem\Context\ReceiverInterface;
+use Phluxor\ActorSystem\Message\MessageEnvelope;
 use Phluxor\ActorSystem\Message\ReceiveFunction;
+use Phluxor\ActorSystem\Message\ReceiverFunctionInterface;
 use Phluxor\ActorSystem\Props;
 use PHPUnit\Framework\TestCase;
+
+use Test\VoidActor;
+
+use function Swoole\Coroutine\run;
 
 class PropsTest extends TestCase
 {
@@ -20,5 +29,65 @@ class PropsTest extends TestCase
             })
         );
         $this->assertNotSame($fun, $fun->clone());
+    }
+
+    public function testPropFromProducerWithMiddleware(): void
+    {
+        run(function () {
+            \Swoole\Coroutine\go(function () {
+                $system = ActorSystem::create();
+                $isCalled = false;
+                $wg = new \Swoole\Coroutine\WaitGroup();
+                $wg->add();
+                $props = Props::fromProducer(
+                    fn() => new VoidActor(),
+                    Props::withReceiverMiddleware(
+                        $this->mockReceiverMiddleware(
+                            function (ContextInterface $context, MessageEnvelope $messageEnvelope) use (&$isCalled, $wg): void {
+                                if ($messageEnvelope->getMessage() === 'hello') {
+                                    $this->assertSame('hello', $messageEnvelope->getMessage());
+                                    $isCalled = true;
+                                    $wg->done();
+                                }
+                            }
+                        )
+                    )
+                );
+                $ref = $system->root()->spawn($props);
+                $system->root()->send($ref, 'hello');
+                $wg->wait();
+                $this->assertTrue($isCalled);
+            });
+        });
+    }
+
+    private function mockReceiverMiddleware(Closure|ReceiverFunctionInterface $next): Props\ReceiverMiddlewareInterface
+    {
+        return new readonly class($next) implements Props\ReceiverMiddlewareInterface {
+
+            public function __construct(
+                private Closure|ReceiverFunctionInterface $next
+            ) {
+            }
+
+            public function __invoke(
+                Closure|ReceiverFunctionInterface $next
+            ): ReceiverFunctionInterface {
+                return new readonly class($this->next) implements ReceiverFunctionInterface {
+
+                    public function __construct(
+                        private Closure|ReceiverFunctionInterface $next
+                    ) {
+                    }
+                    public function __invoke(
+                        ReceiverInterface|ContextInterface $context,
+                        MessageEnvelope $messageEnvelope
+                    ): void {
+                        $next = $this->next;
+                        $next($context, $messageEnvelope);
+                    }
+                };
+            }
+        };
     }
 }
