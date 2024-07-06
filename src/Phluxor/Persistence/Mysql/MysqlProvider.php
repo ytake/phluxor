@@ -139,7 +139,6 @@ class MysqlProvider implements ProviderStateInterface, ProviderInterface
 
     public function restart(): void
     {
-        $this->pdo = null;
         $this->connection->reconnect();
     }
 
