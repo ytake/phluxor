@@ -140,4 +140,9 @@ class ProcessRegistryValue
     {
         return $this->address;
     }
+
+    public function setAddress(string $address): void
+    {
+        $this->address = $address;
+    }
 }
