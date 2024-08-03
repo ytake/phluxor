@@ -44,7 +44,7 @@ class GroupRouterActorTest extends TestCase
                 $m = new MockContext();
                 $m->messageHandle(function () {
                     return new AddRoutee([
-                        'Pid' => new ActorSystem\ProtoBuf\Pid([
+                        'pid' => new ActorSystem\ProtoBuf\Pid([
                             'address' => 'test',
                             'id' => 1
                         ])
@@ -84,7 +84,7 @@ class GroupRouterActorTest extends TestCase
                 $m = new MockContext();
                 $m->messageHandle(function () use ($p) {
                     return new AddRoutee([
-                        'Pid' => $p->protobufPid()
+                        'pid' => $p->protobufPid()
                     ]);
                 });
                 $a->receive($m);
@@ -127,20 +127,20 @@ class GroupRouterActorTest extends TestCase
                 $m = new MockContext();
                 $m->messageHandle(function () use ($p) {
                     return new AddRoutee([
-                        'Pid' => $p->protobufPid()
+                        'pid' => $p->protobufPid()
                     ]);
                 });
                 $a->receive($m);
                 $m->messageHandle(function () use ($p1) {
                     return new AddRoutee([
-                        'Pid' => $p1['ref']->protobufPid()
+                        'pid' => $p1['ref']->protobufPid()
                     ]);
                 });
                 $a->receive($m);
                 // remove p1
                 $m->messageHandle(function () use ($p1) {
                     return new RemoveRoutee([
-                        'Pid' => $p1['ref']->protobufPid()
+                        'pid' => $p1['ref']->protobufPid()
                     ]);
                 });
                 $m->sendHandle(function (?ActorSystem\Ref $ref, $message) use ($p1) {
@@ -185,14 +185,14 @@ class GroupRouterActorTest extends TestCase
                 $p1 = $system->newLocalAddress('p1');
                 $m->messageHandle(function () use ($p1) {
                     return new AddRoutee([
-                        'Pid' => $p1->protobufPid()
+                        'pid' => $p1->protobufPid()
                     ]);
                 });
                 $a->receive($m);
                 $p2 = $system->newLocalAddress('p2');
                 $m->messageHandle(function () use ($p2) {
                     return new AddRoutee([
-                        'Pid' => $p2->protobufPid()
+                        'pid' => $p2->protobufPid()
                     ]);
                 });
                 $a->receive($m);

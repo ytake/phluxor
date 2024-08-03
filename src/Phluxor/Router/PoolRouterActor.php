@@ -45,7 +45,7 @@ readonly class PoolRouterActor implements ActorInterface
                 break;
             case $msg instanceof AddRoutee:
                 $r = $this->state->getRoutees();
-                $ref = new Ref($msg->getPID());
+                $ref = new Ref($msg->getPid());
                 if ($r->contains($ref)) {
                     break;
                 }
@@ -55,7 +55,7 @@ readonly class PoolRouterActor implements ActorInterface
                 break;
             case $msg instanceof RemoveRoutee:
                 $r = $this->state->getRoutees();
-                $ref = new Ref($msg->getPID());
+                $ref = new Ref($msg->getPid());
                 if (!$r->contains($ref)) {
                     break;
                 }
@@ -84,7 +84,7 @@ readonly class PoolRouterActor implements ActorInterface
                 $r->forEach(function (int $int, Ref $pid) use (&$routees) {
                     $routees[] = $pid->protobufPid();
                 });
-                $context->respond(new Routees(['Pids' => $routees]));
+                $context->respond(new Routees(['pids' => $routees]));
                 break;
             case $msg instanceof Terminated:
                 $r = $this->state->getRoutees();

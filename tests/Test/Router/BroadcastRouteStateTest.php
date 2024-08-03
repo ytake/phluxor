@@ -49,7 +49,7 @@ class BroadcastRouteStateTest extends TestCase
                 $props = ActorSystem\Props::fromProducer(fn() => new VoidActor());
                 for ($i = 0; $i < 100; $i++) {
                     $ref = $system->root()->spawnNamed($props, 'test' . $i);
-                    $system->root()->send($g, new AddRoutee(['Pid' => $ref->getRef()->protobufPid()]));
+                    $system->root()->send($g, new AddRoutee(['pid' => $ref->getRef()->protobufPid()]));
                     $system->root()->send($g, 'hello');
                 }
                 $this->assertSame($count, $count2);

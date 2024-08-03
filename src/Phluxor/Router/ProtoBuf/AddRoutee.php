@@ -15,9 +15,9 @@ use Google\Protobuf\Internal\GPBUtil;
 class AddRoutee extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Generated from protobuf field <code>.actor.Pid Pid = 1;</code>
+     * Generated from protobuf field <code>.actor.Pid pid = 1;</code>
      */
-    protected $Pid = null;
+    protected $pid = null;
 
     /**
      * Constructor.
@@ -25,7 +25,7 @@ class AddRoutee extends \Google\Protobuf\Internal\Message
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
-     *     @type \Phluxor\ActorSystem\ProtoBuf\Pid $Pid
+     *     @type \Phluxor\ActorSystem\ProtoBuf\Pid $pid
      * }
      */
     public function __construct($data = NULL) {
@@ -34,33 +34,33 @@ class AddRoutee extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>.actor.Pid Pid = 1;</code>
+     * Generated from protobuf field <code>.actor.Pid pid = 1;</code>
      * @return \Phluxor\ActorSystem\ProtoBuf\Pid|null
      */
     public function getPid()
     {
-        return $this->Pid;
+        return $this->pid;
     }
 
     public function hasPid()
     {
-        return isset($this->Pid);
+        return isset($this->pid);
     }
 
     public function clearPid()
     {
-        unset($this->Pid);
+        unset($this->pid);
     }
 
     /**
-     * Generated from protobuf field <code>.actor.Pid Pid = 1;</code>
+     * Generated from protobuf field <code>.actor.Pid pid = 1;</code>
      * @param \Phluxor\ActorSystem\ProtoBuf\Pid $var
      * @return $this
      */
     public function setPid($var)
     {
         GPBUtil::checkMessage($var, \Phluxor\ActorSystem\ProtoBuf\Pid::class);
-        $this->Pid = $var;
+        $this->pid = $var;
 
         return $this;
     }
