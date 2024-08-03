@@ -6,24 +6,24 @@ namespace Phluxor\Router;
 
 use Phluxor\ActorSystem\Context\ContextInterface;
 use Phluxor\ActorSystem\Context\SenderInterface;
+use Phluxor\ActorSystem\Ref;
 use Phluxor\ActorSystem\RefSet;
-use Phluxor\Router\Exception\InvalidIndexException;
+use Swoole\Atomic;
 
-use function rand;
-
-class RandomRouterState implements StateInterface
+class RoundRobinState implements StateInterface
 {
     public function __construct(
         private RefSet $routees = new RefSet(),
-        private null|ContextInterface|SenderInterface $sender = null
+        private null|ContextInterface|SenderInterface $sender = null,
+        private Atomic $index = new Atomic(-1)
     ) {
     }
 
     public function routeMessage(mixed $message): void
     {
-        $ref = $this->routees->get(rand(0, $this->routees->len()));
+        $ref = $this->roundRobinRoutee();
         if ($ref === null) {
-            throw new InvalidIndexException('Invalid route index, not found routee.');
+            return;
         }
         $this->sender?->send($ref, $message);
     }
@@ -41,5 +41,16 @@ class RandomRouterState implements StateInterface
     public function setSender(ContextInterface|SenderInterface $sender): void
     {
         $this->sender = $sender;
+    }
+
+    private function roundRobinRoutee(): ?Ref
+    {
+        $i = $this->index->add();
+        if ($i < 0) {
+            $this->index->set(0);
+            $i = 0;
+        }
+        $mod = $this->routees->len();
+        return $this->routees->get($i % $mod);
     }
 }

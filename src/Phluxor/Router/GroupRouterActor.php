@@ -8,6 +8,7 @@ use Phluxor\ActorSystem\Context\ContextInterface;
 use Phluxor\ActorSystem\Message\ActorInterface;
 use Phluxor\ActorSystem\Message\Started;
 use Phluxor\ActorSystem\Props;
+use Phluxor\ActorSystem\ProtoBuf\Pid;
 use Phluxor\ActorSystem\Ref;
 use Phluxor\Router\Message\Broadcast;
 use Phluxor\Router\ProtoBuf\AddRoutee;
@@ -36,7 +37,7 @@ class GroupRouterActor implements ActorInterface
                 break;
             case $msg instanceof AddRoutee:
                 $r = $this->state->getRoutees();
-                $ref = new Ref($msg->getPID());
+                $ref = new Ref($msg->getPid());
                 if ($r->contains($ref)) {
                     break;
                 }
@@ -46,7 +47,7 @@ class GroupRouterActor implements ActorInterface
                 break;
             case $msg instanceof RemoveRoutee:
                 $r = $this->state->getRoutees();
-                $ref = new Ref($msg->getPID());
+                $ref = new Ref($msg->getPid());
                 if (!$r->contains($ref)) {
                     break;
                 }
@@ -63,12 +64,12 @@ class GroupRouterActor implements ActorInterface
                 break;
             case $msg instanceof GetRoutees:
                 $r = $this->state->getRoutees();
-                /** @var PID[] $routees */
+                /** @var Pid[] $routees */
                 $routees = [];
                 $r->forEach(function (int $int, Ref $pid) use (&$routees) {
                     $routees[] = $pid->protobufPid();
                 });
-                $context->respond(new Routees(['Pids' => $routees]));
+                $context->respond(new Routees(['pids' => $routees]));
                 break;
         }
     }

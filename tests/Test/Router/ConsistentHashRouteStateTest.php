@@ -76,7 +76,7 @@ class ConsistentHashRouteStateTest extends TestCase
                     ActorSystem\Props::fromProducer(fn() => $this->myActor()),
                     'routee4'
                 );
-                $system->root()->send($g, new AddRoutee(['Pid' => $routee4->getRef()->protobufPid()]));
+                $system->root()->send($g, new AddRoutee(['pid' => $routee4->getRef()->protobufPid()]));
                 sleep(1);
                 $future = $system->root()->requestFuture($g, new GetRoutees(), 1000);
                 $v = $future->result()->value();
@@ -100,7 +100,7 @@ class ConsistentHashRouteStateTest extends TestCase
                 }
                 $g = $system->root()->spawn(GroupRouter::create(...$routees));
                 $system->root()->send($g, new RemoveRoutee([
-                    'Pid' => new ActorSystem\ProtoBuf\Pid([
+                    'pid' => new ActorSystem\ProtoBuf\Pid([
                         'id' => 'routee3',
                         'address' => ActorSystem::LOCAL_ADDRESS
                     ])
@@ -132,7 +132,7 @@ class ConsistentHashRouteStateTest extends TestCase
                     ActorSystem\Props::fromProducer(fn() => $this->myActor()),
                     'routee4'
                 );
-                $system->root()->send($g, new AddRoutee(['Pid' => $routee4->getRef()->protobufPid()]));
+                $system->root()->send($g, new AddRoutee(['pid' => $routee4->getRef()->protobufPid()]));
                 sleep(1);
                 for ($i = 0; $i < 10; $i++) {
                     $system->root()->send($g, new HashMessage('message1'));
@@ -186,7 +186,7 @@ class ConsistentHashRouteStateTest extends TestCase
                 }
 
                 $system->root()->send($g, new RemoveRoutee([
-                    'Pid' => new ActorSystem\ProtoBuf\Pid([
+                    'pid' => new ActorSystem\ProtoBuf\Pid([
                         'id' => 'routee3',
                         'address' => ActorSystem::LOCAL_ADDRESS
                     ])
