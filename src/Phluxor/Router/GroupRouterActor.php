@@ -17,7 +17,7 @@ use Phluxor\Router\ProtoBuf\RemoveRoutee;
 use Phluxor\Router\ProtoBuf\Routees;
 use Swoole\Coroutine\WaitGroup;
 
-class GroupRouterActor implements ActorInterface
+readonly class GroupRouterActor implements ActorInterface
 {
     public function __construct(
         private Props $props,
