@@ -50,7 +50,7 @@ class Config
                 )
             );
         }
-        $props->configure(fn(ActorSystem\Props $props) => null);
+        $props->configure(Props::withSpawnFunc(null));
         $process->setState($config->createRouterState());
 
         $wg = new WaitGroup();
