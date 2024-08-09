@@ -8,7 +8,7 @@ use Brick\Math\Exception\MathException;
 use Phluxor\ActorSystem;
 use PHPUnit\Framework\TestCase;
 
-use function Swoole\Coroutine\run;
+use function Phluxor\Swoole\Coroutine\run;
 
 class ActorSystemTest extends TestCase
 {

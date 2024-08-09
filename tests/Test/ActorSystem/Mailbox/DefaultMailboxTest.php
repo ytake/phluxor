@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace Test\ActorSystem\Mailbox;
 
-use Swoole\Coroutine\WaitGroup;
 use Phluxor\Mspc\Queue as MspcQueue;
 use Phluxor\ActorSystem\Dispatcher\CoroutineDispatcher;
 use Phluxor\ActorSystem\Mailbox\BoundedMailboxQueue;
 use Phluxor\ActorSystem\Mailbox\UnboundedLochFree;
+use Phluxor\Swoole\Coroutine\WaitGroup;
 use PHPUnit\Framework\TestCase;
 use Swoole\Coroutine;
 
-use function Swoole\Coroutine\run;
+use function Phluxor\Swoole\Coroutine\run;
 
 class DefaultMailboxTest extends TestCase
 {

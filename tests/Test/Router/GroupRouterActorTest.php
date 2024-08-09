@@ -12,12 +12,11 @@ use Phluxor\Router\ProtoBuf\GetRoutees;
 use Phluxor\Router\ProtoBuf\RemoveRoutee;
 use Phluxor\Router\ProtoBuf\Routees;
 use PHPUnit\Framework\TestCase;
-use Swoole\Coroutine\WaitGroup;
+use Phluxor\Swoole\Coroutine\WaitGroup;
 use Test\MockContext;
 use Test\ProcessTrait;
 
-use function Swoole\Coroutine\go;
-use function Swoole\Coroutine\run;
+use function Phluxor\Swoole\Coroutine\run;
 
 class GroupRouterActorTest extends TestCase
 {
@@ -54,8 +53,8 @@ class GroupRouterActorTest extends TestCase
                 $routees = $state->getRoutees();
                 $this->assertTrue(
                     $routees->contains(new ActorSystem\Ref(new ActorSystem\ProtoBuf\Pid([
-                    'address' => 'test',
-                    'id' => 1
+                        'address' => 'test',
+                        'id' => 1
                     ])))
                 );
             });
@@ -95,7 +94,7 @@ class GroupRouterActorTest extends TestCase
                 $m->respondHandle(function ($response) use (&$proceed) {
                     $this->assertInstanceOf(Routees::class, $response);
                     $proceed = true;
-                    /** @var Routees  $response*/
+                    /** @var Routees $response */
                     $this->assertSame(1, $response->getPIDs()->count());
                 });
                 $a->receive($m);
@@ -154,7 +153,7 @@ class GroupRouterActorTest extends TestCase
                 $m->respondHandle(function ($response) use (&$proceed) {
                     $this->assertInstanceOf(Routees::class, $response);
                     $proceed = true;
-                    /** @var Routees  $response*/
+                    /** @var Routees $response */
                     $this->assertSame(1, $response->getPIDs()->count());
                 });
                 $a->receive($m);

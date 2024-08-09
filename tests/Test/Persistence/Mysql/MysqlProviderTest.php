@@ -15,14 +15,14 @@ use Swoole\Database\PDOConfig;
 use Swoole\Database\PDOPool;
 use Test\Persistence\ProtoBuf\UserCreated;
 
-use function Swoole\Coroutine\run;
+use function Phluxor\Swoole\Coroutine\run;
 
 class MysqlProviderTest extends TestCase
 {
     public function tearDown(): void
     {
         run(function () {
-            \Swoole\Coroutine\go(function () {
+            go(function () {
                 $pool = new PDOPool(
                     (new PDOConfig())
                         ->withHost('127.0.0.1')
@@ -42,7 +42,7 @@ class MysqlProviderTest extends TestCase
     public function testPersistEvent(): void
     {
         run(function () {
-            \Swoole\Coroutine\go(function () {
+            go(function () {
                 $provider = $this->mysqlProvider();
                 $event = new UserCreated([
                     'userID' => 'test',
@@ -75,7 +75,7 @@ class MysqlProviderTest extends TestCase
     public function testPersistSnapshot(): void
     {
         run(function () {
-            \Swoole\Coroutine\go(function () {
+            go(function () {
                 $provider = $this->mysqlProvider();
                 $event = new UserCreated([
                     'userID' => 'test',

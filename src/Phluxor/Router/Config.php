@@ -9,7 +9,7 @@ use Phluxor\ActorSystem;
 use Phluxor\ActorSystem\Context\SpawnerInterface;
 use Phluxor\ActorSystem\Props;
 use Phluxor\ActorSystem\SpawnResult;
-use Swoole\Coroutine\WaitGroup;
+use Phluxor\Swoole\Coroutine\WaitGroup;
 
 class Config
 {

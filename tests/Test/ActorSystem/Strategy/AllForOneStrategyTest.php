@@ -16,7 +16,7 @@ use PHPUnit\Framework\TestCase;
 use ReflectionMethod;
 use Test\NullProducer;
 
-use function Swoole\Coroutine\run;
+use function Phluxor\Swoole\Coroutine\run;
 
 class AllForOneStrategyTest extends TestCase
 {
@@ -115,7 +115,7 @@ class AllForOneStrategyTest extends TestCase
     public function testAllForOneStrategyIncrementsFailureCount(): void
     {
         run(function () {
-            \Swoole\Coroutine\go(function () {
+            go(function () {
                 $duration = new DateInterval('PT10S');
                 $strategy = new AllForOneStrategy(
                     maxNrOfRetries: 1,

@@ -11,7 +11,7 @@ use Phluxor\ActorSystem\Ref;
 use PHPUnit\Framework\TestCase;
 use Test\ProcessTrait;
 
-use function Swoole\Coroutine\run;
+use function Phluxor\Swoole\Coroutine\run;
 
 class GuardianProcessTest extends TestCase
 {
@@ -20,7 +20,7 @@ class GuardianProcessTest extends TestCase
     public function testShouldReturnGuardianRef(): void
     {
         run(function () {
-            \Swoole\Coroutine\go(function() {
+            go(function() {
                 $system = ActorSystem::create();
                 $duration = new DateInterval('PT1S');
                 $strategy = new ActorSystem\Strategy\OneForOneStrategy(

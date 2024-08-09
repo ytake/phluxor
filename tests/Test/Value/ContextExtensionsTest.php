@@ -9,14 +9,14 @@ use Phluxor\Value\ContextExtensionId;
 use Phluxor\Value\ExtensionInterface;
 use PHPUnit\Framework\TestCase;
 
-use function Swoole\Coroutine\run;
+use function Phluxor\Swoole\Coroutine\run;
 
 class ContextExtensionsTest extends TestCase
 {
     public function testGenerateContextExtensions(): void
     {
         run(function () {
-            \Swoole\Coroutine\go(function () {
+            go(function () {
                 $id = new class() implements ExtensionInterface {
                     public function extensionID(): ContextExtensionId
                     {
@@ -33,7 +33,7 @@ class ContextExtensionsTest extends TestCase
     public function testGenerateSizeOveContextExtensions(): void
     {
         run(function () {
-            \Swoole\Coroutine\go(function () {
+            go(function () {
                 $id = new class() implements ExtensionInterface {
                     public function extensionID(): ContextExtensionId
                     {

@@ -15,7 +15,7 @@ use Phluxor\Router\ProtoBuf\AddRoutee;
 use Phluxor\Router\ProtoBuf\GetRoutees;
 use Phluxor\Router\ProtoBuf\RemoveRoutee;
 use Phluxor\Router\ProtoBuf\Routees;
-use Swoole\Coroutine\WaitGroup;
+use Phluxor\Swoole\Coroutine\WaitGroup;
 
 readonly class GroupRouterActor implements ActorInterface
 {

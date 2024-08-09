@@ -8,7 +8,6 @@ use OpenTelemetry\API\Globals;
 use OpenTelemetry\API\Instrumentation\Configurator;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextStorage;
-use OpenTelemetry\Contrib\Context\Swoole\SwooleContextStorage;
 use OpenTelemetry\Contrib\Otlp\ContentTypes;
 use OpenTelemetry\Contrib\Otlp\MetricExporter;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
@@ -19,11 +18,12 @@ use OpenTelemetry\SDK\Metrics\MetricReader\ExportingReader;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Sdk;
 use OpenTelemetry\SemConv\ResourceAttributes;
+use Phluxor\Swoole\OpenTelemetry\SwooleContextStorage;
 
 class HttpJsonMeterProvider implements ProviderInterface
 {
     /**
-     * @var array{string, string}
+     * @var array<string, string>
      */
     private array $resourceAttributes = [];
 

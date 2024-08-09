@@ -9,8 +9,7 @@ use Phluxor\ActorSystem\Channel\TypedChannel;
 use PHPUnit\Framework\TestCase;
 use Test\EchoRequest;
 
-use function Swoole\Coroutine\go;
-use function Swoole\Coroutine\run;
+use function Phluxor\Swoole\Coroutine\run;
 
 class TypedChannelTest extends TestCase
 {

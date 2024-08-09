@@ -12,11 +12,11 @@ use Phluxor\ActorSystem\Message\MessageEnvelope;
 use Phluxor\ActorSystem\Message\ReceiveFunction;
 use Phluxor\ActorSystem\Message\ReceiverFunctionInterface;
 use Phluxor\ActorSystem\Props;
+use Phluxor\Swoole\Coroutine\WaitGroup;
 use PHPUnit\Framework\TestCase;
-
 use Test\VoidActor;
 
-use function Swoole\Coroutine\run;
+use function Phluxor\Swoole\Coroutine\run;
 
 class PropsTest extends TestCase
 {
@@ -34,10 +34,10 @@ class PropsTest extends TestCase
     public function testPropFromProducerWithMiddleware(): void
     {
         run(function () {
-            \Swoole\Coroutine\go(function () {
+            go(function () {
                 $system = ActorSystem::create();
                 $isCalled = false;
-                $wg = new \Swoole\Coroutine\WaitGroup();
+                $wg = new WaitGroup();
                 $wg->add();
                 $props = Props::fromProducer(
                     fn() => new VoidActor(),
