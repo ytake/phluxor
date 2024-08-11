@@ -144,7 +144,7 @@ class RoundRobinGroupTest extends TestCase
                     $roundRobin,
                     new AddRoutee(['pid' => $routee4->getRef()->protobufPid()])
                 );
-                \Swoole\Coroutine::sleep(0.1);
+                \Swoole\Coroutine::sleep(1);
                 $system->root()->send($roundRobin, '1');
                 $system->root()->send($roundRobin, '1');
                 $system->root()->send($roundRobin, '1');
@@ -176,7 +176,7 @@ class RoundRobinGroupTest extends TestCase
                     $roundRobin,
                     new RemoveRoutee(['pid' => $this->genRef('routee1', $system)->protobufPid()])
                 );
-                \Swoole\Coroutine::sleep(0.1);
+                \Swoole\Coroutine::sleep(1);
                 $system->root()->send($roundRobin, '3');
                 $system->root()->send($roundRobin, '3');
                 $system->root()->send($roundRobin, '3');
