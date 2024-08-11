@@ -25,8 +25,6 @@
     "guzzlehttp/promises": "^2.0",
     "monolog/monolog": "^3.6.0",
     "open-telemetry/opentelemetry": "^1.0.0",
-    "openswoole/core": "^22.1",
-    "openswoole/ide-helper": "^22.1",
     "pascaldevink/shortuuid": "^4.0.0",
     "php-http/httplug": "^2.4",
     "psr/log": "^3.0",
@@ -47,7 +45,8 @@
     "ext-grpc": "to use vitual actor model with grpc",
     "ext-protobuf": "serialization with protobuf",
     "swoole/ide-helper": "IDE helper for Swoole",
-    "openswoole/ide-helper": "IDE helper for Open Swoole"
+    "openswoole/ide-helper": "IDE helper for Open Swoole",
+    "openswoole/core": "Open Swoole core package"
   },
   "autoload": {
     "psr-4": {

@@ -12,6 +12,7 @@ jobs:
     strategy:
       matrix:
         php-versions: ['8.3']
+        swooles: ['swoole', 'openswoole']
     name: PHP ${{ matrix.php-versions }} Test
     steps:
       - uses: actions/checkout@v4
@@ -20,13 +21,16 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php-versions }}
-          extensions: swoole
+          extensions: ${{ matrix.swooles }}
           coverage: none
       - name: Validate composer.json and composer.lock
         run: composer validate
 
       - name: Install dependencies
         run: composer install --prefer-dist --no-progress --no-suggest
+      - name: Determine if swoole or openswoole
+        if: matrix.swooles == 'openswoole'
+        run: composer require openswoole/core
       - name: build container
         run: docker compose -f ./tests/compose.yaml up -d
       - name: Execute tests
