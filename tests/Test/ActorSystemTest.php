@@ -8,7 +8,11 @@ use Brick\Math\Exception\MathException;
 use Phluxor\ActorSystem;
 use PHPUnit\Framework\TestCase;
 
-use function Swoole\Coroutine\run;
+use OpenTelemetry\Contrib\Otlp\MetricExporter;
+use OpenTelemetry\SDK\Common\Export\Http\PsrTransportFactory;
+use OpenTelemetry\SDK\Metrics\MetricReader\ExportingReader;
+
+use function Phluxor\Swoole\Coroutine\run;
 
 class ActorSystemTest extends TestCase
 {
@@ -59,7 +63,7 @@ class ActorSystemTest extends TestCase
                 $config->setMetricsProvider(
                     new ActorSystem\Metrics\HttpJsonMeterProvider(
                         'phluxor',
-                        'http://localhost:4318/v1/metrics'
+                        'http://127.0.0.1:4318/v1/metrics'
                     )
                 );
                 $system = ActorSystem::create($config);

@@ -11,7 +11,7 @@ use Phluxor\Router\Message\Broadcast;
 use PHPUnit\Framework\TestCase;
 use Test\ProcessTrait;
 
-use function Swoole\Coroutine\run;
+use function Phluxor\Swoole\Coroutine\run;
 
 class ProcessTest extends TestCase
 {
@@ -20,7 +20,7 @@ class ProcessTest extends TestCase
     public function testRouterSendsUserMessageToChild(): void
     {
         run(function () {
-            \Swoole\Coroutine\go(function () {
+            go(function () {
                 $proceed = false;
                 $system = ActorSystem::create();
                 $r = $this->spawnMockProcess(

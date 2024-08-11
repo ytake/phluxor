@@ -20,5 +20,8 @@ interface SchemaInterface
 
     public function created(): string;
 
+    /**
+     * @return string[]
+     */
     public function createTable(): array;
 }

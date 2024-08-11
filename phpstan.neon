@@ -1,12 +1,14 @@
 parameters:
-  paths:
-    - src
-  excludePaths:
-    analyseAndScan:
-      - tests/
-      - src/Phluxor/ProtoBuf
-      - src/Phluxor/Metadata/ProtoBuf
-  level: max
-  treatPhpDocTypesAsCertain: false
-  scanDirectories:
-    - vendor/swoole/ide-helper
+    fileExtensions:
+        - php
+    paths:
+        - src
+    excludePaths:
+        - src/Phluxor/Swoole/**
+        - src/Phluxor/Persistence/Mysql/**
+        - src/Phluxor/**/ProtoBuf/**
+    level: max
+    treatPhpDocTypesAsCertain: false
+    scanDirectories:
+       #- vendor/openswoole/ide-helper
+       #- vendor/swoole/ide-helper

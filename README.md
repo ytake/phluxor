@@ -12,18 +12,23 @@ do not use this in production yet.
 
 [sample web application / phluxor-http-application-samples](https://github.com/ytake/phluxor-http-application-samples)  
 [demonstrate the use of Phluxor](https://github.com/ytake/phluxor-example) 
+[Documentation](https://phluxor.github.io/en/guide/)
 
-// 日本語
-
-PhluxorはPHPでのアクターモデルを実現するためのツールキットです。  
-PHP 8.3 と swoole / open swoole が必要です。  
-メッセージのシリアライズには、Protocol Buffersを利用します。/ 他のシリアライズフォーマットはまだサポートされていません。  
-本番環境での使用はまだお勧めしません。
+PhluxorはPHPでのアクターモデルを実現するためのツールキットです。    
+PHP 8.3 と swoole / openswoole が必要です。  
+メッセージのシリアライズには、Protocol Buffersを利用します。  
+他のシリアライズフォーマットはまだサポートされていません。
 
 ## Installation
 
 ```bash
-$ composer require phluxor/phluxor:dev-main
+$ composer require phluxor/phluxor
+```
+
+### If you use Openswoole
+
+```bash
+$ composer require openswoole/core
 ```
 
 ## already implemented

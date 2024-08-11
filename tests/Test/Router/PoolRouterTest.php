@@ -12,14 +12,14 @@ use Phluxor\Router\ProtoBuf\Routees;
 use Phluxor\Router\RoundRobin\PoolRouter;
 use PHPUnit\Framework\TestCase;
 
-use function Swoole\Coroutine\run;
+use function Phluxor\Swoole\Coroutine\run;
 
 class PoolRouterTest extends TestCase
 {
     public function testBroadcastGroupPoolCreatesRoutees(): void
     {
         run(function () {
-            \Swoole\Coroutine\go(function () {
+            go(function () {
                 $system = ActorSystem::create();
                 $props = PoolRouter::create(
                     3,

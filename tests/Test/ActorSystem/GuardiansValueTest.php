@@ -11,14 +11,14 @@ use Phluxor\ActorSystem\GuardiansValue;
 use Phluxor\ActorSystem\Strategy\OneForOneStrategy;
 use PHPUnit\Framework\TestCase;
 
-use function Swoole\Coroutine\run;
+use function Phluxor\Swoole\Coroutine\run;
 
 class GuardiansValueTest extends TestCase
 {
     public function testShouldReturnGuardianRef(): void
     {
         run(function () {
-            \Swoole\Coroutine\go(function() {
+            go(function() {
                 $system = ActorSystem::create();
                 $guardian = new GuardiansValue($system);
                 $duration = new DateInterval('PT1S');

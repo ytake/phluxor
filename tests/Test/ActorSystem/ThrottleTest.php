@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Test\ActorSystem;
 
-use Swoole\Coroutine\WaitGroup;
 use Phluxor\ActorSystem\Throttle;
 use Phluxor\ActorSystem\Valve;
+use Phluxor\Swoole\Coroutine\WaitGroup;
 use PHPUnit\Framework\TestCase;
 
-use function Swoole\Coroutine\run;
+use function Phluxor\Swoole\Coroutine\run;
 
 class ThrottleTest extends TestCase
 {

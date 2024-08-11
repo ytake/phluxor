@@ -13,11 +13,11 @@ use Phluxor\ActorSystem\Ref;
 use Phluxor\ActorSystem\Strategy\OneForOneStrategy;
 use Phluxor\ActorSystem\Supervision\DefaultDecider;
 use PHPUnit\Framework\TestCase;
-use Swoole\Coroutine\WaitGroup;
+use Phluxor\Swoole\Coroutine\WaitGroup;
 use Test\NullProducer;
 use Test\ProcessTrait;
 
-use function Swoole\Coroutine\run;
+use function Phluxor\Swoole\Coroutine\run;
 
 class ActorContextTest extends TestCase
 {

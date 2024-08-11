@@ -10,8 +10,7 @@ use PHPUnit\Framework\TestCase;
 use Swoole\Coroutine;
 use Test\ProcessTrait;
 
-use function go;
-use function Swoole\Coroutine\run;
+use function Phluxor\Swoole\Coroutine\run;
 
 class FutureTest extends TestCase
 {

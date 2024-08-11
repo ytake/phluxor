@@ -10,8 +10,7 @@ use Phluxor\ActorSystem\Message\ReceiveFunction;
 use Phluxor\ActorSystem\Props;
 use PHPUnit\Framework\TestCase;
 
-use function Swoole\Coroutine\go;
-use function Swoole\Coroutine\run;
+use function Phluxor\Swoole\Coroutine\run;
 
 class MessageEnvelopeTest extends TestCase
 {

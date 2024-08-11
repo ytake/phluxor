@@ -64,6 +64,9 @@ class DefaultSchema implements SchemaInterface
         return 'created_at';
     }
 
+    /**
+     * @return string[]
+     */
     public function createTable(): array
     {
         $tables = [
