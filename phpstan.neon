@@ -5,6 +5,7 @@ parameters:
         - src
     excludePaths:
         - src/Phluxor/Swoole/**
+        - src/Phluxor/Persistence/Mysql/**
         - src/Phluxor/**/ProtoBuf/**
     level: max
     treatPhpDocTypesAsCertain: false

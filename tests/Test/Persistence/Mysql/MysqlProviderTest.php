@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Test\Persistence\Mysql;
 
 use Google\Protobuf\Internal\Message;
+use PDO;
 use Phluxor\ActorSystem;
 use Phluxor\Persistence\Mysql\Connection;
 use Phluxor\Persistence\Mysql\DefaultSchema;
@@ -23,18 +24,10 @@ class MysqlProviderTest extends TestCase
     {
         run(function () {
             go(function () {
-                $pool = new PDOPool(
-                    (new PDOConfig())
-                        ->withHost('127.0.0.1')
-                        ->withPort(3306)
-                        ->withDbName('sample')
-                        ->withCharset('utf8mb4')
-                        ->withUsername('user')
-                        ->withPassword('passw@rd')
-                );
-                $pool->get()->exec('TRUNCATE journals;');
-                $pool->get()->exec('TRUNCATE snapshots;');
-                $pool->close();
+                $conn = new PDO('mysql:host=127.0.0.1;port=3306;dbname=sample;charset=utf8mb4', 'user', 'passw@rd');
+                $conn->exec('TRUNCATE journals;');
+                $conn->exec('TRUNCATE snapshots;');
+                $conn = null;
             });
         });
     }
@@ -104,14 +97,13 @@ class MysqlProviderTest extends TestCase
 
     private function mysqlProvider(): MysqlProvider
     {
-        $conn = new Connection(
-            new Dsn(
-                '127.0.0.1',
-                3306,
-                'sample',
-                'user',
-                'passw@rd'
-            ));
+        $conn = new Connection(new Dsn(
+            '127.0.0.1',
+            3306,
+            'sample',
+            'user',
+            'passw@rd'
+        ));
         return new MysqlProvider(
             $conn->proxy(),
             new DefaultSchema(),

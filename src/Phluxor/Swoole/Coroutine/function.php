@@ -7,29 +7,33 @@ namespace Phluxor\Swoole\Coroutine;
 /**
  * @param callable $fn
  * @param mixed ...$args
- * @return bool
+ * @return void
  */
-function run(callable $fn, ...$args): bool
+function run(callable $fn, ...$args): void
 {
     if (extension_loaded('swoole')) {
-        return \Swoole\Coroutine\run($fn, ...$args); // @phpstan-ignore-line
+        \Swoole\Coroutine\run($fn, ...$args); // @phpstan-ignore-line
+        return;
     }
     if (extension_loaded('openswoole')) {
-        return \OpenSwoole\Coroutine::run($fn, ...$args); // @phpstan-ignore-line
+        \OpenSwoole\Coroutine::run($fn, ...$args); // @phpstan-ignore-line
+        return;
     }
 }
 
 /**
  * @param callable $fn
  * @param mixed ...$args
- * @return mixed
+ * @return void
  */
-function go(callable $fn, ...$args): mixed
+function go(callable $fn, ...$args): void
 {
     if (extension_loaded('swoole')) {
-        return \Swoole\Coroutine\go($fn, ...$args); // @phpstan-ignore-line
+        \Swoole\Coroutine\go($fn, ...$args); // @phpstan-ignore-line
+        return;
     }
     if (extension_loaded('openswoole')) {
-        return \OpenSwoole\Coroutine::go($fn, ...$args); // @phpstan-ignore-line
+        \OpenSwoole\Coroutine::go($fn, ...$args); // @phpstan-ignore-line
+        return;
     }
 }

@@ -15,4 +15,9 @@ readonly class Dsn
         public string $charset = 'utf8mb4',
     ) {
     }
+
+    public function __toString(): string
+    {
+        return "mysql:host={$this->host};port={$this->port};dbname={$this->database};charset={$this->charset}";
+    }
 }

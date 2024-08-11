@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Phluxor\ActorSystem\Metrics;
 
+use GuzzleHttp\Client;
+use Http\Discovery\Psr17FactoryDiscovery;
 use OpenTelemetry\API\Globals;
 use OpenTelemetry\API\Instrumentation\Configurator;
 use OpenTelemetry\Context\Context;
@@ -12,6 +14,8 @@ use OpenTelemetry\Contrib\Otlp\ContentTypes;
 use OpenTelemetry\Contrib\Otlp\MetricExporter;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Export\Http\PsrTransportFactory;
+use OpenTelemetry\SDK\Common\Export\TransportFactoryInterface;
+use OpenTelemetry\SDK\Metrics\Data\Temporality;
 use OpenTelemetry\SDK\Metrics\MeterProvider;
 use OpenTelemetry\SDK\Metrics\MeterProviderInterface;
 use OpenTelemetry\SDK\Metrics\MetricReader\ExportingReader;
@@ -19,6 +23,10 @@ use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Sdk;
 use OpenTelemetry\SemConv\ResourceAttributes;
 use Phluxor\Swoole\OpenTelemetry\SwooleContextStorage;
+use Psr\Http\Client\ClientInterface;
+use Symfony\Component\HttpClient\HttpClient;
+use Symfony\Component\HttpClient\Psr18Client;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class HttpJsonMeterProvider implements ProviderInterface
 {
@@ -66,14 +74,22 @@ class HttpJsonMeterProvider implements ProviderInterface
     {
         // Use Swoole context storage
         Context::setStorage(new SwooleContextStorage(new ContextStorage()));
+        $transport = new PsrTransportFactory(
+            $this->transportClient(),
+            Psr17FactoryDiscovery::findRequestFactory(),
+            Psr17FactoryDiscovery::findStreamFactory()
+        );
         $meterProvider = MeterProvider::builder()
             ->addReader(
                 new ExportingReader(
                     new MetricExporter(
-                        PsrTransportFactory::discover()->create(
+                        $transport->create( // @phpstan-ignore-line
                             $this->url,
-                            ContentTypes::JSON
-                        )
+                            ContentTypes::JSON,
+                            [],
+                            TransportFactoryInterface::COMPRESSION_GZIP,
+                        ),
+                        Temporality::DELTA
                     )
                 )
             )
@@ -87,5 +103,12 @@ class HttpJsonMeterProvider implements ProviderInterface
             ->setAutoShutdown(true)
             ->buildAndRegisterGlobal();
         return $meterProvider;
+    }
+
+    private function transportClient(): ClientInterface
+    {
+        return new Psr18Client(HttpClient::create([
+            'timeout' => 90.0,
+        ]));
     }
 }
