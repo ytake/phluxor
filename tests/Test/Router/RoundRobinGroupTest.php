@@ -14,7 +14,6 @@ use Phluxor\Router\ProtoBuf\Routees;
 use Phluxor\Router\RoundRobin\GroupRouter;
 use PHPUnit\Framework\TestCase;
 
-use function Swoole\Coroutine\go;
 use function Phluxor\Swoole\Coroutine\run;
 
 class RoundRobinGroupTest extends TestCase
