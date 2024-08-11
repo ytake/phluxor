@@ -12,7 +12,7 @@ namespace Phluxor\Swoole\Coroutine;
  */
 class WaitGroup
 {
-    private \Co\WaitGroup|\OpenSwoole\Core\Coroutine\WaitGroup $wg; // @phpstan-ignore-line
+    private \Swoole\Coroutine\WaitGroup|\OpenSwoole\Core\Coroutine\WaitGroup $wg; // @phpstan-ignore-line
 
     public function __construct(int $delta = 0)
     {
