@@ -12,11 +12,11 @@ use Phluxor\Router\ProtoBuf\GetRoutees;
 use Phluxor\Router\ProtoBuf\RemoveRoutee;
 use Phluxor\Router\ProtoBuf\Routees;
 use PHPUnit\Framework\TestCase;
-use Phluxor\Swoole\Coroutine\WaitGroup;
+use Swoole\Coroutine\WaitGroup;
 use Test\MockContext;
 use Test\ProcessTrait;
 
-use function Phluxor\Swoole\Coroutine\run;
+use function Swoole\Coroutine\run;
 
 class PoolRouterActorTest extends TestCase
 {

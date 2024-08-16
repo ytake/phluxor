@@ -11,7 +11,7 @@ use Phluxor\ActorSystem\Ref;
 use PHPUnit\Framework\TestCase;
 use Test\ProcessTrait;
 
-use function Phluxor\Swoole\Coroutine\run;
+use function Swoole\Coroutine\run;
 
 class GuardianProcessTest extends TestCase
 {

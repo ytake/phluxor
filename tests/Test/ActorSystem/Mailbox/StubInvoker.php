@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Test\ActorSystem\Mailbox;
 
 use Closure;
-use Phluxor\Swoole\Coroutine\WaitGroup;
 use Phluxor\ActorSystem\Mailbox\MessageInvokerInterface;
+use Swoole\Coroutine\WaitGroup;
 
 class StubInvoker implements MessageInvokerInterface
 {

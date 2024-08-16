@@ -6,7 +6,6 @@ namespace Phluxor\Persistence\Mysql;
 
 use Closure;
 use Google\Protobuf\Internal\Message;
-use OpenSwoole\Core\Coroutine\Client\PDOClient;
 use Phluxor\Persistence\Envelope;
 use Phluxor\Persistence\ProviderInterface;
 use Phluxor\Persistence\ProviderStateInterface;
@@ -22,13 +21,13 @@ use function json_encode;
 /**
  * persistence provider for mysql
  */
-class MysqlProvider implements ProviderStateInterface, ProviderInterface
+readonly class MysqlProvider implements ProviderStateInterface, ProviderInterface
 {
     public function __construct(
-        private readonly PDOProxy|PDOClient $connection, //@phpstan-ignore-line
-        private readonly SchemaInterface $schema,
-        private readonly int $snapshotInterval,
-        private readonly LoggerInterface $logger
+        private PDOProxy $connection,
+        private SchemaInterface $schema,
+        private int $snapshotInterval,
+        private LoggerInterface $logger
     ) {
     }
 
@@ -49,15 +48,13 @@ class MysqlProvider implements ProviderStateInterface, ProviderInterface
     }
 
     /**
-     * @param Closure(PDOProxy|PDOClient): bool $callback
+     * @param Closure(PDOProxy): bool $callback
      * @return void
      */
     private function executeTx(Closure $callback): void
     {
         $conn = $this->connection;
-        if (method_exists($conn, 'reset')) {
-            $conn->reset();
-        }
+        $conn->reset();
         $conn->beginTransaction();
         $result = $callback($conn);
         $result === false ? $conn->rollBack() : $conn->commit();
@@ -114,7 +111,7 @@ class MysqlProvider implements ProviderStateInterface, ProviderInterface
     public function persistenceEvent(string $actorName, int $eventIndex, Message $event): void
     {
         $msg = new \Phluxor\Persistence\Message($event);
-        $this->executeTx(function (PDOProxy|PDOClient $conn) use ($msg, $eventIndex, $actorName) {
+        $this->executeTx(function (PDOProxy $conn) use ($msg, $eventIndex, $actorName) {
             try {
                 $stmt = $conn->prepare(
                     sprintf(
@@ -188,7 +185,7 @@ class MysqlProvider implements ProviderStateInterface, ProviderInterface
     public function persistenceSnapshot(string $actorName, int $snapshotIndex, Message $snapshot): void
     {
         $msg = new \Phluxor\Persistence\Message($snapshot);
-        $this->executeTx(function (PDOProxy|PDOClient $conn) use ($msg, $snapshotIndex, $actorName) {
+        $this->executeTx(function (PDOProxy $conn) use ($msg, $snapshotIndex, $actorName) {
             try {
                 $stmt = $conn->prepare(
                     sprintf(

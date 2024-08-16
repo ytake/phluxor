@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Phluxor\ActorSystem\Metrics;
 
-use GuzzleHttp\Client;
 use Http\Discovery\Psr17FactoryDiscovery;
 use OpenTelemetry\API\Globals;
 use OpenTelemetry\API\Instrumentation\Configurator;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextStorage;
+use OpenTelemetry\Contrib\Context\Swoole\SwooleContextStorage;
 use OpenTelemetry\Contrib\Otlp\ContentTypes;
 use OpenTelemetry\Contrib\Otlp\MetricExporter;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
@@ -22,11 +22,9 @@ use OpenTelemetry\SDK\Metrics\MetricReader\ExportingReader;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Sdk;
 use OpenTelemetry\SemConv\ResourceAttributes;
-use Phluxor\Swoole\OpenTelemetry\SwooleContextStorage;
 use Psr\Http\Client\ClientInterface;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpClient\Psr18Client;
-use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class HttpJsonMeterProvider implements ProviderInterface
 {

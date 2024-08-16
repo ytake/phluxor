@@ -4,11 +4,9 @@ parameters:
     paths:
         - src
     excludePaths:
-        - src/Phluxor/Swoole/**
         - src/Phluxor/Persistence/Mysql/**
         - src/Phluxor/**/ProtoBuf/**
     level: max
     treatPhpDocTypesAsCertain: false
     scanDirectories:
-       #- vendor/openswoole/ide-helper
-       #- vendor/swoole/ide-helper
+       - vendor/swoole/ide-helper

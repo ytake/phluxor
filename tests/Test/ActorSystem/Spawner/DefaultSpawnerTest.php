@@ -10,7 +10,7 @@ use Phluxor\ActorSystem\Spawner\DefaultSpawner;
 use PHPUnit\Framework\TestCase;
 use Test\VoidActor;
 
-use function Phluxor\Swoole\Coroutine\run;
+use function Swoole\Coroutine\run;
 
 class DefaultSpawnerTest extends TestCase
 {

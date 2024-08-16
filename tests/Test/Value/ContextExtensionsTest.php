@@ -9,7 +9,7 @@ use Phluxor\Value\ContextExtensionId;
 use Phluxor\Value\ExtensionInterface;
 use PHPUnit\Framework\TestCase;
 
-use function Phluxor\Swoole\Coroutine\run;
+use function Swoole\Coroutine\run;
 
 class ContextExtensionsTest extends TestCase
 {

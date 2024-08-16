@@ -16,7 +16,7 @@ use PHPUnit\Framework\TestCase;
 use ReflectionMethod;
 use Test\NullProducer;
 
-use function Phluxor\Swoole\Coroutine\run;
+use function Swoole\Coroutine\run;
 
 class AllForOneStrategyTest extends TestCase
 {

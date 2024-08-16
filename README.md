@@ -2,7 +2,7 @@
 
 A toolkit for flexible actor models in PHP, empowering the PHP ecosystem.
 
-requires PHP 8.3 and swoole / open swoole.
+requires PHP 8.3 and swoole.
 
 and Protocol Buffers for message serialization. / not supported other serialization formats yet.
 
@@ -15,7 +15,7 @@ do not use this in production yet.
 [Documentation](https://phluxor.github.io/en/guide/)
 
 PhluxorはPHPでのアクターモデルを実現するためのツールキットです。    
-PHP 8.3 と swoole / openswoole が必要です。  
+PHP 8.3 と swooleが必要です。  
 メッセージのシリアライズには、Protocol Buffersを利用します。  
 他のシリアライズフォーマットはまだサポートされていません。
 
@@ -23,12 +23,6 @@ PHP 8.3 と swoole / openswoole が必要です。
 
 ```bash
 $ composer require phluxor/phluxor
-```
-
-### If you use Openswoole
-
-```bash
-$ composer require openswoole/core
 ```
 
 ## already implemented

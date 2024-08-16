@@ -8,11 +8,7 @@ use Brick\Math\Exception\MathException;
 use Phluxor\ActorSystem;
 use PHPUnit\Framework\TestCase;
 
-use OpenTelemetry\Contrib\Otlp\MetricExporter;
-use OpenTelemetry\SDK\Common\Export\Http\PsrTransportFactory;
-use OpenTelemetry\SDK\Metrics\MetricReader\ExportingReader;
-
-use function Phluxor\Swoole\Coroutine\run;
+use function Swoole\Coroutine\run;
 
 class ActorSystemTest extends TestCase
 {

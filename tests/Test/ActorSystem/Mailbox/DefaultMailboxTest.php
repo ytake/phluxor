@@ -8,22 +8,19 @@ use Phluxor\Mspc\Queue as MspcQueue;
 use Phluxor\ActorSystem\Dispatcher\CoroutineDispatcher;
 use Phluxor\ActorSystem\Mailbox\BoundedMailboxQueue;
 use Phluxor\ActorSystem\Mailbox\UnboundedLochFree;
-use Phluxor\Swoole\Coroutine\WaitGroup;
 use PHPUnit\Framework\TestCase;
 use Swoole\Coroutine;
-
-use function Phluxor\Swoole\Coroutine\run;
 
 class DefaultMailboxTest extends TestCase
 {
     public function testUnboundedLockFreeMailboxUserMessageConsistency(): void
     {
-        run(function () {
+        Coroutine\run(function () {
             go(function () {
                 $mspc = new MspcQueue();
                 $max = 1000;
                 $c = 100;
-                $wg = new WaitGroup();
+                $wg = new Coroutine\WaitGroup();
                 $wg->add();
                 $p = new UnboundedLochFree($mspc);
                 $q = $p();
@@ -57,12 +54,12 @@ class DefaultMailboxTest extends TestCase
 
     public function testUnboundedLockFreeMailboxSystemMessageConsistency(): void
     {
-        run(function () {
+        Coroutine\run(function () {
             go(function () {
                 $mspc = new MspcQueue();
                 $max = 1000;
                 $c = 100;
-                $wg = new WaitGroup();
+                $wg = new Coroutine\WaitGroup();
                 $wg->add();
                 $p = new UnboundedLochFree($mspc);
                 $q = $p();
@@ -90,7 +87,7 @@ class DefaultMailboxTest extends TestCase
 
     public function testBoundedMailbox(): void
     {
-        run(function () {
+        Coroutine\run(function () {
             $mailbox = new BoundedMailboxQueue(3, false);
             $mailbox->push(1);
             $mailbox->push(2);
@@ -102,7 +99,7 @@ class DefaultMailboxTest extends TestCase
 
     public function testBoundedDroppingMailbox(): void
     {
-        run(function () {
+        Coroutine\run(function () {
             $mailbox = new BoundedMailboxQueue(3, true);
             $mailbox->push(1);
             $mailbox->push(2);
