@@ -12,11 +12,9 @@ use Phluxor\Persistence\Mysql\DefaultSchema;
 use Phluxor\Persistence\Mysql\Dsn;
 use Phluxor\Persistence\Mysql\MysqlProvider;
 use PHPUnit\Framework\TestCase;
-use Swoole\Database\PDOConfig;
-use Swoole\Database\PDOPool;
 use Test\Persistence\ProtoBuf\UserCreated;
 
-use function Phluxor\Swoole\Coroutine\run;
+use function Swoole\Coroutine\run;
 
 class MysqlProviderTest extends TestCase
 {
@@ -97,13 +95,14 @@ class MysqlProviderTest extends TestCase
 
     private function mysqlProvider(): MysqlProvider
     {
-        $conn = new Connection(new Dsn(
-            '127.0.0.1',
-            3306,
-            'sample',
-            'user',
-            'passw@rd'
-        ));
+        $conn = new Connection(
+            new Dsn(
+                '127.0.0.1',
+                3306,
+                'sample',
+                'user',
+                'passw@rd'
+            ));
         return new MysqlProvider(
             $conn->proxy(),
             new DefaultSchema(),

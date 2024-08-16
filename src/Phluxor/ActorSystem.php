@@ -57,9 +57,9 @@ class ActorSystem
     public function __construct(
         private readonly Config $config = new Config(),
     ) {
-        if (!extension_loaded('swoole') && !extension_loaded('openswoole')) {
+        if (!extension_loaded('swoole')) {
             throw new ExtensionNotLoadedException(
-                "Actor system cannot be executed because swoole/openswoole extension is not loaded.\n" .
+                "Actor system cannot be executed because swoole extension is not loaded.\n" .
                 "Please install the extension first."
             );
         }

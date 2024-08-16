@@ -10,7 +10,7 @@ use Phluxor\Persistence\InMemoryProvider;
 use PHPUnit\Framework\TestCase;
 use Test\Persistence\ProtoBuf\TestMessage;
 
-use function Phluxor\Swoole\Coroutine\run;
+use function Swoole\Coroutine\run;
 
 class PersistenceTest extends TestCase
 {

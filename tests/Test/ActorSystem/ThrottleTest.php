@@ -6,10 +6,10 @@ namespace Test\ActorSystem;
 
 use Phluxor\ActorSystem\Throttle;
 use Phluxor\ActorSystem\Valve;
-use Phluxor\Swoole\Coroutine\WaitGroup;
 use PHPUnit\Framework\TestCase;
+use Swoole\Coroutine\WaitGroup;
 
-use function Phluxor\Swoole\Coroutine\run;
+use function Swoole\Coroutine\run;
 
 class ThrottleTest extends TestCase
 {

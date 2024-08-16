@@ -8,7 +8,7 @@ use Phluxor\ActorSystem\Context\ContextInterface;
 use Phluxor\ActorSystem\Message\ActorInterface;
 use Phluxor\ActorSystem\Message\Started;
 use Phluxor\ActorSystem\Props;
-use Phluxor\ActorSystem\ProtoBuf\PID;
+use Phluxor\ActorSystem\ProtoBuf\Pid;
 use Phluxor\ActorSystem\ProtoBuf\PoisonPill;
 use Phluxor\ActorSystem\ProtoBuf\Terminated;
 use Phluxor\ActorSystem\Ref;
@@ -17,7 +17,7 @@ use Phluxor\Router\ProtoBuf\AddRoutee;
 use Phluxor\Router\ProtoBuf\GetRoutees;
 use Phluxor\Router\ProtoBuf\RemoveRoutee;
 use Phluxor\Router\ProtoBuf\Routees;
-use Phluxor\Swoole\Coroutine\WaitGroup;
+use Swoole\Coroutine\WaitGroup;
 
 readonly class PoolRouterActor implements ActorInterface
 {
@@ -79,7 +79,7 @@ readonly class PoolRouterActor implements ActorInterface
                 break;
             case $msg instanceof GetRoutees:
                 $r = $this->state->getRoutees();
-                /** @var PID[] $routees */
+                /** @var Pid[] $routees */
                 $routees = [];
                 $r->forEach(function (int $int, Ref $pid) use (&$routees) {
                     $routees[] = $pid->protobufPid();

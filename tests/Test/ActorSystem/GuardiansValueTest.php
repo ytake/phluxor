@@ -11,7 +11,7 @@ use Phluxor\ActorSystem\GuardiansValue;
 use Phluxor\ActorSystem\Strategy\OneForOneStrategy;
 use PHPUnit\Framework\TestCase;
 
-use function Phluxor\Swoole\Coroutine\run;
+use function Swoole\Coroutine\run;
 
 class GuardiansValueTest extends TestCase
 {

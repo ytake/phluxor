@@ -10,7 +10,7 @@ use PHPUnit\Framework\TestCase;
 use Test\ProcessTrait;
 use Test\VoidActor;
 
-use function Phluxor\Swoole\Coroutine\run;
+use function Swoole\Coroutine\run;
 
 class RefTest extends TestCase
 {

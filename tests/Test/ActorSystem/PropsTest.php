@@ -12,11 +12,11 @@ use Phluxor\ActorSystem\Message\MessageEnvelope;
 use Phluxor\ActorSystem\Message\ReceiveFunction;
 use Phluxor\ActorSystem\Message\ReceiverFunctionInterface;
 use Phluxor\ActorSystem\Props;
-use Phluxor\Swoole\Coroutine\WaitGroup;
 use PHPUnit\Framework\TestCase;
+use Swoole\Coroutine\WaitGroup;
 use Test\VoidActor;
 
-use function Phluxor\Swoole\Coroutine\run;
+use function Swoole\Coroutine\run;
 
 class PropsTest extends TestCase
 {

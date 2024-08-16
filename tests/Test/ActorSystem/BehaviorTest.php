@@ -18,7 +18,7 @@ use Test\EchoSetBehaviorActor;
 use Test\NullProducer;
 use Test\PopBehaviorMessage;
 
-use function Phluxor\Swoole\Coroutine\run;
+use function Swoole\Coroutine\run;
 
 class BehaviorTest extends TestCase
 {
