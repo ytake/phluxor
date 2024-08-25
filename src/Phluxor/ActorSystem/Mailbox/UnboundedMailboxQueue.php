@@ -27,4 +27,9 @@ readonly class UnboundedMailboxQueue implements QueueInterface
     {
         return $this->userMailbox->pop();
     }
+
+    public function isEmpty(): bool
+    {
+        return $this->userMailbox->isEmpty();
+    }
 }
