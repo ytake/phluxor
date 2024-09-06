@@ -10,6 +10,7 @@ use Phluxor\ActorSystem\Message\ActorInterface;
 use Phluxor\ActorSystem\Message\MessageEnvelope;
 use Phluxor\Metrics\ActorMetrics;
 use Phluxor\Metrics\PhluxorMetrics;
+use Phluxor\Stack\SinglyLinkedList;
 use Phluxor\Value\ContextExtensionId;
 use Phluxor\Value\ExtensionInterface;
 use Psr\Log\LoggerInterface;
@@ -153,7 +154,11 @@ class ActorContext implements
 
     public function stash(): void
     {
-        // TODO: Implement stash() method.
+        $extras = $this->ensureExtras();
+        if ($extras->stash() == null) {
+            $extras->registerStash(new SinglyLinkedList());
+        }
+        $extras->stash()?->push($this->message());
     }
 
     /**

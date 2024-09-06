@@ -22,7 +22,7 @@
     "ext-pdo": "*",
     "ext-swoole": "^5.1",
     "alb/phpketama": "^0.4.0",
-    "google/protobuf": "^3.25.3",
+    "google/protobuf": "^3.25.4",
     "guzzlehttp/promises": "^2.0",
     "monolog/monolog": "^3.6.0",
     "open-telemetry/opentelemetry": "^1.0.0",

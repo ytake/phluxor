@@ -8,6 +8,7 @@ use Phluxor\Mspc\Queue as MspcQueue;
 
 class UnboundedLochFree
 {
+    /** @var MailboxMiddlewareInterface[] */
     private array $mailboxMiddleware = [];
 
     public function __construct(
