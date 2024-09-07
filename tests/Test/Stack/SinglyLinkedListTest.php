@@ -30,4 +30,17 @@ class SinglyLinkedListTest extends TestCase
         $this->assertEquals(1, $list->pop());
         $this->assertEquals(0, $list->length());
     }
+
+    public function testEachPopStack(): void
+    {
+        $list = new SinglyLinkedList();
+        $list->push(1);
+        $list->push(2);
+        $list->push(3);
+        $size = $list->length();
+        for ($i = 0; $i < $size; $i++) {
+            $list->pop();
+            $this->assertEquals($size - $i - 1, $list->length());
+        }
+    }
 }

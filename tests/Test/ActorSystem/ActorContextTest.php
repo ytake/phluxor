@@ -122,4 +122,56 @@ class ActorContextTest extends TestCase
             });
         });
     }
+
+    public function testStash(): void
+    {
+        run(function () {
+            go(function () {
+                $system = ActorSystem::create();
+                $spawn = $this->spawnMockProcess($system, 'foo');
+                $props = Props::fromProducer(
+                    new NullProducer(),
+                    Props::withSupervisor(
+                        new OneForOneStrategy(10, new DateInterval('PT10S'), new DefaultDecider())
+                    )
+                );
+                $context = new ActorContext($system, $props, null);
+                $context->setSelf($spawn['ref']);
+                $context->stash();
+                $this->assertNotNull($context->ensureExtras()->stash());
+                $this->assertSame(1, $context->ensureExtras()->stash()->length());
+                $this->assertNull($context->ensureExtras()->stash()->pop());
+                $context->ensureExtras()->resetStash();
+                $this->assertNull($context->ensureExtras()->stash());
+                $this->removeMockProcess($system, $spawn['ref']);
+            });
+        });
+    }
+
+    public function testShouldReceiveMessageAfterRestart(): void
+    {
+        run(function () {
+            go(function () {
+                $counter = 0;
+                $system = ActorSystem::create();
+                $props = Props::fromFunction(
+                    new ActorSystem\Message\ReceiveFunction(
+                        function (ContextInterface $context) use (&$counter) {
+                            $context->stash();
+                            $message = $context->message();
+                            if ($message === 'hello') {
+                                $counter++;
+                            }
+                        }
+                ));
+                $ref = $system->root()->spawn($props);
+                for ($i = 0; $i < 4; $i++) {
+                    $system->root()->send($ref, 'hello');
+                }
+                $system->root()->send($ref, new ActorSystem\Message\Restart());
+                \Swoole\Coroutine::sleep(1);
+                $this->assertSame(4, $counter);
+            });
+        });
+    }
 }

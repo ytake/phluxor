@@ -6,5 +6,5 @@ namespace Phluxor\ActorSystem\Message;
 
 interface MessageBatchInterface
 {
-    public function getMessages(): array;
+    public function getMessages(): mixed;
 }

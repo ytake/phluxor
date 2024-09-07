@@ -9,27 +9,30 @@ use PHPUnit\Framework\TestCase;
 use Phluxor\ActorSystem\SliceMap;
 
 use function go;
+use function Swoole\Coroutine\run;
 
 class SliceMapTest extends TestCase
 {
     public function testSliceMapShared(): void
     {
-        go(function () {
-            $map = new SliceMap();
-            $cm = $map->getBucket('a');
-            $this->assertInstanceOf(ConcurrentMapShared::class, $cm->getShard('a'));
+        run(function () {
+            go(function () {
+                $map = new SliceMap();
+                $cm = $map->getBucket('a');
+                $this->assertInstanceOf(ConcurrentMapShared::class, $cm->getShard('a'));
+            });
         });
-        \Swoole\Event::wait();
     }
 
     public function testSliceMapSetIfAbsent(): void
     {
-        go(function () {
-            $map = new SliceMap();
-            $cm = $map->getBucket('a');
-            $this->assertTrue($cm->setIfAbsent('a', 'b'));
-            $this->assertFalse($cm->setIfAbsent('a', 'b'));
+        run(function () {
+            go(function () {
+                $map = new SliceMap();
+                $cm = $map->getBucket('a');
+                $this->assertTrue($cm->setIfAbsent('a', 'b'));
+                $this->assertFalse($cm->setIfAbsent('a', 'b'));
+            });
         });
-        \Swoole\Event::wait();
     }
 }

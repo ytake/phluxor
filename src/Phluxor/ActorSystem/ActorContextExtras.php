@@ -7,6 +7,7 @@ namespace Phluxor\ActorSystem;
 use Closure;
 use Phluxor\ActorSystem\Child\RestartStatistics;
 use Phluxor\ActorSystem\Context\ContextInterface;
+use Phluxor\Stack\SinglyLinkedList;
 use Phluxor\Value\ContextExtensions;
 use Swoole\Timer;
 
@@ -26,6 +27,8 @@ class ActorContextExtras
 
     /** @var int|bool|null */
     private int|bool|null $receiveTimeoutTimer = null;
+
+    private ?SinglyLinkedList $stash = null;
 
     public function __construct(
         private readonly ContextInterface $context,
@@ -72,6 +75,21 @@ class ActorContextExtras
     public function removeChild(Ref $pid): void
     {
         $this->children->remove($pid);
+    }
+
+    public function registerStash(SinglyLinkedList $stash): void
+    {
+        $this->stash = $stash;
+    }
+
+    public function stash(): SinglyLinkedList|null
+    {
+        return $this->stash;
+    }
+
+    public function resetStash(): void
+    {
+        $this->stash = null;
     }
 
     /**
