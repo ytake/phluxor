@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Test\ActorSystem\Mailbox;
 
+use Phluxor\ActorSystem\Mailbox\Batching;
 use Phluxor\ActorSystem\Mailbox\BatchingMailbox;
 use Phluxor\ActorSystem\Mailbox\UnboundedMailboxQueue;
 use Phluxor\ActorSystem\Message\MessageBatch;
@@ -23,6 +24,12 @@ class BatchingMailboxTest extends TestCase
             100,
             []
         );
+    }
+
+    public function testShouldReturnBatching(): void
+    {
+        $mailbox = new Batching(100, 10);
+        $this->assertInstanceOf(BatchingMailbox::class, $mailbox());
     }
 
     public function testUnboundedLockFreeMailboxUserMessageConsistency(): void
