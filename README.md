@@ -12,7 +12,7 @@ do not use this in production yet.
 
 [sample web application / phluxor-http-application-samples](https://github.com/ytake/phluxor-http-application-samples)  
 [demonstrate the use of Phluxor](https://github.com/ytake/phluxor-example)  
-[demonstrates how to use Phluxor with Event Sourcing and CQRS.](https://github.com/ytake/phluxor-example-event-sourcing-cqrs)
+[demonstrates how to use Phluxor with Event Sourcing and CQRS.](https://github.com/ytake/phluxor-example-event-sourcing-cqrs)  
 [Documentation](https://phluxor.github.io/en/guide/)
 
 PhluxorはPHPでのアクターモデルを実現するためのツールキットです。    
