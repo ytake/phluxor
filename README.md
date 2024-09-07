@@ -11,7 +11,8 @@ Documentation is under preparation.
 do not use this in production yet.
 
 [sample web application / phluxor-http-application-samples](https://github.com/ytake/phluxor-http-application-samples)  
-[demonstrate the use of Phluxor](https://github.com/ytake/phluxor-example) 
+[demonstrate the use of Phluxor](https://github.com/ytake/phluxor-example)  
+[demonstrates how to use Phluxor with Event Sourcing and CQRS.](https://github.com/ytake/phluxor-example-event-sourcing-cqrs)
 [Documentation](https://phluxor.github.io/en/guide/)
 
 PhluxorはPHPでのアクターモデルを実現するためのツールキットです。    
@@ -39,13 +40,12 @@ $ composer require phluxor/phluxor
 - persistent actors (in memory / mysql)
 - [OpenTelemetry](https://opentelemetry.io/docs/languages/php/) support (metrics) 
 - router / round-robin, broadcast, scatter-gather, etc.
+- [remoting](https://github.com/ytake/phluxor-remote) / Remoting is the mechanism by which Actors on different nodes talk to each other internally.  
 
 ## work in progress
 
 - open telemetry support (tracing)
 - virtual actors / cluster support
-
-now local actors are supported, and remote actors are in progress.
 
 ## Supervision
 
