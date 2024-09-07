@@ -647,7 +647,6 @@ class ActorContext implements
         try {
             $this->invokeUserMessage(new ActorSystem\Message\Stopping());
         } catch (Throwable $e) {
-            // finalizing throwables / logging
             $this->logger()->error("stopping error", ['exception' => $e->getTraceAsString()]);
         }
         $this->stopAllChildren();
@@ -724,7 +723,6 @@ class ActorContext implements
     }
 
     /**
-     * TODO: implement stash
      * @return void
      */
     private function restart(): void
@@ -732,10 +730,14 @@ class ActorContext implements
         $this->incarnateActor();
         $this->self?->sendSystemMessage($this->actorSystem, new ActorSystem\Message\ResumeMailbox());
         $this->invokeUserMessage(new ActorSystem\Message\Started());
-        // TODO stash implementation
-        // if ($this->extras != null) {
-        //
-        // }
+        $extras = $this->ensureExtras();
+        if ($extras->stash() != null) {
+            $size = $extras->stash()->length();
+            for ($i = 0; $i < $size; $i++) {
+                $msg = $extras->stash()->pop();
+                $this->invokeUserMessage($msg);
+            }
+        }
     }
 
     private function finalizeStop(): void

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Test\ActorSystem;
 
 use Phluxor\ActorSystem;
+use Phluxor\ActorSystem\ProtoBuf\Pid;
 use Phluxor\ActorSystem\Ref;
 use Phluxor\ActorSystem\RefSet;
 use PHPUnit\Framework\TestCase;
@@ -20,19 +21,15 @@ class RefSetTest extends TestCase
     public function testPidSetClears(): void
     {
         $pidSet = new RefSet();
-        $pidSet->add(new Ref(new \Phluxor\ActorSystem\ProtoBuf\PID([
+        $pidSet->add(new Ref(new Pid([
             'address' => ActorSystem::LOCAL_ADDRESS,
             'id' => 'p1',
         ])));
-
-        $pid = new \Phluxor\ActorSystem\ProtoBuf\PID();
-        $pidSet->add(new Ref(new \Phluxor\ActorSystem\ProtoBuf\PID([
+        $pidSet->add(new Ref(new Pid([
             'address' => ActorSystem::LOCAL_ADDRESS,
             'id' => 'p2',
         ])));
-
-        $pid = new \Phluxor\ActorSystem\ProtoBuf\PID();
-        $pidSet->add(new Ref(new \Phluxor\ActorSystem\ProtoBuf\PID([
+        $pidSet->add(new Ref(new Pid([
             'address' => ActorSystem::LOCAL_ADDRESS,
             'id' => 'p3',
         ])));
@@ -46,20 +43,20 @@ class RefSetTest extends TestCase
     public function testShouldRemovePidFromPidSet(): void
     {
         $pidSet = new RefSet();
-        $pidSet->add(new Ref(new \Phluxor\ActorSystem\ProtoBuf\PID([
+        $pidSet->add(new Ref(new Pid([
             'address' => ActorSystem::LOCAL_ADDRESS,
             'id' => 'p1',
         ])));
-        $pidSet->add(new Ref(new \Phluxor\ActorSystem\ProtoBuf\PID([
+        $pidSet->add(new Ref(new Pid([
             'address' => ActorSystem::LOCAL_ADDRESS,
             'id' => 'p2',
         ])));
-        $pidSet->add(new Ref(new \Phluxor\ActorSystem\ProtoBuf\PID([
+        $pidSet->add(new Ref(new Pid([
             'address' => ActorSystem::LOCAL_ADDRESS,
             'id' => 'p3',
         ])));
         $this->assertSame(3, $pidSet->len());
-        $pidSet->remove(new Ref(new \Phluxor\ActorSystem\ProtoBuf\PID([
+        $pidSet->remove(new Ref(new Pid([
             'address' => ActorSystem::LOCAL_ADDRESS,
             'id' => 'p2',
         ])));
@@ -69,12 +66,12 @@ class RefSetTest extends TestCase
     public function testAddSmall(): void
     {
         $pidSet = new RefSet();
-        $pidSet->add(new Ref(new \Phluxor\ActorSystem\ProtoBuf\PID([
+        $pidSet->add(new Ref(new Pid([
             'address' => ActorSystem::LOCAL_ADDRESS,
             'id' => 'p1',
         ])));
         $this->assertFalse($pidSet->empty());
-        $pidSet->add(new Ref(new \Phluxor\ActorSystem\ProtoBuf\PID([
+        $pidSet->add(new Ref(new Pid([
             'address' => ActorSystem::LOCAL_ADDRESS,
             'id' => 'p1',
         ])));
@@ -84,15 +81,15 @@ class RefSetTest extends TestCase
     public function testPidSetValue(): void
     {
         $pidSet = new RefSet();
-        $pidSet->add(new Ref(new \Phluxor\ActorSystem\ProtoBuf\PID([
+        $pidSet->add(new Ref(new Pid([
             'address' => ActorSystem::LOCAL_ADDRESS,
             'id' => 'p1',
         ])));
-        $pidSet->add(new Ref(new \Phluxor\ActorSystem\ProtoBuf\PID([
+        $pidSet->add(new Ref(new PID([
             'address' => ActorSystem::LOCAL_ADDRESS,
             'id' => 'p2',
         ])));
-        $pidSet->add(new Ref(new \Phluxor\ActorSystem\ProtoBuf\PID([
+        $pidSet->add(new Ref(new Pid([
             'address' => ActorSystem::LOCAL_ADDRESS,
             'id' => 'p3',
         ])));

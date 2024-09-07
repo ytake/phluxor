@@ -147,4 +147,31 @@ class ActorContextTest extends TestCase
             });
         });
     }
+
+    public function testShouldReceiveMessageAfterRestart(): void
+    {
+        run(function () {
+            go(function () {
+                $counter = 0;
+                $system = ActorSystem::create();
+                $props = Props::fromFunction(
+                    new ActorSystem\Message\ReceiveFunction(
+                        function (ContextInterface $context) use (&$counter) {
+                            $context->stash();
+                            $message = $context->message();
+                            if ($message === 'hello') {
+                                $counter++;
+                            }
+                        }
+                ));
+                $ref = $system->root()->spawn($props);
+                for ($i = 0; $i < 4; $i++) {
+                    $system->root()->send($ref, 'hello');
+                }
+                $system->root()->send($ref, new ActorSystem\Message\Restart());
+                \Swoole\Coroutine::sleep(1);
+                $this->assertSame(4, $counter);
+            });
+        });
+    }
 }
