@@ -19,7 +19,6 @@ use Test\ProcessTrait;
 
 use function Swoole\Coroutine\run;
 
-
 class ActorContextTest extends TestCase
 {
     use ProcessTrait;
