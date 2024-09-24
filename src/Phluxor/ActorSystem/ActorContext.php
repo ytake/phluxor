@@ -476,9 +476,8 @@ class ActorContext implements
         }
         $influenceTimeout = true;
         if ($this->receiveTimeout->s > 0) {
-            if ($message instanceof ActorSystem\Message\NotInfluenceReceiveTimeoutInterface) {
-                $influenceTimeout = false;
-            } else {
+            $influenceTimeout = !($message instanceof ActorSystem\Message\NotInfluenceReceiveTimeoutInterface);
+            if ($influenceTimeout) {
                 $this->ensureExtras()->stopReceiveTimeoutTimer();
             }
         }

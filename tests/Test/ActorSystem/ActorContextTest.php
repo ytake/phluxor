@@ -19,7 +19,6 @@ use Test\ProcessTrait;
 
 use function Swoole\Coroutine\run;
 
-
 class ActorContextTest extends TestCase
 {
     use ProcessTrait;
@@ -163,7 +162,8 @@ class ActorContextTest extends TestCase
                                 $counter++;
                             }
                         }
-                ));
+                    )
+                );
                 $ref = $system->root()->spawn($props);
                 for ($i = 0; $i < 4; $i++) {
                     $system->root()->send($ref, 'hello');
@@ -171,6 +171,112 @@ class ActorContextTest extends TestCase
                 $system->root()->send($ref, new ActorSystem\Message\Restart());
                 \Swoole\Coroutine::sleep(1);
                 $this->assertSame(4, $counter);
+            });
+        });
+    }
+
+    public function testShouldReceiveTimeoutMessage(): void
+    {
+        run(function () {
+            go(function () {
+                $system = ActorSystem::create();
+                $proceed = false;
+                $props = Props::fromFunction(
+                    new ActorSystem\Message\ReceiveFunction(
+                        function (ContextInterface $context) use (&$proceed) {
+                            $message = $context->message();
+                            switch (true) {
+                                case $message === 'hello':
+                                    $context->setReceiveTimeout(new DateInterval('PT1S'));
+                                    // any process that takes more than 1 second will be terminated
+                                    break;
+                                case $message instanceof ActorSystem\Message\ReceiveTimeout:
+                                    $proceed = true;
+                                    break;
+                            }
+                        }
+                    )
+                );
+                $ref = $system->root()->spawn($props);
+                $system->root()->send($ref, 'hello');
+                \Swoole\Coroutine::sleep(2);
+                $this->assertTrue($proceed);
+            });
+        });
+    }
+
+    public function testShouldNotReceiveTimeoutMessageAfterReset(): void
+    {
+        run(function () {
+            go(function () {
+                $system = ActorSystem::create();
+                $proceed = false;
+                $props = Props::fromFunction(
+                    new ActorSystem\Message\ReceiveFunction(
+                        function (ContextInterface $context) use (&$proceed) {
+                            $message = $context->message();
+                            switch (true) {
+                                case $message === 'hello':
+                                    $context->setReceiveTimeout(new DateInterval('PT1S'));
+                                    break;
+                                case $message === 'reset':
+                                    // reset the timeout
+                                    $context->setReceiveTimeout(new DateInterval('PT0S'));
+                                    break;
+                                case $message instanceof ActorSystem\Message\ReceiveTimeout:
+                                    $proceed = true;
+                                    break;
+                            }
+                        }
+                    )
+                );
+                $ref = $system->root()->spawn($props);
+                $system->root()->send($ref, 'hello');
+                $system->root()->send($ref, 'reset');
+                \Swoole\Coroutine::sleep(2);
+                $this->assertFalse($proceed);
+            });
+        });
+    }
+
+    public function testShouldNotReceiveTimeoutMessageAfterNoInfluence(): void
+    {
+        run(function () {
+            go(function () {
+                $system = ActorSystem::create();
+                $proceed = false;
+                $count = 0;
+                $wg = new WaitGroup();
+                $props = Props::fromFunction(
+                    new ActorSystem\Message\ReceiveFunction(
+                        function (ContextInterface $context) use (&$proceed, &$count, $wg) {
+                            $message = $context->message();
+                            switch (true) {
+                                case $message === 'hello':
+                                    $wg->add();
+                                    $context->setReceiveTimeout(new DateInterval('PT1S'));
+                                    break;
+                                case $message instanceof NoInfluence:
+                                    $context->setReceiveTimeout(new DateInterval('PT1S'));
+                                    break;
+                                case $message instanceof ActorSystem\Message\ReceiveTimeout:
+                                    $proceed = true;
+                                    $count++;
+                                    $wg->done();
+                                    break;
+                            }
+                        }
+                    )
+                );
+                $ref = $system->root()->spawn($props);
+                $system->root()->send($ref, 'hello');
+                $system->root()->send($ref, 'hell');
+                $system->root()->send($ref, new NoInfluence());
+                $system->root()->send($ref, 'hell');
+                \Swoole\Coroutine::sleep(4);
+                $wg->wait();
+                $this->assertTrue($proceed);
+                $this->assertSame(1, $count);
             });
         });
     }
