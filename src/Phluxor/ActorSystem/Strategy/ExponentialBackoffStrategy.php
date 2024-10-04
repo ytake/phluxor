@@ -48,8 +48,8 @@ final readonly class ExponentialBackoffStrategy implements SupervisorStrategyInt
         $this->setFailureCount($restartStatistics);
         $backoff = $restartStatistics->failureCount() * $this->initialBackoff->s;
         $noise = random_int(0, 500);
-        $dur = $backoff + $noise;
-        Timer::after($dur * 10, function () use ($actorSystem, $supervisor, $child, $reason) {
+        $dur = $backoff * 1000 + $noise;
+        Timer::after($dur, function () use ($actorSystem, $supervisor, $child, $reason) {
             $actorSystem->getEventStream()?->publish(
                 new SupervisorEvent(
                     $child,
