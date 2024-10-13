@@ -2,9 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Phluxor\Persistence\Mysql;
+namespace Phluxor\Persistence\PgSql;
 
-class DefaultSchema implements SchemaInterface
+use Phluxor\Persistence\RdbmsSchemaInterface;
+
+class DefaultRdbmsSchema implements RdbmsSchemaInterface
 {
     public function __construct(
         private string $journalTable = 'journals',
@@ -75,16 +77,16 @@ class DefaultSchema implements SchemaInterface
         ];
         $createTables = [];
         foreach ($tables as $table) {
-            $createTables[] = "CREATE TABLE `$table` (" .
-                "`" . $this->id() . "` varchar(26) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL," .
-                "`" . $this->payload() . "` json NOT NULL," .
-                "`" . $this->sequenceNumber() . "` bigint DEFAULT NULL," .
-                "`" . $this->actorName() . "` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL," .
-                "`" . $this->created() . "` timestamp DEFAULT CURRENT_TIMESTAMP," .
-                "PRIMARY KEY (`" . $this->id() . "`)," .
-                "UNIQUE KEY `uidx_id` (`" . $this->id() . "`)," .
-                "UNIQUE KEY `uidx_names` (`" . $this->actorName() . "`,`" . $this->sequenceNumber() . "`)" .
-                ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;";
+            $createTables[] = "CREATE TABLE $table (" .
+                $this->id() . "VARCHAR(26) NOT NULL," .
+                $this->payload() . "BYTEA NOT NULL," .
+                $this->sequenceNumber() . "BIGINT," .
+                $this->actorName() . "VARCHAR(255)," .
+                $this->created() . "TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP," .
+                "PRIMARY KEY (" . $this->id() . ")," .
+                "UNIQUE (" . $this->id() . ")," .
+                "UNIQUE (" . $this->actorName() . "," . $this->sequenceNumber() . ")" .
+                ");";
         }
         return $createTables;
     }

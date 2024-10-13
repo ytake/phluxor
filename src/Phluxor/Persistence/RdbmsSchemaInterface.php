@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Phluxor\Persistence\Mysql;
+namespace Phluxor\Persistence;
 
-interface SchemaInterface
+interface RdbmsSchemaInterface
 {
     public function journalTableName(): string;
 

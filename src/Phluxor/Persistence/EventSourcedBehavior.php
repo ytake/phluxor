@@ -11,7 +11,7 @@ use Phluxor\ActorSystem\Message\MessageEnvelope;
 use Phluxor\ActorSystem\Message\ReceiverFunctionInterface;
 use Phluxor\ActorSystem\Props\ReceiverMiddlewareInterface;
 
-readonly class EventSourcedReceiver implements ReceiverMiddlewareInterface
+readonly class EventSourcedBehavior implements ReceiverMiddlewareInterface
 {
     /**
      * @param ProviderInterface $provider
@@ -27,6 +27,6 @@ readonly class EventSourcedReceiver implements ReceiverMiddlewareInterface
      */
     public function __invoke(Closure|ReceiverFunctionInterface $next): ReceiverFunctionInterface
     {
-        return new EventSourcedReceiverFactory($this->provider, $next);
+        return new EventSourcedBehaviorFactory($this->provider, $next);
     }
 }
