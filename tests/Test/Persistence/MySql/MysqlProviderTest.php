@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Test\Persistence\Mysql;
+namespace Test\Persistence\MySql;
 
 use Google\Protobuf\Internal\Message;
 use PDO;
 use Phluxor\ActorSystem;
-use Phluxor\Persistence\Mysql\Connection;
-use Phluxor\Persistence\Mysql\DefaultSchema;
-use Phluxor\Persistence\Mysql\Dsn;
-use Phluxor\Persistence\Mysql\MysqlProvider;
+use Phluxor\Persistence\MySql\Connection;
+use Phluxor\Persistence\MySql\DefaultSchema;
+use Phluxor\Persistence\MySql\Dsn;
+use Phluxor\Persistence\MySql\MysqlProvider;
 use PHPUnit\Framework\TestCase;
 use Test\Persistence\ProtoBuf\UserCreated;
 

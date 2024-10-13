@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace Example\Persistence;
 
 use Phluxor\ActorSystem;
-use Phluxor\Persistence\EventSourcedReceiver;
-use Phluxor\Persistence\Mysql\Connection;
-use Phluxor\Persistence\Mysql\DefaultSchema;
-use Phluxor\Persistence\Mysql\Dsn;
-use Phluxor\Persistence\Mysql\MysqlProvider;
+use Phluxor\Persistence\EventSourcedBehavior;
+use Phluxor\Persistence\MySql\Connection;
+use Phluxor\Persistence\MySql\DefaultSchema;
+use Phluxor\Persistence\MySql\Dsn;
+use Phluxor\Persistence\MySql\MysqlProvider;
 use Psr\Log\LoggerInterface;
 use Test\Persistence\ProtoBuf\TestMessage;
 
@@ -24,7 +24,7 @@ class SampleSystem
                 $system = ActorSystem::create();
                 $props = ActorSystem\Props::fromProducer(fn() => new PersistenceActor(),
                     ActorSystem\Props::withReceiverMiddleware(
-                        new EventSourcedReceiver(
+                        new EventSourcedBehavior(
                             $this->mysqlProvider($system->getLogger(), 3)
                         )
                     ));

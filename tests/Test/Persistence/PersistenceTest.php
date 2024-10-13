@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Test\Persistence;
 
 use Phluxor\ActorSystem;
-use Phluxor\Persistence\EventSourcedReceiver;
+use Phluxor\Persistence\EventSourcedBehavior;
 use Phluxor\Persistence\InMemoryProvider;
 use PHPUnit\Framework\TestCase;
 use Test\Persistence\ProtoBuf\TestMessage;
@@ -46,7 +46,7 @@ class PersistenceTest extends TestCase
                     return new InMemoryTestActor();
                 },
                     ActorSystem\Props::withReceiverMiddleware(
-                        new EventSourcedReceiver(new InMemoryStateProvider(new InMemoryProvider(2)))
+                        new EventSourcedBehavior(new InMemoryStateProvider(new InMemoryProvider(2)))
                     ));
                 $ref = $system->root()->spawnNamed($props, 'test.actor');
                 $this->assertNull($ref->isError());

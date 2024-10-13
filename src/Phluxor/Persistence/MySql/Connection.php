@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Phluxor\Persistence\Mysql;
+namespace Phluxor\Persistence\MySql;
 
 use Swoole\Database\PDOConfig;
 use Swoole\Database\PDOPool;

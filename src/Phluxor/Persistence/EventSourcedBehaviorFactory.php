@@ -9,7 +9,7 @@ use Phluxor\ActorSystem\Message\MessageEnvelope;
 use Phluxor\ActorSystem\Message\ReceiverFunctionInterface;
 use Phluxor\ActorSystem\Message\Started;
 
-readonly class EventSourcedReceiverFactory implements ReceiverFunctionInterface
+readonly class EventSourcedBehaviorFactory implements ReceiverFunctionInterface
 {
     /**
      * @param ProviderInterface $provider

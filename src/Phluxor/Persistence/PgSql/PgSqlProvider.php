@@ -2,15 +2,17 @@
 
 declare(strict_types=1);
 
-namespace Phluxor\Persistence\Mysql;
+namespace Phluxor\Persistence\PgSql;
 
 use Closure;
 use Google\Protobuf\Internal\Message;
+use PDO;
+use PDOException;
 use Phluxor\Persistence\Envelope;
 use Phluxor\Persistence\ProviderInterface;
 use Phluxor\Persistence\ProviderStateInterface;
+use Phluxor\Persistence\RdbmsSchemaInterface;
 use Phluxor\Persistence\SnapshotResult;
-use PDO;
 use Psr\Log\LoggerInterface;
 use ReflectionException;
 use Swoole\Database\PDOProxy;
@@ -21,11 +23,11 @@ use function json_encode;
 /**
  * persistence provider for mysql
  */
-readonly class MysqlProvider implements ProviderStateInterface, ProviderInterface
+readonly class PgSqlProvider implements ProviderStateInterface, ProviderInterface
 {
     public function __construct(
         private PDOProxy $connection,
-        private SchemaInterface $schema,
+        private RdbmsSchemaInterface $schema,
         private int $snapshotInterval,
         private LoggerInterface $logger
     ) {
@@ -70,6 +72,7 @@ readonly class MysqlProvider implements ProviderStateInterface, ProviderInterfac
      */
     public function getEvents(string $actorName, int $eventIndexStart, int $eventIndexEnd, Closure $callback): void
     {
+        /** @var PDO $conn */
         $conn = $this->connection;
         $conn->beginTransaction();
         $query = sprintf(
@@ -97,7 +100,7 @@ readonly class MysqlProvider implements ProviderStateInterface, ProviderInterfac
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
         $conn->commit();
         foreach ($rows as $row) {
-            $env = new Envelope($row['payload']);
+            $env = new Envelope(stream_get_contents($row['payload']));
             $callback($env->message());
         }
     }
@@ -113,6 +116,7 @@ readonly class MysqlProvider implements ProviderStateInterface, ProviderInterfac
         $msg = new \Phluxor\Persistence\Message($event);
         $this->executeTx(function (PDOProxy $conn) use ($msg, $eventIndex, $actorName) {
             try {
+                /** @var \PDO $conn */
                 $stmt = $conn->prepare(
                     sprintf(
                         'INSERT INTO %s (%s) VALUES (?, ?, ?, ?)',
@@ -120,17 +124,18 @@ readonly class MysqlProvider implements ProviderStateInterface, ProviderInterfac
                         $this->selectColumns()
                     )
                 );
-                $result = $stmt->execute([
-                    (string)(new Ulid()),
-                    json_encode($msg),
-                    $eventIndex,
-                    $actorName,
-                ]);
+                $ulid = (string)(new Ulid());
+                $encoded = json_encode($msg);
+                $stmt->bindParam(1, $ulid);
+                $stmt->bindParam(2, $encoded, \PDO::PARAM_LOB);
+                $stmt->bindParam(3, $eventIndex);
+                $stmt->bindParam(4, $actorName);
+                $result = $stmt->execute();
                 if ($result === false) {
                     $this->logger->error('Failed to insert event', ['actor' => $actorName]);
                 }
                 return $result;
-            } catch (\PDOException $e) {
+            } catch (PDOException $e) {
                 $this->logger->error('error on persistenceEvent', ['actor' => $actorName, 'error' => $e->getMessage()]);
                 return false;
             }
@@ -154,6 +159,7 @@ readonly class MysqlProvider implements ProviderStateInterface, ProviderInterfac
      */
     public function getSnapshot(string $actorName): SnapshotResult
     {
+        /** @var PDO $conn */
         $conn = $this->connection;
         $conn->beginTransaction();
         $stmt = $conn->prepare(
@@ -167,12 +173,11 @@ readonly class MysqlProvider implements ProviderStateInterface, ProviderInterfac
         );
         $stmt->execute([$actorName]);
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        $conn->commit();
         if ($row === false) {
-            $conn->commit();
             return new SnapshotResult(null, 0, false);
         }
-        $conn->commit();
-        $env = new Envelope($row['payload']);
+        $env = new Envelope(stream_get_contents($row['payload']));
         return new SnapshotResult($env->message(), $row['sequence_number'], true);
     }
 
@@ -194,17 +199,18 @@ readonly class MysqlProvider implements ProviderStateInterface, ProviderInterfac
                         $this->selectColumns()
                     )
                 );
-                $result = $stmt->execute([
-                    (string)(new Ulid()),
-                    json_encode($msg),
-                    $snapshotIndex,
-                    $actorName,
-                ]);
+                $ulid = (string)(new Ulid());
+                $encoded = json_encode($msg);
+                $stmt->bindParam(1, $ulid);
+                $stmt->bindParam(2, $encoded, PDO::PARAM_LOB);
+                $stmt->bindParam(3, $snapshotIndex);
+                $stmt->bindParam(4, $actorName);
+                $result = $stmt->execute();
                 if ($result === false) {
                     $this->logger->error('Failed to insert snapshot', ['actor' => $actorName]);
                 }
                 return $result;
-            } catch (\PDOException $e) {
+            } catch (PDOException $e) {
                 $this->logger->error(
                     'error on persistenceSnapshot',
                     ['actor' => $actorName, 'error' => $e->getMessage()]

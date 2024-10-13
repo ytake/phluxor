@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Phluxor\Persistence\Mysql;
+namespace Phluxor\Persistence\MySql;
 
 readonly class Dsn
 {
@@ -18,6 +18,6 @@ readonly class Dsn
 
     public function __toString(): string
     {
-        return "mysql:host={$this->host};port={$this->port};dbname={$this->database};charset={$this->charset}";
+        return "mysql:host=$this->host;port=$this->port;dbname=$this->database;charset=$this->charset";
     }
 }

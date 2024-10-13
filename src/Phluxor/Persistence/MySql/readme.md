@@ -1,8 +1,8 @@
-# Phluxor Mysql Persistence Adapter
+# Phluxor MySQL Persistence Adapter
 
-persisting Phluxor actor state to a Mysql database.  
+persisting Phluxor actor state to a MySQL database.  
 
-This package provides a Mysql persistence layer for Phluxor.
+This package provides a MySQL persistence layer for Phluxor.
 
 ## Usage
 
@@ -64,7 +64,7 @@ declare(strict_types=1);
 namespace Example\Persistence;
 
 use Phluxor\ActorSystem;
-use Phluxor\Persistence\EventSourcedReceiver;
+use Phluxor\Persistence\EventSourcedBehavior;
 use Phluxor\Persistence\Mysql\Connection;
 use Phluxor\Persistence\Mysql\DefaultSchema;
 use Phluxor\Persistence\Mysql\Dsn;
@@ -83,7 +83,7 @@ class SampleSystem
                 $system = ActorSystem::create();
                 $props = ActorSystem\Props::fromProducer(fn() => new PersistenceActor(),
                     ActorSystem\Props::withReceiverMiddleware(
-                        new EventSourcedReceiver(
+                        new EventSourcedBehavior(
                             $this->mysqlProvider($system->getLogger(), 3)
                         )
                     ));
@@ -122,44 +122,45 @@ use ULID as id(varchar(26)) and json as payload.
 see [Default Schema](DefaultSchema.php)
 
 ```sql
-CREATE TABLE `journals`
+CREATE TABLE journals
 (
-    `id`              varchar(26) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
-    `payload`         json                                                  NOT NULL,
-    `sequence_number` bigint                                                 DEFAULT NULL,
-    `actor_name`      varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
-    `created_at`      timestamp                                              DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (`id`),
-    UNIQUE KEY `uidx_id` (`id`),
-    UNIQUE KEY `uidx_names` (`actor_name`,`sequence_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
+    id              VARCHAR(26) NOT NULL,
+    payload         BYTEA NOT NULL,
+    sequence_number BIGINT,
+    actor_name      VARCHAR(255),
+    created_at      TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    UNIQUE (id),
+    UNIQUE (actor_name, sequence_number)
+);
 
-CREATE TABLE `snapshots`
+CREATE TABLE snapshots
 (
-    `id`              varchar(26) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
-    `payload`         json                                                  NOT NULL,
-    `sequence_number` bigint                                                 DEFAULT NULL,
-    `actor_name`      varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
-    `created_at`      timestamp                                              DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (`id`),
-    UNIQUE KEY `uidx_id` (`id`),
-    UNIQUE KEY `uidx_names` (`actor_name`,`sequence_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
+    id              VARCHAR(26) NOT NULL,
+    payload         BYTEA NOT NULL,
+    sequence_number BIGINT,
+    actor_name      VARCHAR(255),
+    created_at      TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    UNIQUE (id),
+    UNIQUE (actor_name, sequence_number)
+);
+
 
 ```
 
 ## change table name
 
-for journal table and snapshot table, you can change table name by implementing `Phluxor\Persistence\Mysql\SchemaInterface`.  
+for journal table and snapshot table, you can change table name by implementing `Phluxor\Persistence\RdbmsSchemaInterface`.  
 
 ```php
 <?php
 
 declare(strict_types=1);
 
-namespace Phluxor\Persistence\Mysql;
+namespace Phluxor\Persistence;
 
-interface SchemaInterface
+interface RdbmsSchemaInterface
 {
     public function journalTableName(): string;
 
