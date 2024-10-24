@@ -2,16 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Phluxor\Persistence\PgSql;
+namespace Phluxor\Persistence;
 
 use Closure;
 use Google\Protobuf\Internal\Message;
+
 use PDO;
-use PDOException;
-use Phluxor\Persistence\Envelope;
-use Phluxor\Persistence\ProviderStateInterface;
-use Phluxor\Persistence\RdbmsProvider;
-use Phluxor\Persistence\SnapshotResult;
+use Psr\Log\LoggerInterface;
 use ReflectionException;
 use Swoole\Database\PDOProxy;
 use Symfony\Component\Uid\Ulid;
@@ -19,10 +16,47 @@ use Symfony\Component\Uid\Ulid;
 use function json_encode;
 
 /**
- * persistence provider for postgresql
+ * persistence provider for mysql
  */
-readonly class PgSqlProvider extends RdbmsProvider
+readonly class RdbmsProvider implements ProviderStateInterface, ProviderInterface
 {
+    public function __construct(
+        protected PDOProxy $connection,
+        protected RdbmsSchemaInterface $schema,
+        protected int $snapshotInterval,
+        protected LoggerInterface $logger
+    ) {
+    }
+
+    /**
+     * @return string
+     */
+    protected function selectColumns(): string
+    {
+        return implode(
+            ',',
+            [
+                $this->schema->id(),
+                $this->schema->payload(),
+                $this->schema->sequenceNumber(),
+                $this->schema->actorName(),
+            ]
+        );
+    }
+
+    /**
+     * @param Closure(PDOProxy): bool $callback
+     * @return void
+     */
+    protected function executeTx(Closure $callback): void
+    {
+        $conn = $this->connection;
+        $conn->reset();
+        $conn->beginTransaction();
+        $result = $callback($conn);
+        $result === false ? $conn->rollBack() : $conn->commit();
+    }
+
     /**
      * @param string $actorName
      * @param int $eventIndexStart
@@ -33,7 +67,6 @@ readonly class PgSqlProvider extends RdbmsProvider
      */
     public function getEvents(string $actorName, int $eventIndexStart, int $eventIndexEnd, Closure $callback): void
     {
-        /** @var PDO $conn */
         $conn = $this->connection;
         $conn->beginTransaction();
         $query = sprintf(
@@ -61,7 +94,7 @@ readonly class PgSqlProvider extends RdbmsProvider
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
         $conn->commit();
         foreach ($rows as $row) {
-            $env = new Envelope(stream_get_contents($row['payload']));
+            $env = new Envelope($row['payload']);
             $callback($env->message());
         }
     }
@@ -77,7 +110,6 @@ readonly class PgSqlProvider extends RdbmsProvider
         $msg = new \Phluxor\Persistence\Message($event);
         $this->executeTx(function (PDOProxy $conn) use ($msg, $eventIndex, $actorName) {
             try {
-                /** @var \PDO $conn */
                 $stmt = $conn->prepare(
                     sprintf(
                         'INSERT INTO %s (%s) VALUES (?, ?, ?, ?)',
@@ -85,22 +117,31 @@ readonly class PgSqlProvider extends RdbmsProvider
                         $this->selectColumns()
                     )
                 );
-                $ulid = (string)(new Ulid());
-                $encoded = json_encode($msg);
-                $stmt->bindParam(1, $ulid);
-                $stmt->bindParam(2, $encoded, \PDO::PARAM_LOB);
-                $stmt->bindParam(3, $eventIndex);
-                $stmt->bindParam(4, $actorName);
-                $result = $stmt->execute();
+                $result = $stmt->execute([
+                    (string)(new Ulid()),
+                    json_encode($msg),
+                    $eventIndex,
+                    $actorName,
+                ]);
                 if ($result === false) {
                     $this->logger->error('Failed to insert event', ['actor' => $actorName]);
                 }
                 return $result;
-            } catch (PDOException $e) {
+            } catch (\PDOException $e) {
                 $this->logger->error('error on persistenceEvent', ['actor' => $actorName, 'error' => $e->getMessage()]);
                 return false;
             }
         });
+    }
+
+    public function restart(): void
+    {
+        $this->connection->reconnect();
+    }
+
+    public function getSnapshotInterval(): int
+    {
+        return $this->snapshotInterval;
     }
 
     /**
@@ -110,7 +151,6 @@ readonly class PgSqlProvider extends RdbmsProvider
      */
     public function getSnapshot(string $actorName): SnapshotResult
     {
-        /** @var PDO $conn */
         $conn = $this->connection;
         $conn->beginTransaction();
         $stmt = $conn->prepare(
@@ -124,11 +164,12 @@ readonly class PgSqlProvider extends RdbmsProvider
         );
         $stmt->execute([$actorName]);
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
-        $conn->commit();
         if ($row === false) {
+            $conn->commit();
             return new SnapshotResult(null, 0, false);
         }
-        $env = new Envelope(stream_get_contents($row['payload']));
+        $conn->commit();
+        $env = new Envelope($row['payload']);
         return new SnapshotResult($env->message(), $row['sequence_number'], true);
     }
 
@@ -150,18 +191,17 @@ readonly class PgSqlProvider extends RdbmsProvider
                         $this->selectColumns()
                     )
                 );
-                $ulid = (string)(new Ulid());
-                $encoded = json_encode($msg);
-                $stmt->bindParam(1, $ulid);
-                $stmt->bindParam(2, $encoded, PDO::PARAM_LOB);
-                $stmt->bindParam(3, $snapshotIndex);
-                $stmt->bindParam(4, $actorName);
-                $result = $stmt->execute();
+                $result = $stmt->execute([
+                    (string)(new Ulid()),
+                    json_encode($msg),
+                    $snapshotIndex,
+                    $actorName,
+                ]);
                 if ($result === false) {
                     $this->logger->error('Failed to insert snapshot', ['actor' => $actorName]);
                 }
                 return $result;
-            } catch (PDOException $e) {
+            } catch (\PDOException $e) {
                 $this->logger->error(
                     'error on persistenceSnapshot',
                     ['actor' => $actorName, 'error' => $e->getMessage()]
@@ -169,5 +209,10 @@ readonly class PgSqlProvider extends RdbmsProvider
                 return false;
             }
         });
+    }
+
+    public function getState(): ProviderStateInterface
+    {
+        return $this;
     }
 }

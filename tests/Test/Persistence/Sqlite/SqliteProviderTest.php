@@ -1,41 +1,32 @@
 <?php
 
-namespace Test\Persistence\PgSql;
+declare(strict_types=1);
+
+namespace Test\Persistence\Sqlite;
 
 use Google\Protobuf\Internal\Message;
+use PDO;
 use Phluxor\ActorSystem;
-use Phluxor\Persistence\PgSql\Connection;
-use Phluxor\Persistence\PgSql\DefaultSchema;
-use Phluxor\Persistence\PgSql\Dsn;
-use Phluxor\Persistence\PgSql\PgSqlProvider;
+use Phluxor\Persistence\Sqlite\Connection;
+use Phluxor\Persistence\Sqlite\DefaultSchema;
+use Phluxor\Persistence\Sqlite\SqliteProvider;
 use PHPUnit\Framework\TestCase;
-
 use Test\Persistence\ProtoBuf\UserCreated;
 
 use function Swoole\Coroutine\run;
 
-class PgSqlProviderTest extends TestCase
+class SqliteProviderTest extends TestCase
 {
-    private Dsn $dsn;
-
-    protected function setUp(): void
-    {
-        $this->dsn = new Dsn(
-            '127.0.0.1',
-            5432,
-            'sample',
-            'postgres',
-            'postgres'
-        );
-    }
+    private const string SQLITE_DB_PATH = '../../../sqlite/data/data.db';
 
     public function tearDown(): void
     {
         run(function () {
             go(function () {
-                $conn = new \PDO((string)$this->dsn, $this->dsn->username, $this->dsn->password);
-                $conn->exec('TRUNCATE journals;');
-                $conn->exec('TRUNCATE snapshots;');
+                $path = $this->sqlitePath();
+                $conn = new PDO("sqlite:$path");
+                $conn->exec('DELETE FROM journals;');
+                $conn->exec('DELETE FROM snapshots;');
                 $conn = null;
             });
         });
@@ -45,13 +36,15 @@ class PgSqlProviderTest extends TestCase
     {
         run(function () {
             go(function () {
-                $provider = $this->pgsqlProvider();
+                $provider = $this->sqliteProvider();
                 $event = new UserCreated([
                     'userID' => 'test',
                     'userName' => 'test',
                     'email' => '',
                 ]);
-                $provider->persistenceEvent('user', 1, $event);
+                for($i = 0; $i < 400; $i++) {
+                    $provider->persistenceEvent('user', $i, $event);
+                }
                 $processed = false;
                 $provider->getEvents('user', 1, 4, function (Message $e) use (&$processed) {
                     $this->assertInstanceOf(UserCreated::class, $e);
@@ -62,7 +55,7 @@ class PgSqlProviderTest extends TestCase
                 });
                 $this->assertTrue($processed);
                 $processed = false;
-                $provider->getEvents('user', 1, 0, function (Message $e) use (&$processed) {
+                $provider->getEvents('user', 399, 400, function (Message $e) use (&$processed) {
                     $this->assertInstanceOf(UserCreated::class, $e);
                     $this->assertSame('test', $e->getUserName());
                     $this->assertSame('test', $e->getUserID());
@@ -78,7 +71,7 @@ class PgSqlProviderTest extends TestCase
     {
         run(function () {
             go(function () {
-                $provider = $this->pgsqlProvider();
+                $provider = $this->sqliteProvider();
                 $event = new UserCreated([
                     'userID' => 'test',
                     'userName' => 'test',
@@ -95,6 +88,8 @@ class PgSqlProviderTest extends TestCase
                 $this->assertNull($result->getSnapshot());
                 $processed = false;
                 $provider->getEvents('user', 1, 0, function (Message $e) use (&$processed) {
+                    // should not be called
+                    // journal is empty
                     $processed = true;
                 });
                 $this->assertFalse($processed);
@@ -102,12 +97,19 @@ class PgSqlProviderTest extends TestCase
         });
     }
 
-    private function pgsqlProvider(): PgSqlProvider
+    private function sqlitePath(): string
     {
-        $conn = new Connection(
-            $this->dsn
-        );
-        return new PgSqlProvider(
+        $path = realpath(__DIR__ . DIRECTORY_SEPARATOR . self::SQLITE_DB_PATH);
+        if(!$path) {
+            throw new \RuntimeException();
+        }
+        return $path;
+    }
+
+    private function sqliteProvider(): SqliteProvider
+    {
+        $conn = new Connection($this->sqlitePath());
+        return new SqliteProvider(
             $conn->proxy(),
             new DefaultSchema(),
             3,
