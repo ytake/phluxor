@@ -6,7 +6,7 @@ namespace Phluxor\Persistence\PgSql;
 
 use Phluxor\Persistence\RdbmsSchemaInterface;
 
-class DefaultRdbmsSchema implements RdbmsSchemaInterface
+class DefaultSchema implements RdbmsSchemaInterface
 {
     public function __construct(
         private string $journalTable = 'journals',

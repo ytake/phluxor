@@ -1,8 +1,8 @@
-# Phluxor PostgreSQL Persistence Adapter
+# Phluxor SQLite Persistence Adapter
 
-persisting Phluxor actor state to a PostgreSQL database.  
+persisting Phluxor actor state to a SQLite database.  
 
-This package provides a PostgreSQL persistence layer for Phluxor.
+This package provides a SQLite persistence layer for Phluxor.
 
 ## Usage
 
@@ -53,7 +53,7 @@ class PersistenceActor implements ActorInterface
 }
 ```
 
-use `Phluxor\Persistence\PgSql\PgSqlProvider`.
+use `Phluxor\Persistence\Sqlite\SqliteProvider`.
 
 ```php
 
@@ -65,10 +65,9 @@ namespace Example\Persistence;
 
 use Phluxor\ActorSystem;
 use Phluxor\Persistence\EventSourcedBehavior;
-use Phluxor\Persistence\PgSql\Connection;
-use Phluxor\Persistence\PgSql\DefaultSchema;
-use Phluxor\Persistence\PgSql\Dsn;
-use Phluxor\Persistence\PgSql\PgSqlProvider;
+use Phluxor\Persistence\Sqlite\Connection;
+use Phluxor\Persistence\Sqlite\DefaultSchema;
+use Phluxor\Persistence\Sqlite\SqliteProvider;
 use Psr\Log\LoggerInterface;
 use Test\Persistence\ProtoBuf\TestMessage;
 
@@ -84,7 +83,7 @@ class SampleSystem
                 $props = ActorSystem\Props::fromProducer(fn() => new PersistenceActor(),
                     ActorSystem\Props::withReceiverMiddleware(
                         new EventSourcedBehavior(
-                            $this->pgsqlProvider($system->getLogger(), 3)
+                            $this->sqliteProvider($system->getLogger(), 3)
                         )
                     ));
                 $ref = $system->root()->spawnNamed($props, 'test.actor');
@@ -93,19 +92,12 @@ class SampleSystem
         });
     }
 
-    private function pgsqlProvider(
+    private function sqliteProvider(
         LoggerInterface $logger,
         int $snapshotInterval
-    ): PgSqlProvider {
-        $conn = new Connection(
-            new Dsn(
-                '127.0.0.1',
-                3306,
-                'sample',
-                'user',
-                'passw@rd'
-            ));
-        return new PgSqlProvider(
+    ): SqliteProvider {
+        $conn = new Connection($this->sqlitePath());
+        return new SqliteProvider(
             $conn->proxy(),
             new DefaultSchema(),
             $snapshotInterval,
@@ -117,35 +109,32 @@ class SampleSystem
 
 # Default table schema
 
-use ULID as id(varchar(26)) and BYTEA as payload.  
+use ULID as id(varchar(26)) and json as payload.  
 
 see [Default Schema](DefaultSchema.php)
 
 ```sql
 CREATE TABLE journals
 (
-    id              VARCHAR(26) NOT NULL,
-    payload         BYTEA NOT NULL,
-    sequence_number BIGINT,
-    actor_name      VARCHAR(255),
-    created_at      TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (id),
+    id              TEXT NOT NULL PRIMARY KEY,
+    payload         BLOB NOT NULL,
+    sequence_number INTEGER NOT NULL,
+    actor_name      TEXT NOT NULL,
+    created_at      TEXT NOT NULL DEFAULT (DATETIME('now', 'localtime')),
     UNIQUE (id),
     UNIQUE (actor_name, sequence_number)
 );
 
 CREATE TABLE snapshots
 (
-    id              VARCHAR(26) NOT NULL,
-    payload         BYTEA NOT NULL,
-    sequence_number BIGINT,
-    actor_name      VARCHAR(255),
-    created_at      TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (id),
+    id              TEXT NOT NULL PRIMARY KEY,
+    payload         BLOB NOT NULL,
+    sequence_number INTEGER NOT NULL,
+    actor_name      TEXT NOT NULL,
+    created_at      TEXT NOT NULL DEFAULT (DATETIME('now', 'localtime')),
     UNIQUE (id),
     UNIQUE (actor_name, sequence_number)
 );
-
 ```
 
 ## change table name

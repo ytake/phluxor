@@ -117,7 +117,7 @@ class SampleSystem
 
 # Default table schema
 
-use ULID as id(varchar(26)) and json as payload.  
+use ULID as id(varchar(26)) and BYTEA as payload.  
 
 see [Default Schema](DefaultSchema.php)
 

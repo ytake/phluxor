@@ -25,10 +25,11 @@ jobs:
           coverage: none
       - name: Validate composer.json and composer.lock
         run: composer validate
-
       - name: Install dependencies
         run: composer install --prefer-dist --no-progress --no-suggest
       - name: build container
         run: docker compose -f ./tests/compose.yaml up -d
+      - name: sqlite3
+        run: sqlite3 ./tests/sqlite/data/data.db < ./tests/sqlite/create.sql
       - name: Execute tests
         run: composer tests
