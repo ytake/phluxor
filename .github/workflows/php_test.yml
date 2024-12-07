@@ -11,17 +11,19 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        php-versions: ['8.3']
-        swooles: ['swoole']
-    name: PHP ${{ matrix.php-versions }} Test
+        phps: [
+          {version: '8.3', swoole: 'swoole-5.1.6'},
+          {version: '8.4', swoole: 'swoole-6.0.0'}
+        ]
+    name: PHP ${{ matrix.phps.version }} Test
     steps:
       - uses: actions/checkout@v4
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: ${{ matrix.php-versions }}
-          extensions: ${{ matrix.swooles }}
+          php-version: ${{ matrix.phps.version }}
+          extensions: ${{ matrix.phps.swoole }}
           coverage: none
       - name: Validate composer.json and composer.lock
         run: composer validate

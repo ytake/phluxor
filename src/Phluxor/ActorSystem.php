@@ -17,7 +17,6 @@ use Phluxor\ActorSystem\RootContext;
 use Phluxor\ActorSystem\Strategy\SupervisorEvent;
 use Phluxor\EventStream\EventStream;
 use Phluxor\Value\ContextExtensions;
-use PascalDeVink\ShortUuid\ShortUuid;
 use Ramsey\Uuid\Uuid;
 use RuntimeException;
 use Swoole\Coroutine\Channel;
