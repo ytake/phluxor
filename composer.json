@@ -27,7 +27,6 @@
     "monolog/monolog": "^3.8.1",
     "open-telemetry/opentelemetry": "^1.0.0",
     "open-telemetry/context-swoole": "^1.0.1",
-    "pascaldevink/shortuuid": "^4.0.0",
     "php-http/httplug": "^2.4",
     "psr/log": "^3.0",
     "ramsey/uuid": "^4.7.5",
