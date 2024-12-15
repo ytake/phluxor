@@ -9,7 +9,8 @@ use Phluxor\ActorSystem\Context\ContextInterface;
 use Phluxor\ActorSystem\Context\ReceiverInterface;
 use Phluxor\ActorSystem\Context\ReceiverPartInterface;
 use Phluxor\ActorSystem\Message\MessageEnvelope;
-use Phluxor\Persistence\Message\ReplayComplete;
+use Phluxor\Persistence\Message\OfferSnapshot;
+use Phluxor\Persistence\Message\ReplayCompleted;
 use Phluxor\Persistence\Message\RequestSnapshot;
 use RuntimeException;
 
@@ -58,19 +59,26 @@ trait Mixin
         $result = $this->providerState->getSnapshot($this->name());
         if ($result->isOk()) {
             $this->eventIndex = $result->getEventIndex();
-            $this->receiver->receive(new MessageEnvelope(header: null, message: $result->getSnapshot()));
+            $messageEnvelope = new MessageEnvelope(header: null, message: $result->getSnapshot());
+            $this->receiver->receive($messageEnvelope);
+            $offerSnapshot = new OfferSnapshot($result->getSnapshot());
+            $this->receiveRecover($offerSnapshot);
         }
         $this->providerState->getEvents(
             $this->name(),
             $this->eventIndex,
             0,
             function (mixed $event) use ($receiver) {
-                $this->receiver->receive(new MessageEnvelope(header: null, message: $event));
+                $messageEnvelope = new MessageEnvelope(header: null, message: $event);
+                $this->receiver->receive($messageEnvelope);
+                $this->receiveRecover($messageEnvelope->getMessage());
                 $this->eventIndex++;
             }
         );
         $this->recovering = false;
-        $this->receiver->receive(new MessageEnvelope(header: null, message: new ReplayComplete()));
+        $messageEnvelope = new MessageEnvelope(header: null, message: new ReplayCompleted());
+        $this->receiver->receive($messageEnvelope);
+        $this->receiveRecover($messageEnvelope->getMessage());
     }
 
     public function persistenceReceive(Message $message): void
@@ -92,5 +100,15 @@ trait Mixin
     public function name(): string
     {
         return $this->name;
+    }
+
+    /**
+     * @param mixed $message
+     * @return void
+     */
+    public function receiveRecover(
+        mixed $message
+    ): void {
+        // Implement this method
     }
 }
