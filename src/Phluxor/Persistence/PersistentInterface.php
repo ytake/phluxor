@@ -32,4 +32,12 @@ interface PersistentInterface
     public function recovering(): bool;
 
     public function name(): string;
+
+    /**
+     * @param mixed $message
+     * @return void
+     */
+    public function receiveRecover(
+        mixed $message
+    ): void;
 }
