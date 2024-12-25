@@ -88,7 +88,7 @@ class PersistenceTest extends TestCase
                 });
                 $props = ActorSystem\Props::fromProducer(fn() => $this->receiveRecoverActor(),
                     ActorSystem\Props::withReceiverMiddleware(
-                        new EventSourcedBehavior(new InMemoryStateProvider(new InMemoryProvider(2)))
+                        new EventSourcedBehavior(new InMemoryStateProvider(new InMemoryProvider(1)))
                     ));
                 $ref = $system->root()->spawnNamed($props, 'test.actor');
                 $this->assertNull($ref->isError());
@@ -147,6 +147,67 @@ class PersistenceTest extends TestCase
                         break;
                     case $msg instanceof Query:
                         $context->respond($this->state);
+                        break;
+                    case $msg instanceof Messages:
+                        $context->respond($this->receiveRecoverMessages);
+                        break;
+                }
+            }
+
+            public function receiveRecover(mixed $message): void
+            {
+                $this->receiveRecoverMessages[] = get_debug_type($message);
+            }
+        };
+    }
+
+    // snapshot取得を実行してもSenderが上書きされないことを確認
+    public function testReceiveRecoverySender(): void
+    {
+        run(function () {
+            go(function () {
+                $system = ActorSystem::create();
+                $props = ActorSystem\Props::fromProducer(fn() => $this->receiveRecoverActorSender(),
+                    ActorSystem\Props::withReceiverMiddleware(
+                        new EventSourcedBehavior(new InMemoryStateProvider(new InMemoryProvider(1)))
+                    ));
+                $ref = $system->root()->spawnNamed($props, 'test.actor');
+                $system->root()->requestFuture($ref->getRef(), new TestMessage(['message' => 'hello3']), 1);
+                $system->root()->requestFuture($ref->getRef(), new TestMessage(['message' => 'hello3']), 1);
+                $system->root()->requestFuture($ref->getRef(), new TestMessage(['message' => 'hello3']), 1);
+                $system->root()->requestFuture($ref->getRef(), new TestMessage(['message' => 'hello3']), 1);
+                $system->root()->requestFuture($ref->getRef(), new TestMessage(['message' => 'hello3']), 1);
+                $s = $system->root()->poisonFuture($ref->getRef())?->wait();
+                $ref = $system->root()->spawnNamed($props, 'test.actor');
+                $r = $system->root()->requestFuture($ref->getRef(), new TestMessage(['message' => 'hello3']), 1);
+                $this->assertSame('ok', $r->result()->value());
+                $r = $system->root()->requestFuture($ref->getRef(), new TestMessage(['message' => 'hello3']), 1);
+                $this->assertSame('ok', $r->result()->value());
+            });
+        });
+    }
+
+    private function receiveRecoverActorSender(): ActorSystem\Message\ActorInterface
+    {
+        return new class() implements ActorSystem\Message\ActorInterface, PersistentInterface {
+            use Mixin;
+
+            private string $state = '';
+            /** @var string[] */
+            private array $receiveRecoverMessages = [];
+
+            public function receive(ActorSystem\Context\ContextInterface $context): void
+            {
+                $msg = $context->message();
+                switch (true) {
+                    case $msg instanceof RequestSnapshot:
+                        $this->persistenceSnapshot(new TestSnapshot(['message' => $this->state]));
+                        break;
+                    case $msg instanceof TestMessage:
+                        if (!$this->recovering()) {
+                            $this->persistenceReceive($msg);
+                        }
+                        $context->respond('ok');
                         break;
                     case $msg instanceof Messages:
                         $context->respond($this->receiveRecoverMessages);

@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace Phluxor\Persistence;
 
 use Google\Protobuf\Internal\Message;
+use Phluxor\ActorSystem\ActorContext;
 use Phluxor\ActorSystem\Context\ContextInterface;
 use Phluxor\ActorSystem\Context\ReceiverInterface;
 use Phluxor\ActorSystem\Context\ReceiverPartInterface;
 use Phluxor\ActorSystem\Message\MessageEnvelope;
+use Phluxor\ActorSystem\Ref;
 use Phluxor\Persistence\Message\OfferSnapshot;
 use Phluxor\Persistence\Message\ReplayCompleted;
 use Phluxor\Persistence\Message\RequestSnapshot;
@@ -85,9 +87,19 @@ trait Mixin
     {
         $this->providerState?->persistenceEvent($this->name(), $this->eventIndex, $message);
         if ($this->eventIndex % $this->providerState?->getSnapshotInterval() === 0) {
-            $this->receiver->receive(
-                new MessageEnvelope(header: null, message: new RequestSnapshot())
-            );
+            $envelope = new MessageEnvelope(header: null, message: new RequestSnapshot());
+            if($this->receiver instanceof ActorContext) {
+                $sender = $this->receiver->sender();
+                // if the sender is set in the context, do not rewrite the sender
+                if ($sender instanceof Ref) {
+                    $envelope = new MessageEnvelope(
+                        header: null,
+                        message: new RequestSnapshot(),
+                        sender: $sender
+                    );
+                }
+            };
+            $this->receiver->receive($envelope);
         }
         $this->eventIndex++;
     }
