@@ -20,6 +20,25 @@ PHP 8.3 と swooleが必要です。
 メッセージのシリアライズには、Protocol Buffersを利用します。  
 他のシリアライズフォーマットはまだサポートされていません。
 
+```mermaid
+sequenceDiagram
+    participant A as Actor A
+    participant B as Actor B
+    participant C as Actor C
+
+    A->>B: Message(Data X)
+    Note over B: B processes the received message, updates internal state,<br> and prepares the next message
+    B->>C: Message(Data Y)
+    Note over C: C processes the message from B.<br>Meanwhile, A or other actors can progress with separate tasks.
+
+    par Concurrent Execution
+        A->>C: Another Message(Data Z)
+        C->>B: Result Message(Computed W)
+    and
+        B->>A: State Report(State S)
+    end
+```
+
 ## Installation
 
 ```bash

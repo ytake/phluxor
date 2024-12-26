@@ -10,6 +10,7 @@ use Phluxor\ActorSystem\Message\ActorInterface;
 use Phluxor\ActorSystem\Message\MessageEnvelope;
 use Phluxor\Metrics\ActorMetrics;
 use Phluxor\Metrics\PhluxorMetrics;
+use Phluxor\Persistence\Message\RequestSnapshot;
 use Phluxor\Stack\SinglyLinkedList;
 use Phluxor\Value\ContextExtensionId;
 use Phluxor\Value\ExtensionInterface;
@@ -324,8 +325,12 @@ class ActorContext implements
     {
         $this->messageOrEnvelope = $envelope;
         $this->defaultReceive();
-        // release message
-        $this->messageOrEnvelope = null;
+        if ($envelope !== null) {
+            $messageType = $envelope->getMessage();
+            if (!$messageType instanceof RequestSnapshot) {
+                $this->messageOrEnvelope = null;
+            }
+        }
     }
 
     public function defaultReceive(): void
