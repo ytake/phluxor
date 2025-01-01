@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Phluxor\ActorSystem;
 
-use function array_key_exists;
-
 class ConcurrentMap
 {
     /** @var ConcurrentMapShared[] */
@@ -16,7 +14,7 @@ class ConcurrentMap
     public function __construct()
     {
         for ($i = 0; $i < self::SHARD_COUNT; $i++) {
-            $this->map[] = new ConcurrentMapShared();
+            $this->map[$i] = new ConcurrentMapShared();
         }
     }
 
@@ -27,9 +25,6 @@ class ConcurrentMap
     public function getShard(string $key): ConcurrentMapShared
     {
         $shardIndex = $this->fnv32($key) % self::SHARD_COUNT;
-        if (!array_key_exists($shardIndex, $this->map)) {
-            return new ConcurrentMapShared();
-        }
         return $this->map[$shardIndex];
     }
 
@@ -92,14 +87,13 @@ class ConcurrentMap
      */
     public function fnv32(string $key): int
     {
-        $hash = 2166136261;
-        $prime32 = 16777619;
-        $keyLength = strlen($key);
-        for ($i = 0; $i < $keyLength; $i++) {
-            $hash *= $prime32;
-            $hash = (int) $hash;
+        $hash = 0x811c9dc5;     // FNV offset basis (32bit)
+        $prime32 = 0x01000193; // FNV prime (32bit)
+        $len = strlen($key);
+        for ($i = 0; $i < $len; $i++) {
             $hash ^= ord($key[$i]);
+            $hash = ($hash * $prime32) & 0xffffffff;
         }
-        return (int) $hash & 0xffffffff;
+        return $hash;
     }
 }

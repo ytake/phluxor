@@ -25,21 +25,14 @@ class Queue
     public function push(mixed $item): void
     {
         $this->lock->lock();
-        $this->content->overrideTail(($this->content->getTail() + 1) % $this->content->getMod());
-        if ($this->content->getTail() === $this->content->getHead()) {
-            $fillFactor = 2;
-            $newLen = $this->content->getMod() * $fillFactor;
-            $newBuff = array_fill(0, $newLen, null);
-            for ($i = 0; $i < $this->content->getMod(); $i++) {
-                $buffIndex = ($this->content->getTail() + $i) % $this->content->getMod();
-                $newBuff[$i] = $this->content->getBuffer()[$buffIndex];
-            }
-            $mod = $this->content->getMod();
-            $this->content = new RingBuffer(initialSize: $newLen, head: 0);
-            $this->content->replaceBuffer($newBuff);
-            $this->content->overrideTail($mod);
+        $newTail = ($this->content->getTail() + 1) % $this->content->getMod();
+        if ($newTail === $this->content->getHead()) {
+            $this->grow();
+            $newTail = ($this->content->getTail() + 1) % $this->content->getMod();
         }
+        $this->content->overrideTail($newTail);
         $this->content->add($this->content->getTail(), $item);
+
         $this->len->add(1);
         $this->lock->unlock();
     }
@@ -54,10 +47,6 @@ class Queue
         return $this->length() === 0;
     }
 
-    /**
-     * single consumer
-     * @return QueueResult
-     */
     public function pop(): QueueResult
     {
         if ($this->isEmpty()) {
@@ -65,10 +54,14 @@ class Queue
         }
 
         $this->lock->lock();
-        $this->content->overrideHead(($this->content->getHead() + 1) % $this->content->getMod());
-        $result = $this->content->getBuffer()[$this->content->getHead()];
-        $this->content->add($this->content->getHead(), null);
+        $newHead = ($this->content->getHead() + 1) % $this->content->getMod();
+        $result = $this->content->getBuffer()[$newHead];
+        $this->content->add($newHead, null);
+
+        $this->content->overrideHead($newHead);
+
         $this->len->sub(1);
+        $this->maybeShrink();
         $this->lock->unlock();
 
         return new QueueResult($result, true);
@@ -79,23 +72,81 @@ class Queue
         if ($this->isEmpty()) {
             return new QueueResult(null, false);
         }
-
         $this->lock->lock();
-        if ($count >= $this->len->get()) {
-            $count = $this->len->get();
+        $avail = $this->len->get();
+        if ($count >= $avail) {
+            $count = $avail;
         }
 
-        $this->len->sub($count);
         $buffer = [];
-
         for ($i = 0; $i < $count; $i++) {
             $pos = ($this->content->getHead() + 1 + $i) % $this->content->getMod();
             $buffer[] = $this->content->getBuffer()[$pos];
+            // nullクリア
             $this->content->add($pos, null);
         }
+        $this->content->overrideHead(
+            ($this->content->getHead() + $count) % $this->content->getMod()
+        );
 
-        $this->content->overrideHead(($this->content->getHead() + $count) % $this->content->getMod());
+        $this->len->sub($count);
+        $this->maybeShrink();
+
         $this->lock->unlock();
+
         return new QueueResult($buffer, true);
+    }
+
+    /**
+     * grow the ring buffer
+     * @return void
+     */
+    private function grow(): void
+    {
+        $oldMod = $this->content->getMod();
+        $newMod = $oldMod * 2;
+        $newBuffer = array_fill(0, $newMod, null);
+
+        $currentSize = $this->len->get();
+        for ($i = 0; $i < $currentSize; $i++) {
+            $oldPos = ($this->content->getHead() + 1 + $i) % $oldMod;
+            $newBuffer[$i + 1] = $this->content->getBuffer()[$oldPos];
+        }
+        $this->content->replaceBuffer($newBuffer, $newMod);
+        $this->content->overrideHead(0);
+        $this->content->overrideTail($currentSize);
+    }
+
+    /**
+     * shrink the ring buffer if the usage ratio is less than 25%
+     * @return void
+     */
+    private function maybeShrink(): void
+    {
+        $oldMod = $this->content->getMod();
+        if ($oldMod <= 4) {
+            return;
+        }
+
+        $currentSize = $this->len->get();
+        $usageRatio = $currentSize / $oldMod;
+        if ($usageRatio < 0.25) {
+            $newMod = (int)($oldMod / 2);
+            // 最小限 currentSize は入る必要があるのでそれ以下にはしない
+            if ($newMod < $currentSize + 1) {
+                return;
+            }
+
+            $newBuffer = array_fill(0, $newMod, null);
+
+            // headの次から順に currentSize 分だけコピー
+            for ($i = 0; $i < $currentSize; $i++) {
+                $oldPos = ($this->content->getHead() + 1 + $i) % $oldMod;
+                $newBuffer[$i + 1] = $this->content->getBuffer()[$oldPos];
+            }
+            $this->content->replaceBuffer($newBuffer, $newMod);
+            $this->content->overrideHead(0);
+            $this->content->overrideTail($currentSize);
+        }
     }
 }

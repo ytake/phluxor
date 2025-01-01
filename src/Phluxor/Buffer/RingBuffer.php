@@ -8,7 +8,7 @@ use function array_fill;
 
 final class RingBuffer
 {
-    /** @var array array<int, mixed> */
+    /** @var array<int, mixed> $buffer */
     private array $buffer;
     private int $mod;
 
@@ -26,21 +26,23 @@ final class RingBuffer
         $this->mod = $initialSize;
     }
 
+    /**
+     * @return array<int, mixed>
+     */
     public function getBuffer(): array
     {
         return $this->buffer;
     }
 
     /**
-     * Replaces the current buffer with a new buffer.
-     *
-     * @param array $newBuffer array<int, mixed> The new buffer to replace the current buffer with.
-     *
+     * @param array<int, mixed> $newBuffer
+     * @param int $newMod
      * @return void
      */
-    public function replaceBuffer(array $newBuffer): void
+    public function replaceBuffer(array $newBuffer, int $newMod): void
     {
         $this->buffer = $newBuffer;
+        $this->mod = $newMod;
     }
 
     public function getMod(): int
@@ -61,11 +63,6 @@ final class RingBuffer
     public function add(int $offer, mixed $item): void
     {
         $this->buffer[$offer] = $item;
-    }
-
-    public function removeBuffer(int $index): void
-    {
-        unset($this->buffer[$index]);
     }
 
     public function overrideHead(int $head): void

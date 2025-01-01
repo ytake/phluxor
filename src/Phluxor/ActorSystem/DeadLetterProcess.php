@@ -79,7 +79,7 @@ readonly class DeadLetterProcess implements ProcessInterface
             if ($message instanceof DeadLetterEvent) {
                 if (!$message->isNoSender()) {
                     $this->actorSystem->root()->send(
-                        $message->getSender(),
+                        $message->sender,
                         new ActorSystem\ProtoBuf\DeadLetterResponse()
                     );
                 }
@@ -88,9 +88,9 @@ readonly class DeadLetterProcess implements ProcessInterface
                         $this->actorSystem->getLogger()->info(
                             "deadletter",
                             [
-                                "message" => $message->getMessage(),
-                                "sender" => (string) $message->getSender(),
-                                "pid" => (string) $message->getRef()
+                                "message" => $message->message,
+                                "sender" => (string) $message->sender,
+                                "pid" => (string) $message->ref
                             ]
                         );
                     }
@@ -99,14 +99,14 @@ readonly class DeadLetterProcess implements ProcessInterface
         });
         $this->actorSystem->getEventStream()?->subscribe(function (mixed $message) {
             if ($message instanceof DeadLetterEvent) {
-                $m = $message->getMessage();
+                $m = $message->message;
                 if ($m instanceof ActorSystem\ProtoBuf\Watch) {
                     if ($m->getWatcher() != null) {
                         $pid = new Ref($m->getWatcher());
                         $pid->sendSystemMessage(
                             $this->actorSystem,
                             new ActorSystem\ProtoBuf\Terminated([
-                                "who" => $message->getRef(),
+                                "who" => $message->ref,
                                 'why' => ActorSystem\ProtoBuf\TerminatedReason::NotFound
                             ])
                         );

@@ -9,21 +9,16 @@ namespace Phluxor\ActorSystem;
  */
 readonly class DeadLetterEvent
 {
+    /**
+     * @param Ref|null $ref
+     * @param mixed $message
+     * @param Ref|null $sender
+     */
     public function __construct(
-        private Ref|null $pid,
-        private mixed $message,
-        private Ref|null $sender,
+        public Ref|null $ref,
+        public mixed $message,
+        public Ref|null $sender,
     ) {
-    }
-
-    public function getMessage(): mixed
-    {
-        return $this->message;
-    }
-
-    public function getSender(): Ref|null
-    {
-        return $this->sender;
     }
 
     public function isNoSender(): bool
@@ -31,13 +26,8 @@ readonly class DeadLetterEvent
         return $this->sender === null;
     }
 
-    public function getRef(): Ref|null
-    {
-        return $this->pid;
-    }
-
     public function isNoPid(): bool
     {
-        return $this->pid === null;
+        return $this->ref === null;
     }
 }
