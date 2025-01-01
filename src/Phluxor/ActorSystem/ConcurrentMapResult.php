@@ -7,8 +7,8 @@ namespace Phluxor\ActorSystem;
 readonly class ConcurrentMapResult
 {
     public function __construct(
-        private mixed $value,
-        private bool $exists
+        public mixed $value,
+        public bool $exists
     ) {
     }
 

@@ -89,7 +89,7 @@ class ProcessRegistryValue
     {
         $bucket = $this->localPIDs->getBucket($pid->protobufPid()->getId());
         $ref = $bucket->pop($pid->protobufPid()->getId());
-        $value = $ref->getValue();
+        $value = $ref->value;
         if ($value instanceof ActorProcess) {
             $value->dead()->set(1);
         }
@@ -116,10 +116,10 @@ class ProcessRegistryValue
         }
         $bucket = $this->localPIDs->getBucket($pid->protobufPid()->getId());
         $value = $bucket->get($pid->protobufPid()->getId());
-        if (!$value->exists()) {
+        if (!$value->exists) {
             return new ProcessRegistryResult($this->actorSystem->getDeadLetter(), false);
         }
-        return new ProcessRegistryResult($value->getValue(), true);
+        return new ProcessRegistryResult($value->value, true);
     }
 
     /**
@@ -130,10 +130,10 @@ class ProcessRegistryValue
     {
         $bucket = $this->localPIDs->getBucket($id);
         $value = $bucket->get($id);
-        if (!$value->exists()) {
+        if (!$value->exists) {
             return new ProcessRegistryResult($this->actorSystem->getDeadLetter(), false);
         }
-        return new ProcessRegistryResult($value->getValue(), true);
+        return new ProcessRegistryResult($value->value, true);
     }
 
     public function getAddress(): string

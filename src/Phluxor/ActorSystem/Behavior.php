@@ -86,7 +86,7 @@ class Behavior implements ActorInterface
         $this->behaviors[] = $receive;
     }
 
-    private function pop(): ReceiveFunction
+    private function pop(): ?ReceiveFunction
     {
         $behavior = null;
         $length = $this->len();

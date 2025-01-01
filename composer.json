@@ -32,7 +32,8 @@
     "ramsey/uuid": "^4.7.5",
     "symfony/cache": "^7.0",
     "symfony/uid": "^7.0",
-    "brick/math": "^0.12"
+    "brick/math": "^0.12",
+    "ext-gmp": "*"
   },
   "require-dev": {
     "phpunit/phpunit": "^10.5.11",
