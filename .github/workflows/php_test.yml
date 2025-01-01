@@ -34,4 +34,4 @@ jobs:
       - name: sqlite3
         run: sqlite3 ./tests/sqlite/data/data.db < ./tests/sqlite/create.sql
       - name: Execute tests
-        run: ./vendor/bin/phpunit --debug
+        run: ./vendor/bin/phpunit

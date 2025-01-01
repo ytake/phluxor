@@ -24,7 +24,6 @@ class ConcurrentMapTest extends TestCase
     }
 
     /**
-     * @covers \Phluxor\ActorSystem\ConcurrentMap::getShard
      * Test that getShard returns the same shard for identical keys.
      */
     public function testGetShardConsistency(): void
@@ -36,7 +35,6 @@ class ConcurrentMapTest extends TestCase
     }
 
     /**
-     * @covers \Phluxor\ActorSystem\ConcurrentMap::getShard
      * Test shard retrieval with different keys.
      */
     public function testGetShardWithDifferentKeys(): void
@@ -48,7 +46,6 @@ class ConcurrentMapTest extends TestCase
     }
 
     /**
-     * @covers \Phluxor\ActorSystem\ConcurrentMap::getShard
      * Test shard retrieval with edge cases such as empty and special characters.
      */
     public function testGetShardWithEdgeCases(): void
@@ -61,7 +58,6 @@ class ConcurrentMapTest extends TestCase
     }
 
     /**
-     * @covers \Phluxor\ActorSystem\ConcurrentMap::getShard
      * Test that getShard always returns an instance of ConcurrentMapShared.
      */
     public function testGetShardReturnsValidInstance(): void
