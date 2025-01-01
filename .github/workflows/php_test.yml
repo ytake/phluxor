@@ -10,9 +10,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
     strategy:
+      max-parallel: 1
       matrix:
         phps: [
-          #{version: '8.3', swoole: 'swoole-5.1.6'},
+          {version: '8.3', swoole: 'swoole-6.0.0'},
           {version: '8.4', swoole: 'swoole-6.0.0'}
         ]
     name: PHP ${{ matrix.phps.version }} Test
@@ -34,4 +35,4 @@ jobs:
       - name: sqlite3
         run: sqlite3 ./tests/sqlite/data/data.db < ./tests/sqlite/create.sql
       - name: Execute tests
-        run: composer tests
+        run: ./vendor/bin/phpunit

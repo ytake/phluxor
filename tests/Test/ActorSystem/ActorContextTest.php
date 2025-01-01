@@ -82,7 +82,6 @@ class ActorContextTest extends TestCase
 
                 $this->assertSame(1, $count);
             });
-            $this->assertTrue(true);
         });
     }
 
