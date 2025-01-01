@@ -25,9 +25,7 @@ class SliceMap
         // GMP版 MurmurHash3(32bit)
         $hash32 = $this->murmurHash3_32_GMP($key);
 
-        // PHPのintにキャスト (0～2^32-1の範囲)
-        // ただし PHP は符号付き64ビットintなので、2^31を超えると負数になる点に注意
-        // 「常に正の値が欲しい」場合は下記のような対処もあり：
+        // other implementation
         // if (gmp_cmp($hash32, gmp_init('0x80000000')) >= 0) {
         //     $index = gmp_intval(gmp_sub($hash32, gmp_init('4294967296')));
         // } else {
@@ -73,7 +71,6 @@ class SliceMap
                 | ((ord($key[$i + 3]) & 0xff) << 24),
                 10
             );
-
             // k1 *= c1
             $k1 = self::gmpAnd32(gmp_mul($k1, $c1));
             // k1 = rotateLeft(k1, 15)
@@ -128,15 +125,13 @@ class SliceMap
         $h1 = gmp_xor($h1, self::gmpShiftRight($h1, 13));
         $h1 = self::gmpAnd32(gmp_mul($h1, gmp_init('0xc2b2ae35', 16)));
         $h1 = gmp_xor($h1, self::gmpShiftRight($h1, 16));
-
-        // 32bitにマスク
-        $h1 = self::gmpAnd32($h1);
-
-        return $h1;
+        return self::gmpAnd32($h1);
     }
 
     /**
-     * gmpで32ビットマスクをかける (val & 0xffffffff)
+     * gmp 32bit  (val & 0xffffffff)
+     * @param GMP $val
+     * @return GMP
      */
     private static function gmpAnd32(GMP $val): GMP
     {
@@ -149,31 +144,34 @@ class SliceMap
     }
 
     /**
-     * gmpで32ビット rotate-left
+     * gmp 32bit rotate-left
+     * @param GMP $val
+     * @param int $shift
+     * @return GMP
      */
     private static function gmpRotl32(GMP $val, int $shift): GMP
     {
-        // 32ビットにマスクしてから回転
         $shift = $shift & 31;
         $val = self::gmpAnd32($val);
-
-        // left-shift部
         $ls = gmp_mul($val, gmp_init(2 ** $shift, 10));
         $ls = self::gmpAnd32($ls);
-
-        // right-shift部
+        // right-shift
         $rsShift = 32 - $shift;
         // $val >> (32-$shift)
         $rs = self::gmpShiftRight($val, $rsShift);
-
         // OR
         return gmp_or($ls, $rs);
     }
 
     /**
-     * gmpで論理右シフト(符号を維持しない右シフト)
+     * gmp 32bit shift-right
+     * subtract 2^$shift
      *
-     * - PHPの算術シフトと違い、GMPなので自力で 2^$shift で割る。
+     * gmpで論理右シフト(符号を維持しない右シフト)
+     * PHPの算術シフトと違い、GMPなので自力で 2^$shift
+     * @param GMP $val
+     * @param int $shift
+     * @return GMP
      */
     private static function gmpShiftRight(GMP $val, int $shift): GMP
     {
