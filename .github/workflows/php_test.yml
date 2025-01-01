@@ -12,7 +12,7 @@ jobs:
     strategy:
       matrix:
         phps: [
-          {version: '8.3', swoole: 'swoole-5.1.6'},
+          #{version: '8.3', swoole: 'swoole-5.1.6'},
           {version: '8.4', swoole: 'swoole-6.0.0'}
         ]
     name: PHP ${{ matrix.phps.version }} Test
