@@ -10,6 +10,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     strategy:
+      max-parallel: 1
       matrix:
         phps: [
           {version: '8.3', swoole: 'swoole-6.0.0'},
