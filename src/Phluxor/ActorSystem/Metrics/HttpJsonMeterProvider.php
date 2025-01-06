@@ -8,7 +8,6 @@ use Http\Discovery\Psr17FactoryDiscovery;
 use OpenTelemetry\API\Globals;
 use OpenTelemetry\API\Instrumentation\Configurator;
 use OpenTelemetry\Context\Context;
-use OpenTelemetry\Context\ContextStorage;
 use OpenTelemetry\Contrib\Context\Swoole\SwooleContextStorage;
 use OpenTelemetry\Contrib\Otlp\ContentTypes;
 use OpenTelemetry\Contrib\Otlp\MetricExporter;
@@ -71,7 +70,7 @@ class HttpJsonMeterProvider implements ProviderInterface
     public function provide(): MeterProviderInterface
     {
         // Use Swoole context storage
-        Context::setStorage(new SwooleContextStorage(new ContextStorage()));
+        Context::setStorage(new SwooleContextStorage(Context::storage()));
         $transport = new PsrTransportFactory(
             $this->transportClient(),
             Psr17FactoryDiscovery::findRequestFactory(),

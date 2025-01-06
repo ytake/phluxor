@@ -85,7 +85,13 @@ class RootContext implements
     {
         $this->spawnMiddleware = makeSpawnMiddlewareChain(
             $middleware,
-            new ActorSystem\Spawner\SpawnFunction()
+            function (
+                ActorSystem $actorSystem,
+                string $id,
+                Props $props,
+            ): SpawnResult {
+                return $props->spawn($actorSystem, $id, $this);
+            }
         );
         return $this;
     }
@@ -227,15 +233,15 @@ class RootContext implements
      */
     public function spawnNamed(Props $props, string $name): SpawnResult
     {
-        $rt = $this;
+        $rootContext = $this;
         if ($props->getGuardianStrategy() != null) {
-            $rt = $rt->copy()->withGuardian($props->getGuardianStrategy());
+            $rootContext = $this->copy()->withGuardian($props->getGuardianStrategy());
         }
-        if ($rt->spawnMiddleware != null) {
-            $call = $rt->spawnMiddleware;
-            return $call($this->actorSystem, $name, $props, $rt);
+        if ($rootContext->spawnMiddleware != null) {
+            $spawnMiddleware = $this->spawnMiddleware;
+            return $spawnMiddleware($this->actorSystem, $name, $props, $rootContext);
         }
-        return $props->spawn($this->actorSystem, $name, $rt);
+        return $props->spawn($this->actorSystem, $name, $rootContext);
     }
 
     /**

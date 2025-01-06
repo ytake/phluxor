@@ -67,12 +67,12 @@ class ActorContext implements
     public function ensureExtras(): ActorContextExtras
     {
         if ($this->extras == null) {
-            $ctxd = $this;
+            $ctx = $this;
             if ($this->props != null && $this->props->contextDecoratorChain() != null) {
                 $c = $this->props->contextDecoratorChain();
-                $ctxd = $c($this);
+                $ctx = $c($this);
             }
-            $this->extras = new ActorContextExtras($ctxd);
+            $this->extras = new ActorContextExtras($ctx);
         }
         return $this->extras;
     }
@@ -391,8 +391,9 @@ class ActorContext implements
         if ($this->self != null) {
             $id = $this->self->protobufPid()->getId();
         }
-        if ($this->props->spawnMiddlewareChain() != null) {
-            $r = $this->props->spawnMiddlewareChain()($this->actorSystem, sprintf("%s/%s", $id, $name), $props, $this);
+        $chain = $this->props->spawnMiddlewareChain();
+        if ($chain != null) {
+            $r = $chain($this->actorSystem, sprintf("%s/%s", $id, $name), $props, $this);
         } else {
             $r = $props->spawn($this->actorSystem, sprintf("%s/%s", $id, $name), $this);
         }

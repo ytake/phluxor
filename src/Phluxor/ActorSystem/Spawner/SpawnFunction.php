@@ -10,7 +10,7 @@ use Phluxor\ActorSystem\Props;
 use Phluxor\ActorSystem\SpawnFunctionInterface;
 use Phluxor\ActorSystem\SpawnResult;
 
-class SpawnFunction implements SpawnFunctionInterface
+readonly class SpawnFunction implements SpawnFunctionInterface
 {
     /**
      * @param ActorSystem $actorSystem

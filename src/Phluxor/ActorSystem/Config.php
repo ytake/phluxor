@@ -133,8 +133,9 @@ class Config
      * @param ActorSystem\Metrics\ProviderInterface $metricsProvider
      * @return Config
      */
-    public function setMetricsProvider(ActorSystem\Metrics\ProviderInterface $metricsProvider): Config
-    {
+    public function setMetricsProvider(
+        ActorSystem\Metrics\ProviderInterface $metricsProvider
+    ): Config {
         $this->metricsProvider = $metricsProvider->provide();
         return $this;
     }
