@@ -11,14 +11,4 @@ readonly class ConcurrentMapResult
         public bool $exists
     ) {
     }
-
-    public function getValue(): mixed
-    {
-        return $this->value;
-    }
-
-    public function exists(): bool
-    {
-        return $this->exists;
-    }
 }

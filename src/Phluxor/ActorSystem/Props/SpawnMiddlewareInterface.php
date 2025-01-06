@@ -4,15 +4,16 @@ declare(strict_types=1);
 
 namespace Phluxor\ActorSystem\Props;
 
+use Closure;
 use Phluxor\ActorSystem\SpawnFunctionInterface;
 
 interface SpawnMiddlewareInterface
 {
     /**
-     * @param SpawnFunctionInterface $next
-     * @return SpawnFunctionInterface
+     * @param Closure|SpawnFunctionInterface $next
+     * @return Closure|SpawnFunctionInterface
      */
     public function __invoke(
-        SpawnFunctionInterface $next
-    ): SpawnFunctionInterface;
+        Closure|SpawnFunctionInterface $next
+    ): Closure|SpawnFunctionInterface;
 }

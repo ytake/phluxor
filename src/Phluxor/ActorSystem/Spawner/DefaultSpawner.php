@@ -34,6 +34,7 @@ class DefaultSpawner implements ActorSystem\SpawnFunctionInterface
             props: $props,
             parent: $parentContext->self()
         );
+        $context->incarnateActor();
         $mailbox = $props->produceMailbox();
 
         $this->prepareMailboxMetrics($actorSystem, $mailbox, $context);
@@ -50,7 +51,7 @@ class DefaultSpawner implements ActorSystem\SpawnFunctionInterface
             );
         }
         $context->setSelf($addResult->getRef());
-        $props->initialize($context);
+        $props->initialize($props, $context);
         $mailbox->registerHandlers($context, $dispatcher);
         $mailbox->postSystemMessage(new ActorSystem\Message\Started());
         $mailbox->start();

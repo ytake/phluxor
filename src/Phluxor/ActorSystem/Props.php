@@ -66,6 +66,8 @@ class Props
     /** @var Closure(ReceiverInterface|ContextInterface, MessageEnvelope): void|ReceiverFunctionInterface|null */
     private Closure|ReceiverFunctionInterface|null $receiverMiddlewareChain = null;
 
+    private readonly ActorSystem\Spawner\DefaultSpawner $defaultSpawner;
+
     /**
      * @param ProducerWithActorSystemInterface|Closure(ActorSystem): ActorInterface $producer
      * @param ActorSystem\Props\ContextDecoratorInterface[] $contextDecorator
@@ -75,6 +77,7 @@ class Props
         private array $contextDecorator = [],
     ) {
         $this->producer = $producer;
+        $this->defaultSpawner = new ActorSystem\Spawner\DefaultSpawner();
     }
 
     public function getDispatcher(): DispatcherInterface
@@ -107,7 +110,7 @@ class Props
     public function getSpawner(): Closure|SpawnFunctionInterface
     {
         if ($this->spawner == null) {
-            return new ActorSystem\Spawner\DefaultSpawner();
+            return $this->defaultSpawner;
         }
         return $this->spawner;
     }
@@ -142,15 +145,25 @@ class Props
     }
 
     /**
+     * default spawner for creating actors
+     * @return Spawner\DefaultSpawner
+     */
+    public function getDefaultSpawner(): ActorSystem\Spawner\DefaultSpawner
+    {
+        return $this->defaultSpawner;
+    }
+
+    /**
+     * @param Props $props
      * @param ActorContext $ctx
      * @return void
      */
-    public function initialize(ActorContext $ctx): void
+    public function initialize(Props $props, ActorContext $ctx): void
     {
-        if (count($this->onInit) == 0) {
+        if (count($props->onInit) == 0) {
             return;
         }
-        foreach ($this->onInit as $init) {
+        foreach ($props->onInit as $init) {
             $init($ctx);
         }
     }
@@ -172,8 +185,8 @@ class Props
     }
 
     /**
-     * @deprecated
      * @return Closure(ContextInterface): ContextInterface|ContextDecoratorFunctionInterface|null
+     * @deprecated
      */
     public function getContextDecoratorChain(): Closure|ContextDecoratorFunctionInterface|null
     {
@@ -205,7 +218,7 @@ class Props
                 fn($reason) => Directive::Restart
             );
         }
-         return $this->supervisorStrategy;
+        return $this->supervisorStrategy;
     }
 
     /**
@@ -220,7 +233,7 @@ class Props
     }
 
     /**
-     * @param ProducerInterface|Closure(): ActorInterface  $producer
+     * @param ProducerInterface|Closure(): ActorInterface $producer
      * @return Closure(Props): void
      */
     public static function withProducer(ProducerInterface|Closure $producer): Closure
@@ -371,7 +384,7 @@ class Props
                 $props->spawnMiddleware,
                 function (ActorSystem $actorSystem, string $id, Props $props, SpawnerInterface $context): SpawnResult {
                     if ($props->spawner == null) {
-                        $defaultSpawner = new ActorSystem\Spawner\DefaultSpawner();
+                        $defaultSpawner = $props->defaultSpawner;
                         return $defaultSpawner($actorSystem, $id, $props, $context);
                     }
                     $spawner = $props->spawner;

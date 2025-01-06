@@ -10,8 +10,13 @@ use Phluxor\ActorSystem\Props;
 use Phluxor\ActorSystem\SpawnFunctionInterface;
 use Phluxor\ActorSystem\SpawnResult;
 
-class SpawnFunction implements SpawnFunctionInterface
+readonly class SpawnFunction implements SpawnFunctionInterface
 {
+    public function __construct(
+        private ActorSystem\RootContext $rootContext
+    ) {
+
+    }
     /**
      * @param ActorSystem $actorSystem
      * @param string $id
@@ -25,6 +30,6 @@ class SpawnFunction implements SpawnFunctionInterface
         Props $props,
         Context\SpawnerInterface $parentContext
     ): SpawnResult {
-        return $props->spawn($actorSystem, $id, $parentContext);
+        return $props->spawn($actorSystem, $id, $this->rootContext);
     }
 }

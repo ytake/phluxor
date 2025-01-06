@@ -55,7 +55,7 @@ class Config
 
         $wg = new WaitGroup();
         $wg->add(1);
-        $spawner = new ActorSystem\Spawner\DefaultSpawner();
+        $spawner = $props->getDefaultSpawner();
         if ($config->routerType() == RouterType::GroupRouterType) {
             $ref = $spawner(
                 $actorSystem,
