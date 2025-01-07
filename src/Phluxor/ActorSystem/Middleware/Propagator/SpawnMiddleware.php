@@ -15,10 +15,13 @@ class SpawnMiddleware implements SpawnMiddlewareInterface
 {
     /** @var SpawnMiddlewareInterface[] */
     private array $spawnMiddleware = [];
+
     /** @var SenderMiddlewareInterface[] */
     private array $senderMiddleware = [];
+
     /** @var ReceiverMiddlewareInterface[] */
     private array $receiverMiddleware = [];
+
     /** @var ContextDecoratorInterface[] */
     private array $contextDecorators = [];
 

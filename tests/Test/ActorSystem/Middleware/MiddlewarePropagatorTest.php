@@ -17,7 +17,6 @@ use function Swoole\Coroutine\run;
 class MiddlewarePropagatorTest extends TestCase
 {
     private int $spawnCounter = 0;
-    private ?ActorSystem\Message\ReceiveFunction $starFunc = null;
 
     public function testMiddlewarePropagator(): void
     {
